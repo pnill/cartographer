@@ -29,7 +29,7 @@ real32 __cdecl player_control_get_field_of_view(uint32 user_index)
 {
 	const s_player_control* player_control_info = player_control_get(user_index);
 
-	float result = observer_suggested_field_of_view();
+	float result = observer_default_field_of_view();
 
 	if (player_control_info->unit_datum_index != NONE)
 	{

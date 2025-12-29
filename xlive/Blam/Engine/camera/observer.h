@@ -116,7 +116,7 @@ void observer_update(real32 dt);
 void __cdecl observer_validate_camera_command(s_observer_command* observer_command);
 
 // Gets the FOV value for the observer camera
-real32 observer_suggested_field_of_view(void);
+real32 observer_default_field_of_view(void);
 
 // Sets the FOV value for the observer camera
 void observer_set_suggested_field_of_view(real32 fov);

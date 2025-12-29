@@ -3,12 +3,14 @@
 
 #include "render.h"
 
+#include "camera/observer.h"
 #include "math/matrix_math.h"
+#include "rasterizer/rasterizer_globals.h"
 #include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
 
 /* prototypes */
 
-void __cdecl render_camera_build_projection_static(render_camera* camera, real_rectangle2d* frustum_bounds, render_projection* out_projection);
+static void __cdecl render_camera_build_projection_static(render_camera* camera, real_rectangle2d* frustum_bounds, render_projection* out_projection);
 
 /* public code */
 
@@ -40,7 +42,9 @@ void __cdecl render_camera_build_projection_static(render_camera* camera, real_r
 	{
 		if (profile_settings->static_first_person)
 		{
-			camera->vertical_field_of_view = DEGREES_TO_RADIANS(64.f) * 0.78500003f;
+			// Should really be 70 but something is different with the way h2v calculates fov and does projection
+			const real32 ratio = 16.f / 9.f;
+			camera->vertical_field_of_view = arctangent(tangent(DEGREES_TO_RADIANS(78) / 2.f) / ratio, 1.f) * 2.f;
 		}
 	}
 	
@@ -159,8 +163,64 @@ bool render_camera_world_to_screen(
 	return within_screen_bounds;
 }
 
-void __cdecl render_camera_build(render_camera* camera, s_observer_result* result, int16* a3, int16* a4)
+void render_camera_build(
+	render_camera* camera,
+	const s_observer_result* observer,
+	const point2d* view_size,
+	const point2d* view_array_size)
 {
-	INVOKE(0x194E75, 0x0, render_camera_build, camera, result, a3, a4);
+	//INVOKE(0x194E75, 0x0, render_camera_build, camera, result, a3, a4);
+	ASSERT(camera);
+
+	if (observer)
+	{
+		real32 fov_scale = 0.785f;
+		camera->point = observer->position;
+		camera->forward = observer->forward;
+		camera->up = observer->up;
+		camera->vertical_field_of_view = observer->vertical_field_of_view;
+		camera->scale = observer->scale;
+
+		ASSERT(camera->vertical_field_of_view < _pi - _real_epsilon);
+		ASSERT(camera->vertical_field_of_view > _real_epsilon);
+
+		if (view_size && view_array_size)
+		{
+			const int32 val = 100 * view_size->x * view_array_size->y / (view_array_size->x * view_size->y);
+			if (val == 200)
+			{
+				fov_scale = 0.5f;
+			}
+			else if (val == 50)
+			{
+				fov_scale = 0.8f;
+			}
+		}
+
+		camera->vertical_field_of_view *= fov_scale;
+		camera->scale *= fov_scale;
+		ASSERT(camera->vertical_field_of_view < _pi - _real_epsilon);
+		ASSERT(camera->vertical_field_of_view > _real_epsilon);
+
+	}
+	else
+	{
+		camera->point = *global_origin3d;
+		camera->forward = *global_forward3d;
+		camera->up = *global_up3d;
+		
+		const real32 ratio = 4.f / 3.f;
+		camera->vertical_field_of_view = arctangent(tangent(observer_default_field_of_view() * 0.5f) / ratio, 1.f) * 2.f;
+		camera->scale = 1.f;
+		
+		ASSERT(camera->vertical_field_of_view < _pi - _real_epsilon);
+		ASSERT(camera->vertical_field_of_view > _real_epsilon);
+	}
+
+	camera->mirrored = false;
+	rasterizer_get_z_planes(&camera->z_near, &camera->z_far);
+	camera->enlarge_view = false;
+	ASSERT(camera->vertical_field_of_view < _pi - _real_epsilon);
+	ASSERT(camera->vertical_field_of_view > _real_epsilon);
 	return;
 }

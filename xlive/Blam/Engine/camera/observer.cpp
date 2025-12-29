@@ -122,7 +122,7 @@ void __cdecl observer_validate_camera_command(s_observer_command* observer_comma
 	return;
 }
 
-real32 observer_suggested_field_of_view(void)
+real32 observer_default_field_of_view(void)
 {
 	return *Memory::GetAddress<real32*>(0x413780, 0x3B5300);
 }

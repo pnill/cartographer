@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "rasterizer_globals.h"
 
-#include "shell/shell.h"
-
 /* public code */
 
 s_rasterizer_globals* rasterizer_globals_get(void)
@@ -36,5 +34,16 @@ void rasterizer_get_screen_and_frame_bounds(rectangle2d* screen_bounds, rectangl
 {
 	rasterizer_get_screen_bounds(screen_bounds);
 	rasterizer_get_frame_bounds(frame_bounds);
+	return;
+}
+
+void rasterizer_get_z_planes(real32* z_near, real32* z_far)
+{
+	s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
+
+	ASSERT(z_near && z_far);
+
+	*z_near = rasterizer_globals->clipping_parameters.z_near;
+	*z_far = rasterizer_globals->clipping_parameters.z_far;
 	return;
 }

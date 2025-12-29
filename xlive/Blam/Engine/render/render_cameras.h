@@ -1,5 +1,4 @@
 #pragma once
-#include "camera/observer.h"
 
 struct render_camera
 {
@@ -15,7 +14,7 @@ struct render_camera
 	real32 z_near;
 	real32 z_far;
 	real_plane3d mirror_plane;
-	bool tiled;
+	bool enlarge_view;
 	int8 pad1[3];
 	real32 unk_floats[3];
 	bool bool_2;
@@ -67,4 +66,8 @@ bool render_camera_world_to_screen(
 	const real_point3d* view_point,
 	real_point2d* screen_point);
 
-void __cdecl render_camera_build(render_camera* camera, s_observer_result* result, int16* a3, int16* a4);
+void render_camera_build(
+	render_camera* camera,
+	const struct s_observer_result* observer,
+	const point2d* view_size,
+	const point2d* view_array_size);

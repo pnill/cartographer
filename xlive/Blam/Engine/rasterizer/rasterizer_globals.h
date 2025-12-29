@@ -132,3 +132,5 @@ void rasterizer_get_screen_bounds(rectangle2d* screen_bounds);
 void rasterizer_get_frame_bounds(rectangle2d* frame_bounds);
 
 void rasterizer_get_screen_and_frame_bounds(rectangle2d* screen_bounds, rectangle2d* frame_bounds);
+
+void rasterizer_get_z_planes(real32* z_near, real32* z_far);

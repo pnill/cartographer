@@ -138,7 +138,7 @@ void __cdecl main_render_player_view(void)
 	rasterizer_get_screen_and_frame_bounds(
 		&window->rasterizer_camera.viewport_bounds,
 		&window->rasterizer_camera.window_bounds);
-	render_camera_build(&window->rasterizer_camera, 0, 0, 0);
+	render_camera_build(&window->rasterizer_camera, NULL, NULL, NULL);
 
 	if (!debug_render_freeze || window->single_view)
 	{
@@ -165,7 +165,7 @@ void __cdecl main_render_previous_backbuffer(int32 a1, int32 a2)
 		&g_window_bounds[0].rasterizer_camera.viewport_bounds,
 		&g_window_bounds[0].rasterizer_camera.window_bounds);
 
-	render_camera_build(&g_window_bounds[0].rasterizer_camera, 0, 0, 0);
+	render_camera_build(&g_window_bounds[0].rasterizer_camera, NULL, NULL, NULL);
 	
 	if (!debug_render_freeze || g_window_bounds[0].single_view)
 	{

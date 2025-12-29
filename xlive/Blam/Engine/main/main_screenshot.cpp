@@ -306,7 +306,7 @@ bool __cdecl screenshot_render(window_bound* window)
 							if (tiled)
 							{
 								const int32 vertical_offset = screenshot_globals->resolution_multiplier - vertical_tile_num - 1;
-								window->rasterizer_camera.tiled = true;
+								window->rasterizer_camera.enlarge_view = true;
 								window->rasterizer_camera.unk_floats[0] = (unk_num * screen_size_per_tile) - 1.f;
 								window->rasterizer_camera.unk_floats[1] = ((2 * vertical_offset + 1) * screen_size_per_tile) - 1.f;
 								window->rasterizer_camera.unk_floats[2] = screen_size_per_tile;
