@@ -517,6 +517,7 @@ inline real32 tangent(real32 x)
 	{
 		fld x
 		fptan
+		fstp st(0)
 		fstp result
 	}
 
