@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "new_hud.h"
 
-#include "camera/camera.h"
 #include "game/game.h"
 #include "interface/hud.h"
 #include "interface/new_hud_definitions.h"
 #include "main/main_screenshot.h"
 #include "networking/logic/life_cycle_manager.h"
+#include "render/render.h"
 
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Modules/Shell/Config.h"
@@ -123,7 +123,7 @@ bool __cdecl render_ingame_chat_check(void)
 real_point2d* __cdecl ui_get_hud_element_position_hook(e_hud_anchor anchor, real_point2d* point)
 {
 	real32 safe_area = *Memory::GetAddress<real32*>(0x9770F0);
-	render_camera* global_camera = get_global_camera();
+	s_render* render = render_get();
 
 	real32 scale_factor = *get_secondary_hud_scale();
 
@@ -132,8 +132,8 @@ real_point2d* __cdecl ui_get_hud_element_position_hook(e_hud_anchor anchor, real
 	switch (anchor)
 	{
 	case _hud_anchor_weapon_hud:
-		point->x = (real32)global_camera->window_bounds.left + safe_area;
-		point->y = (real32)global_camera->window_bounds.top + (safe_area / scale_factor); // (100.f * scale_factor) - 100.f;
+		point->x = (real32)render->camera.window_bounds.left + safe_area;
+		point->y = (real32)render->camera.window_bounds.top + (safe_area / scale_factor); // (100.f * scale_factor) - 100.f;
 		break;
 	default:
 		INVOKE(0x223969, 0x0, ui_get_hud_element_position_hook, anchor, point);

@@ -5,11 +5,6 @@
 
 /* public code */
 
-render_camera* get_global_camera(void)
-{
-	return Memory::GetAddress<render_camera*>(0x4E66C8);
-}
-
 render_camera* get_effect_camera(void)
 {
 	return Memory::GetAddress<render_camera*>(0xA3DF88);

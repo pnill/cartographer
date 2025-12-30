@@ -20,11 +20,6 @@ void render_cameras_apply_patches(void)
 	return;
 }
 
-render_projection* global_projection_get(void)
-{
-	return Memory::GetAddress<render_projection*>(0x4E673C);
-}
-
 void __cdecl render_camera_build_projection(render_camera* camera,
 	real_rectangle2d* frustum_bounds,
 	render_projection* projection)

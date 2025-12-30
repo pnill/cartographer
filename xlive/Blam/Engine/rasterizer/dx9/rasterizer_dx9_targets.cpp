@@ -3,7 +3,6 @@
 
 #include "rasterizer_dx9_main.h"
 
-#include "camera/camera.h"
 #include "main/main_screenshot.h"
 #include "rasterizer/rasterizer_globals.h"
 
@@ -170,17 +169,17 @@ bool __cdecl rasterizer_dx9_set_render_target_internal(IDirect3DSurface9* target
 
 void __cdecl rasterizer_set_render_target_internal_hook_set_viewport(IDirect3DSurface9* target, IDirect3DSurface9* z_stencil, bool a3)
 {
-	const render_camera* global_camera = get_global_camera();
+	const s_render* render = render_get();
 
 	// NOTE: *ONLY* use this function for entire screen surfaces (e.g the backbuffer, a render target)
 
 	rasterizer_dx9_set_render_target_internal(target, z_stencil, a3);
 	D3DVIEWPORT9 vp =
 	{
-		(DWORD)global_camera->viewport_bounds.left,
-		(DWORD)global_camera->viewport_bounds.top,
-		(DWORD)rectangle2d_width(&global_camera->viewport_bounds),
-		(DWORD)rectangle2d_height(&global_camera->viewport_bounds),
+		(DWORD)render->camera.viewport_bounds.left,
+		(DWORD)render->camera.viewport_bounds.top,
+		(DWORD)rectangle2d_width(&render->camera.viewport_bounds),
+		(DWORD)rectangle2d_height(&render->camera.viewport_bounds),
 		0.f,
 		1.f
 	};

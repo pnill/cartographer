@@ -44,8 +44,6 @@ ASSERT_STRUCT_SIZE(render_projection, 192);
 
 void render_cameras_apply_patches(void);
 
-render_projection* global_projection_get(void);
-
 void __cdecl render_camera_build_projection(render_camera* camera,
 	real_rectangle2d* frustum_bounds,
 	render_projection* projection);

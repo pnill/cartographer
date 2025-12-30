@@ -93,12 +93,12 @@ void rasterizer_dx9_postprocess_scene(int32 render_layer_debug_view, bool lens_f
 			real32 brightness_calculation = (overbrightness + 1.0f) * (brightness * 0.5f);
 			brightness = PIN(brightness_calculation, 0.f, 1.f);
 			
-			s_scenario_fog_result* g_fog_result = global_fog_result_get();
+			const s_render* render = render_get();
 
-			if (g_fog_result->gamma_override > 0.f)
+			if (render->fog.gamma_override > 0.f)
 			{
-				bloom_threshold += ((g_fog_result->field_E4 - bloom_threshold) * g_fog_result->gamma_override);
-				brightness		+= ((g_fog_result->field_E8 - brightness) * g_fog_result->gamma_override);
+				bloom_threshold += ((render->fog.field_E4 - bloom_threshold) * render->fog.gamma_override);
+				brightness		+= ((render->fog.field_E8 - brightness) * render->fog.gamma_override);
 			}
 
 			// This logging doesn't seem to be setup properly in the base game?

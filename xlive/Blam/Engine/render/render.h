@@ -86,6 +86,26 @@ struct rasterizer_scene_begin_parameters
 };
 ASSERT_STRUCT_SIZE(rasterizer_scene_begin_parameters, 12);
 
+
+struct s_render
+{
+	render_camera camera;
+	render_projection projection;
+	int32 player_window_index;
+	int32 user_render_index;
+	int32 controller_render_index;
+	int32 leaf_index;
+	int32 cluster_index;
+	bool bsp_test_failed;
+	bool visible_sky_model;
+	int32 visible_sky_index;
+	s_scenario_fog_result fog;
+	bool unk_0;
+	uint32 render_light_flags;
+	bool __render_light_flags_are_enabled;
+	bool unk_1;
+};
+
 /* globals */
 
 extern bool render_lens_flares_enabled;
@@ -93,6 +113,8 @@ extern bool render_lens_flares_enabled;
 /* public code */
 
 void render_apply_patches(void);
+
+s_render* render_get(void);
 
 window_bound* get_user_window_bounds(int32 user_index);
 
@@ -119,8 +141,6 @@ int32 get_player_window_count(void);
 real32* hs_texture_camera_scale_get(void);
 
 bool* hs_texture_camera_view_get(void);
-
-s_scenario_fog_result* global_fog_result_get(void);
 
 int32* global_user_render_index_get(void);
 

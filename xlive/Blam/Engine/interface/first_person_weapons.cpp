@@ -3,7 +3,6 @@
 
 #include "animations/animation_definitions.h"
 #include "cache/cache_files.h"
-#include "camera/camera.h"
 #include "game/cheats.h"
 #include "game/game_globals.h"
 #include "items/weapons.h"
@@ -13,6 +12,7 @@
 #include "models/models.h"
 #include "models/render_model_definitions.h"
 #include "render/render_cameras.h"
+#include "render/render.h"
 #include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
 
 #include "units/units.h"
@@ -149,7 +149,7 @@ int32 __cdecl first_person_weapon_build_models(int32 user_index, datum unit_inde
 						}
 					}
 					real_matrix4x3 camera_matrix;
-					render_camera* global_camera = get_global_camera();
+					render_camera* global_camera = &render_get()->camera;
 					matrix4x3_from_point_and_vectors(&camera_matrix, &global_camera->point, &global_camera->forward, &global_camera->up);
 					if (TEST_BIT(first_person_data->flags, 2))
 					{

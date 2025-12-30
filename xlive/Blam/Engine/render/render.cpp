@@ -63,14 +63,6 @@ window_bound g_user_window_bounds[k_number_of_controllers]{};
 int32* get_global_window_out_cluster_index(int32 index);
 int32* get_global_window_out_leaf_index(int32 index);
 uint32* global_scene_rendered_count_get(void);
-int32* curent_window_bound_index_get(void);
-int32* global_cluster_index_get(void);
-int32* global_leaf_index_get(void);
-bool* global_bsp_test_failed_get(void);
-bool* global_sky_active_get(void);
-int32* global_sky_index_get(void);
-s_scenario_fog_result* global_fog_result_get(void);
-bool* global_byte_4E6938_get(void);
 
 void render_view(
 	real_rectangle2d* frustum_bounds,
@@ -113,6 +105,11 @@ void render_apply_patches(void)
 	PatchCall(Memory::GetAddress(0x190E45), main_time_frame_rate_display);
 #endif
 	return;
+}
+
+s_render* render_get(void)
+{
+	return Memory::GetAddress<s_render*>(0x4E66C8);
 }
 
 window_bound* get_user_window_bounds(int32 user_index)
@@ -173,11 +170,6 @@ real32* hs_texture_camera_scale_get(void)
 bool* hs_texture_camera_view_get(void)
 {
 	return Memory::GetAddress<bool*>(0x4F435C);
-}
-
-s_scenario_fog_result* global_fog_result_get(void)
-{
-	return Memory::GetAddress<s_scenario_fog_result*>(0x4E6818);
 }
 
 int32* global_user_render_index_get(void)
@@ -354,6 +346,8 @@ void __cdecl render_scene(
 	int32 effect_flag,
 	real32 depth_range)
 {
+	const s_render* render = render_get();
+
 	rasterizer_scene_begin_parameters parameters;
 	uint32* g_scene_rendered_count = global_scene_rendered_count_get();
 	parameters.scene_rendered_count = ++*g_scene_rendered_count;
@@ -524,12 +518,11 @@ render_layer_2:
 				submit_occlusion_tests(lens_flare_occlusion_test);
 			}
 
-			const s_scenario_fog_result* g_fog_result = global_fog_result_get();
 			if (render_layer_debug_view != 2 &&
 				*get_render_fog_enabled() &&
 				render_patchy_fog_enabled &&
 				effect_flag != 2 &&
-				!g_fog_result->field_96)
+				!render->fog.field_96)
 			{
 				rasterizer_dx9_perf_event_begin("patchy_fog", NULL);
 				render_patchy_fog(render_section_visibility_get_model_group_count() <= 0, true);
@@ -650,9 +643,7 @@ render_postprocess:
 		{
 			g_water_refraction_surface_updated = false;
 
-			const s_scenario_fog_result* g_fog_result = global_fog_result_get();
-
-			const bool water_enabled = !g_fog_result->camera_immersion_flags.test(_camera_immersion_disable_water_bit);
+			const bool water_enabled = !render->fog.camera_immersion_flags.test(_camera_immersion_disable_water_bit);
 			bool clear_target = false;
 
 			if (water_enabled)
@@ -679,9 +670,8 @@ render_widgets:
 				goto render_layer_2;
 			}
 
-			const s_scenario_fog_result* g_fog_result = global_fog_result_get();
 			rasterizer_dx9_perf_event_begin("patchy_fog", NULL);
-			if (g_fog_result->field_96)
+			if (render->fog.field_96)
 			{
 				render_patchy_fog(1, 1);
 			}
@@ -741,41 +731,6 @@ uint32* global_scene_rendered_count_get(void)
 	return Memory::GetAddress<uint32*>(0x4E6964);
 }
 
-int32* curent_window_bound_index_get(void)
-{
-	return Memory::GetAddress<int32*>(0x4E67FC);
-}
-
-int32* global_cluster_index_get(void)
-{
-	return Memory::GetAddress<int32*>(0x4E680C);
-}
-
-int32* global_leaf_index_get(void)
-{
-	return Memory::GetAddress<int32*>(0x4E6808);
-}
-
-bool* global_bsp_test_failed_get(void)
-{
-	return Memory::GetAddress<bool*>(0x4E6810);
-}
-
-bool* global_sky_active_get(void)
-{
-	return Memory::GetAddress<bool*>(0x4E6811);
-}
-
-int32* global_sky_index_get(void)
-{
-	return Memory::GetAddress<int32*>(0x4E6814);
-}
-
-bool* global_byte_4E6938_get(void)
-{
-	return Memory::GetAddress<bool*>(0x4E6938);
-}
-
 void render_view(
 	real_rectangle2d* frustum_bounds,
 	render_camera* rasterizer_camera,
@@ -788,7 +743,7 @@ void render_view(
 	int16 render_type,
 	int32 user_index,
 	int32 controller_index,
-	bool draw_sky,
+	bool sky_active,
 	int32 sky_index,
 	s_scenario_fog_result* fog,
 	int8 zero_1,
@@ -804,21 +759,20 @@ void render_view(
 
 	ASSERT(fog);
 	
-	*curent_window_bound_index_get() = window_bound_index;
-	*global_cluster_index_get() = cluster_index;
-	*global_leaf_index_get() = leaf_index;
-	*global_bsp_test_failed_get() = bsp_test_failed;
-	*global_user_render_index_get() = user_index;
-	*global_sky_active_get() = draw_sky;
-	*global_sky_index_get() = sky_index;
-	
-	*global_fog_result_get() = *fog;
-	*global_byte_4E6938_get() = false;
+	s_render* render = render_get();
+	render->player_window_index = window_bound_index;
+	render->cluster_index = cluster_index;
+	render->leaf_index = leaf_index;
+	render->bsp_test_failed = bsp_test_failed;
+	render->user_render_index = user_index;
+	render->controller_render_index = controller_index;
+	render->visible_sky_model = sky_active;
+	render->visible_sky_index = sky_index;
+	render->fog = *fog;
+	render->unk_0 = false;
+	render->camera = *render_camera;
 
-	struct render_camera* global_camera = get_global_camera();
-	*global_camera = *render_camera;
-
-	render_camera_build_projection(global_camera, frustum_bounds, global_projection_get());
+	render_camera_build_projection(&render->camera, frustum_bounds, &render->projection);
 	render_first_person();
 	render_sky_model();
 	render_lights();

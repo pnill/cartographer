@@ -33,10 +33,10 @@ void __cdecl render_submit_transparent_geometry(s_model_group_submit_data* model
 {
 	uint32 v1 = FLAG(_render_layer_active_camo);
 
-	s_scenario_fog_result* g_fog_result = global_fog_result_get();
-	if (g_fog_result->patchy_fog_tag_index != NONE && !g_fog_result->field_96)
+	const s_render* render = render_get();
+	if (render->fog.patchy_fog_tag_index != NONE && !render->fog.field_96)
 	{
-		real32 result = (g_fog_result->field_88.lower > g_fog_result->field_88.upper ? g_fog_result->field_88.lower : g_fog_result->field_88.upper);
+		real32 result = (render->fog.field_88.lower > render->fog.field_88.upper ? render->fog.field_88.lower : render->fog.field_88.upper);
 
 		if (result > 0.f)
 			v1 = FLAG(_render_layer_active_camo) | FLAG(_render_layer_selfibloomination);
@@ -92,9 +92,9 @@ void __cdecl render_submit_transparent_geometry(s_model_group_submit_data* model
 	render_scene_geometry(_collection_type_0, _render_layer_fog);
 	render_scene_geometry(_collection_type_0, _render_layer_active_camo);
 
-	if (g_fog_result->patchy_fog_tag_index != NONE && !g_fog_result->field_96)
+	if (render->fog.patchy_fog_tag_index != NONE && !render->fog.field_96)
 	{
-		real32 result = (g_fog_result->field_88.lower > g_fog_result->field_88.upper ? g_fog_result->field_88.lower : g_fog_result->field_88.upper);
+		real32 result = (render->fog.field_88.lower > render->fog.field_88.upper ? render->fog.field_88.lower : render->fog.field_88.upper);
 
 		if (result > 0.f)
 		{

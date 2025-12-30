@@ -299,9 +299,9 @@ void main_time_frame_rate_display(void)
 		char string[64];
 		csprintf(string, NUMBEROF(string), "[%.1f] %d", (real32)framerate_rounded, framerate_rounded);
 		
-		const render_camera* camera = get_global_camera();
-		const int16 width = rectangle2d_width(&camera->window_bounds);
-		const int16 height = rectangle2d_height(&camera->window_bounds);
+		const s_render* render = render_get();
+		const int16 width = rectangle2d_width(&render->camera.window_bounds);
+		const int16 height = rectangle2d_height(&render->camera.window_bounds);
 
 		rectangle2d rect;
 		rasterizer_get_screen_bounds(&rect);
@@ -330,9 +330,9 @@ void main_time_frame_rate_display(void)
 		rectangle2d rect;
 		rasterizer_get_frame_bounds(&rect);
 
-		const render_camera* camera = get_global_camera();
-		const int16 width = rectangle2d_width(&camera->window_bounds);
-		const int16 height = rectangle2d_height(&camera->window_bounds);
+		const s_render* render = render_get();
+		const int16 width = rectangle2d_width(&render->camera.window_bounds);
+		const int16 height = rectangle2d_height(&render->camera.window_bounds);
 
 		const int16 width_scale_factor = MAX(width / 640, 1);
 		const int16 height_scale_factor = MAX(height / 480, 1);

@@ -125,7 +125,7 @@ void motion_sensor_update_with_delta(real32 delta)
 //	// pulse might not be perfectly aligned
 //	offset_point->x = safe_area;
 //	// from bottom point
-//	offset_point->y = rectangle2d_height(&global_camera->window_bounds) + 8 - safe_area;
+//	offset_point->y = rectangle2d_height(&render->camera.window_bounds) + 8 - safe_area;
 //
 //	INVOKE(0x22C86F, 0x0, motion_sensor_render_update, local_player_index, a2, offset_point);
 //}
@@ -159,15 +159,14 @@ void __cdecl motion_sensor_draw_screen(int32 local_render_user_index, int32 unus
 
 void __cdecl motion_sensor_render_update(real_point2d* position, real32 pulse)
 {
-	render_camera* global_camera = get_global_camera();
+	const s_render* render = render_get();
+	position->x -= render->camera.viewport_bounds.left;
+	position->x -= render->camera.window_bounds.left;
+	position->x += ::abs(render->camera.viewport_bounds.left - render->camera.window_bounds.left);
 
-	position->x -= global_camera->viewport_bounds.left;
-	position->x -= global_camera->window_bounds.left;
-	position->x += ::abs(global_camera->viewport_bounds.left - global_camera->window_bounds.left);
-
-	position->y -= global_camera->viewport_bounds.top;
-	position->y -= global_camera->window_bounds.bottom;
-	position->y += (global_camera->window_bounds.bottom - global_camera->viewport_bounds.top);
+	position->y -= render->camera.viewport_bounds.top;
+	position->y -= render->camera.window_bounds.bottom;
+	position->y += (render->camera.window_bounds.bottom - render->camera.viewport_bounds.top);
 
 	INVOKE(0x284810, 0x0, motion_sensor_render_update, position, pulse);
 }

@@ -688,9 +688,10 @@ void __cdecl draw_hud_text_widget(uint32 local_render_user_index, s_new_hud_temp
 		new_hud_widget_anchor_calculate_point(text_widget->anchor, &anchor_point);
 
 		const point2d screen_offset = text_widget->screen_offsets[get_screen_split_type(local_render_user_index)];
+		const s_render* render = render_get();
 
-		real32 final_location_x = (((screen_offset.x + offset_result.x) * *get_primary_hud_scale()) * scale_result.x + anchor_point.x) - get_global_camera()->viewport_bounds.left;
-		real32 final_location_y = (((screen_offset.y + offset_result.y) * *get_primary_hud_scale()) * scale_result.y + anchor_point.y) - get_global_camera()->viewport_bounds.top;
+		real32 final_location_x = (((screen_offset.x + offset_result.x) * *get_primary_hud_scale()) * scale_result.x + anchor_point.x) - render->camera.viewport_bounds.left;
+		real32 final_location_y = (((screen_offset.y + offset_result.y) * *get_primary_hud_scale()) * scale_result.y + anchor_point.y) - render->camera.viewport_bounds.top;
 
 		real_point2d final_location{ final_location_x, final_location_y };
 
@@ -860,9 +861,9 @@ static void rasterizer_setup_2d_vertex_shader_user_interface_constants(void)
 	real_vector4d vc[5];
 	int16 width, height;
 
-	render_camera* global_camera = get_global_camera();
+	s_render* render = render_get();
 
-	rectangle2d screen_bounds = global_camera->viewport_bounds;
+	rectangle2d screen_bounds = render->camera.viewport_bounds;
 	width = rectangle2d_width(&screen_bounds);
 	height = rectangle2d_height(&screen_bounds);
 

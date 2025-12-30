@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "terminal.h"
 
-#include "camera/camera.h"
 #include "cseries/threads_windows.h"
 #include "interface/hud.h"
 #include "main/console.h"
@@ -9,6 +8,7 @@
 #include "memory/rockall_heap_manager.h"
 #include "rasterizer/rasterizer_text.h"
 #include "render/render_cameras.h"
+#include "render/render.h"
 #include "text/draw_string.h"
 #include "text/font_group.h"
 
@@ -265,7 +265,7 @@ void __cdecl terminal_draw(void)
 		const real32 g_hud_scale_secondary = *get_secondary_hud_scale();
 		const int16 line_height = (int16)font_get_line_height(_font_id_fixedsys_9);
 		const int16 font_size_scaled = (int16)((real32)line_height * g_hud_scale_secondary);
-		const render_camera* global_camera = get_global_camera();
+		const render_camera* global_camera = &render_get()->camera;
 
 		if (terminal_globals.input_state)
 		{
