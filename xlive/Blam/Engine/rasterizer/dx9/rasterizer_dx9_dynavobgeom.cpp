@@ -2,6 +2,7 @@
 #include "rasterizer_dx9_dynavobgeom.h"
 
 #include "rasterizer_dx9.h"
+#include "rasterizer_dx9_errors.h"
 #include "rasterizer_dx9_dynamic_geometry.h"
 #include "rasterizer_dx9_main.h"
 #include "rasterizer_dx9_shader_submit.h"
@@ -191,8 +192,13 @@ void rasterizer_dx9_dynamic_screen_geometry_draw(const rasterizer_dynamic_screen
 				ps_constants[5].k = (real32)(parameters->map1_to_2_blend_function == _framebuffer_blend_function_subtract);
 			}
 
-			draw_geometry = SUCCEEDED(global_d3d_device->SetPixelShader(dynavobgeom_pixel_shaders_get()[0]));
+			HRESULT hr;
+			rasterizer_dx9_log_hr(
+				hr,
+				global_d3d_device->SetPixelShader(dynavobgeom_pixel_shaders_get()[0])
+			);
 
+			draw_geometry = SUCCEEDED(hr);
 			if (rasterizer_get_main_pixel_shader_cache()->test_cache(0, ps_constants, NUMBEROF(ps_constants)))
 			{
 				global_d3d_device->SetPixelShaderConstantF(0, (real32*)ps_constants, NUMBEROF(ps_constants));

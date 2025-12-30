@@ -1,5 +1,7 @@
 #pragma once
 
+/* enums */
+
 enum e_interpolation_type : uint8
 {
 	_interpolation_type_none = 0,
@@ -17,6 +19,8 @@ enum e_interpolator_control_flags : uint8
 	_interpolator_control_finished_bit = 1,
 
 };
+
+/* classes */
 
 class c_interpolator_control
 {

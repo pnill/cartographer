@@ -14,7 +14,6 @@
 
 #include "bink/wmv_playback.h"
 #include "cache/pc_geometry_cache.h"
-#include "camera/camera.h"
 #include "effects/beam.h"
 #include "effects/player_effects.h"
 #include "game/game_engine.h"
@@ -27,6 +26,7 @@
 #include "objects/lights.h"
 #include "rasterizer/dx9/rasterizer_dx9.h"
 #include "rasterizer/dx9/rasterizer_dx9_decals.h"
+#include "rasterizer/dx9/rasterizer_dx9_errors.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
 #include "rasterizer/dx9/rasterizer_dx9_screen_effect.h"
 #include "rasterizer/dx9/rasterizer_dx9_shader_submit_new.h"
@@ -604,13 +604,17 @@ render_postprocess:
 					const real32 new_depth_range = global_window_parameters->camera.z_far - global_window_parameters->camera.z_near;
 					const real_vector4d ps_constants{ 0.f, 1.f, new_depth_range, 1.f };
 					rasterizer_dx9_set_target(_rasterizer_target_backbuffer, 0, true);
-					global_d3d_device->Clear(
-						0,
-						NULL,
-						D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER,
-						global_white_pixel32,
-						1.f,
-						0);
+					
+					rasterizer_dx9_log(
+						global_d3d_device->Clear(
+							0,
+							NULL,
+							D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER,
+							global_white_pixel32,
+							1.f,
+							0
+						)
+					);
 
 					if (rasterizer_get_main_pixel_shader_cache()->test_cache(16, &ps_constants, 1))
 					{

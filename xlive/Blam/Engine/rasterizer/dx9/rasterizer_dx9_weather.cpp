@@ -2,6 +2,7 @@
 #include "rasterizer_dx9_weather.h"
 
 #include "rasterizer_dx9.h"
+#include "rasterizer_dx9_errors.h"
 #include "rasterizer_dx9_fullscreen_passes.h"
 #include "rasterizer_dx9_main.h"
 #include "rasterizer_dx9_submit.h"
@@ -118,7 +119,11 @@ bool __cdecl rasterizer_dx9_weather_plate_setup_pipeline(const c_animated_backgr
 	{
 		IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
 		global_d3d_device->SetPixelShaderConstantF(0, (real32*)ps_constants, NUMBEROF(ps_constants));
-		global_d3d_device->SetPixelShader(g_d3d9_weather_shaders[_dx9_weather_shader_weather_plate]);
+		rasterizer_dx9_log(
+			global_d3d_device->SetPixelShader(
+				g_d3d9_weather_shaders[_dx9_weather_shader_weather_plate]
+			)
+		);
 	}
 	return true;
 }

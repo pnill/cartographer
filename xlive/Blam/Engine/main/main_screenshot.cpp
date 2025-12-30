@@ -11,6 +11,7 @@
 #include "game/game_time.h"
 #include "main/console.h"
 #include "main/main.h"
+#include "rasterizer/dx9/rasterizer_dx9_errors.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
 #include "rasterizer/rasterizer_main.h"
 #include "render/render.h"
@@ -140,8 +141,20 @@ bool __cdecl screenshot_render(window_bound* window)
 		int16 screen_width = rectangle2d_width(&rasterizer_globals->screen_bounds);
 		int16 screen_height = rectangle2d_height(&rasterizer_globals->screen_bounds);
 
-
-		const HRESULT hr = global_d3d_device->CreateRenderTarget(screen_width, screen_height, D3DFMT_A8R8G8B8, D3DMULTISAMPLE_NONE, 0, true, &rasterizer_dx9_globals->global_d3d_surface_screenshot, NULL);
+		HRESULT hr;
+		rasterizer_dx9_log_hr(
+			hr,
+			global_d3d_device->CreateRenderTarget(
+				screen_width, 
+				screen_height,
+				D3DFMT_A8R8G8B8,
+				D3DMULTISAMPLE_NONE,
+				0,
+				true,
+				&rasterizer_dx9_globals->global_d3d_surface_screenshot,
+				NULL
+			)
+		);
 		if (FAILED(hr))
 		{
 			result = false;

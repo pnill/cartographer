@@ -1,7 +1,15 @@
 #pragma once
 
+/* typedefs */
+
+typedef uint32 pixel32;
+
+/* macros */
+
+#define PIXEL32_ARGB(a,r,g,b) ((pixel32)((((a)&0xff)<<24)|(((r)&0xff)<<16)|(((g)&0xff)<<8)|((b)&0xff)))
+#define PIXEL32_RGBA(r,g,b,a) PIXEL32_ARGB(a,r,g,b)
+
 /* structures */
-typedef D3DCOLOR pixel32;
 
 union real_rgb_color
 {

@@ -368,8 +368,8 @@ static void console_complete(void)
 		int16 last_similar_character_index = SHORT_MAX;
 		const bool print_second_column = count > k_hs_completed_items_per_column;
 		
-		char output[1024];
-		csstrncpy(output, "", NUMBEROF(output));
+		char print_buffer[1024];
+		csstrncpy(print_buffer, "", NUMBEROF(print_buffer));
 		console_printf("");
 
 		int32 token_num = 0;
@@ -391,12 +391,12 @@ static void console_complete(void)
 
 			if (print_second_column)
 			{
-				csstrncat(output, matching_items[token_num], NUMBEROF(output));
-				csstrncat(output, "|t", NUMBEROF(output));
+				csstrncat(print_buffer, matching_items[token_num], NUMBEROF(print_buffer));
+				csstrncat(print_buffer, "|t", NUMBEROF(print_buffer));
 				if (token_num % 4 == 3)
 				{
-					console_printf(output);
-					csstrncpy(output, "", NUMBEROF(output));
+					console_printf(print_buffer);
+					csstrncpy(print_buffer, "", NUMBEROF(print_buffer));
 				}
 			}
 			else
@@ -407,7 +407,7 @@ static void console_complete(void)
 
 		if (print_second_column && (token_num - 1) % 4 != 3)
 		{
-			console_printf(output);
+			console_printf(print_buffer);
 		}
 
 		ASSERT((int16)cstrlen(matching_items[0]) >= last_similar_character_index + 1);

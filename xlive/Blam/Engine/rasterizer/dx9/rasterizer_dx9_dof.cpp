@@ -2,6 +2,7 @@
 #include "rasterizer_dx9_dof.h"
 
 #include "rasterizer_dx9.h"
+#include "rasterizer_dx9_errors.h"
 #include "rasterizer_dx9_main.h"
 #include "rasterizer_dx9_submit.h"
 #include "rasterizer_dx9_shader_submit.h"
@@ -237,6 +238,9 @@ bool __cdecl rasterizer_dx9_depth_of_field_pipeline_setup(s_rasterizer_dx9_dof_o
 	{
 		rasterizer_dx9_globals->global_d3d_device->SetPixelShaderConstantF(0, (const float*)&dof_data->constants, NUMBEROF(dof_data->constants));
 	}
-	rasterizer_dx9_globals->global_d3d_device->SetPixelShader(get_local_pixel_shaders()[5]);
+
+	rasterizer_dx9_log(
+		rasterizer_dx9_globals->global_d3d_device->SetPixelShader(get_local_pixel_shaders()[5])
+	);
 	return true;
 }

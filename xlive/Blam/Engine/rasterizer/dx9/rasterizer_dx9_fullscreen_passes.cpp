@@ -2,6 +2,7 @@
 #include "rasterizer_dx9_fullscreen_passes.h"
 
 #include "rasterizer_dx9.h"
+#include "rasterizer_dx9_errors.h"
 #include "rasterizer_dx9_main.h"
 #include "rasterizer_dx9_screen_effect.h"
 #include "rasterizer_dx9_shader_submit.h"
@@ -118,7 +119,9 @@ void __cdecl rasterizer_dx9_apply_gamma_and_brightness(e_rasterizer_target raste
 		}
 		else
 		{
-			global_d3d_device->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backbuffer);
+			rasterizer_dx9_log(
+				global_d3d_device->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backbuffer)
+			);
 		}
 
 		const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
@@ -130,7 +133,15 @@ void __cdecl rasterizer_dx9_apply_gamma_and_brightness(e_rasterizer_target raste
 			rectangle2d_to_rect(&global_window_parameters->camera.viewport_bounds, &rect);
 
 			rasterizer_set_render_target_internal_hook_set_viewport(backbuffer, (IDirect3DSurface9*)NONE, true);
-			global_d3d_device->StretchRect(target_surface, &rect, backbuffer, &rect, D3DTEXF_NONE);
+			rasterizer_dx9_log(
+				global_d3d_device->StretchRect(
+					target_surface,
+					&rect,
+					backbuffer,
+					&rect,
+					D3DTEXF_NONE
+				)
+			);
 		}
 		else
 		{
@@ -180,7 +191,15 @@ void __cdecl rasterizer_dx9_apply_gamma_and_brightness(e_rasterizer_target raste
 
 			IDirect3DSurface9* dst_surface = rasterizer_dx9_get_render_target_surface(rasterizer_target_dst, 0);
 			IDirect3DSurface9* src_surface = rasterizer_dx9_get_render_target_surface(rasterizer_target, 0);
-			global_d3d_device->StretchRect(src_surface, &rect, dst_surface, NULL, D3DTEXF_POINT);
+			rasterizer_dx9_log(
+				global_d3d_device->StretchRect(
+					src_surface,
+					&rect,
+					dst_surface,
+					NULL,
+					D3DTEXF_POINT
+				)
+			);
 		}
 	}
 	return;

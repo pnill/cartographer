@@ -2,6 +2,7 @@
 #include "rasterizer_dx9_screen_effect.h"
 
 #include "rasterizer_dx9.h"
+#include "rasterizer_dx9_errors.h"
 #include "rasterizer_dx9_main.h"
 #include "rasterizer_dx9_dof.h"
 #include "rasterizer_dx9_fullscreen_passes.h"
@@ -21,7 +22,6 @@
 #define k_bloom_blur_amount 3.992f
 #define k_bloom_box_factor 0.25f
 #define k_bloom_max_factor 0.f
-
 
 /* globals */
 
@@ -73,7 +73,15 @@ void rasterizer_dx9_postprocess_scene(int32 render_layer_debug_view, bool lens_f
 	rectangle2d_to_rect(&global_window_parameters->camera.viewport_bounds, &rect);
 
 	s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
-	dx9_globals->global_d3d_device->StretchRect(dx9_globals->global_d3d_surface_render_primary, &rect, dx9_globals->global_d3d_surface_render_resolved, &rect, D3DTEXF_NONE);
+	
+	rasterizer_dx9_log(
+		dx9_globals->global_d3d_device->StretchRect(
+			dx9_globals->global_d3d_surface_render_primary,
+			&rect,
+			dx9_globals->global_d3d_surface_render_resolved,
+			&rect,
+			D3DTEXF_NONE)
+	);
 	rasterizer_globals_get()->rasterizer_draw_on_main_back_buffer = true;
 
 	if (render_layer_selfibloomination && !g_disable_bloom)

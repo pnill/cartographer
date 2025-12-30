@@ -4,6 +4,8 @@
 
 void system_debug_memory_internal(const char* string, const char* file, int32 line);
 
+void debug_end_tracking_nonheap_allocation(void);
+
 /* macros */
 
 #ifdef DEBUG_MEMORY_ENABLED

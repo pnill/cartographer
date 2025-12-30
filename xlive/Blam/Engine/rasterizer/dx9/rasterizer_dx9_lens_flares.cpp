@@ -3,6 +3,7 @@
 
 #include "rasterizer_dx9.h"
 #include "rasterizer_dx9_dof.h"
+#include "rasterizer_dx9_errors.h"
 #include "rasterizer_dx9_fullscreen_passes.h"
 #include "rasterizer_dx9_main.h"
 #include "rasterizer_dx9_screen_effect.h"
@@ -18,19 +19,23 @@
 #include "render/render.h"
 
 /* constants */
-#define k_sun_quad_pass_count 16
+
+enum
+{
+	k_sun_quad_pass_count = 16,
+};
 
 /* globals */
 
-IDirect3DPixelShader9* sun_glow_convolve_shader = NULL;
+static IDirect3DPixelShader9* sun_glow_convolve_shader = NULL;
 
 /* prototypes */
 
-IDirect3DPixelShader9** lens_flare_pixel_shaders_get(void);
-void __cdecl rasterizer_dx9_lens_flares_create_pixel_shaders(void);
-bool rasterizer_dx9_sun_is_in_bounds(const real_rectangle2d* rect);
-void rasterizer_dx9_sun_glow_copy_source(const RECT* rect, e_rasterizer_target target);
-e_rasterizer_target rasterizer_dx9_convolve_surfaces_original(e_rasterizer_target primary_target, e_rasterizer_target secondary_target, int16 pass_count);
+static IDirect3DPixelShader9** lens_flare_pixel_shaders_get(void);
+static void __cdecl rasterizer_dx9_lens_flares_create_pixel_shaders(void);
+static bool rasterizer_dx9_sun_is_in_bounds(const real_rectangle2d* rect);
+static void rasterizer_dx9_sun_glow_copy_source(const RECT* rect, e_rasterizer_target target);
+static e_rasterizer_target rasterizer_sun_glow_convolve(e_rasterizer_target primary_target, e_rasterizer_target secondary_target, int16 pass_count);
 
 /* public code */
 
@@ -134,8 +139,9 @@ e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* 
 			rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, FALSE);
 			rasterizer_dx9_set_render_state(D3DRS_ZENABLE, D3DZB_FALSE);
 			rasterizer_dx9_set_render_state(D3DRS_DEPTHBIAS, 0);
-			global_d3d_device->SetPixelShader(lens_flare_pixel_shaders[1]);
-
+			rasterizer_dx9_log(
+				global_d3d_device->SetPixelShader(lens_flare_pixel_shaders[1])
+			);
 			viewport_middle_x = 10.f / viewport_width;
 			viewport_middle_y = 10.f / viewport_height;
 
@@ -164,7 +170,9 @@ e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* 
 			rasterizer_dx9_set_render_state(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
 
 			rasterizer_dx9_set_stencil_mode(8);
-			global_d3d_device->SetPixelShader(lens_flare_pixel_shaders[2]);
+			rasterizer_dx9_log(
+				global_d3d_device->SetPixelShader(lens_flare_pixel_shaders[2])
+			);
 			rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA);
 			rasterizer_dx9_draw_rect(&sun_surface_quad, 1.f, global_yellow_pixel32);
 
@@ -178,8 +186,22 @@ e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* 
 			// this definitely needs a helper function to pass just the rasterizer_target surfaces from the enum
 			// and posibly the size to be copied with the rects
 			rasterizer_dx9_perf_event_begin("copy_to_sun_glow_primary", NULL);
-			global_d3d_device->StretchRect(dx9_globals->global_d3d_surface_render_primary, &rect, dx9_globals->global_d3d_surface_sun_glow_primary, NULL, D3DTEXF_LINEAR);
-			global_d3d_device->StretchRect(dx9_globals->global_d3d_surface_render_primary, &rect, dx9_globals->global_d3d_surface_sun_glow_secondary, NULL, D3DTEXF_LINEAR);
+			rasterizer_dx9_log(
+				global_d3d_device->StretchRect(
+					dx9_globals->global_d3d_surface_render_primary,
+					&rect,
+					dx9_globals->global_d3d_surface_sun_glow_primary,
+					NULL,
+					D3DTEXF_LINEAR)
+			);
+			rasterizer_dx9_log(
+				global_d3d_device->StretchRect(
+					dx9_globals->global_d3d_surface_render_primary,
+					&rect,
+					dx9_globals->global_d3d_surface_sun_glow_secondary,
+					NULL,
+					D3DTEXF_LINEAR)
+			);
 
 			// These are currently broken...
 			// FIXME
@@ -193,7 +215,7 @@ e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* 
 
 			rasterizer_dx9_perf_event_begin("sun_glow_convolve", NULL);
 
-			e_rasterizer_target target = rasterizer_dx9_convolve_surfaces_original(_rasterizer_target_sun_glow_primary, _rasterizer_target_sun_glow_secondary, 4);
+			e_rasterizer_target target = rasterizer_sun_glow_convolve(_rasterizer_target_sun_glow_primary, _rasterizer_target_sun_glow_secondary, 4);
 
 		   /*e_rasterizer_target target = rasterizer_dx9_convolve_screen_surfaces(
 				1.0f, 1.0f, 0.0f, 
@@ -225,8 +247,9 @@ e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* 
 			rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, FALSE);
 			rasterizer_dx9_set_render_state(D3DRS_ZFUNC, D3DCMP_ALWAYS);
 			rasterizer_dx9_set_render_state(D3DRS_DEPTHBIAS, 0);
-			global_d3d_device->SetPixelShader(lens_flare_pixel_shaders[4]);
-
+			rasterizer_dx9_log(
+				global_d3d_device->SetPixelShader(lens_flare_pixel_shaders[4])
+			);
 			real32 alpha = 1.f - global_window_parameters->fog_result.sky_fog_alpha;
 			alpha = PIN(alpha, 0.f, 1.f);
 
@@ -311,12 +334,12 @@ e_rasterizer_target rasterizer_dx9_sun_glow_occlude(datum tag_index, real_point3
 
 /* private code */
 
-IDirect3DPixelShader9** lens_flare_pixel_shaders_get(void)
+static IDirect3DPixelShader9** lens_flare_pixel_shaders_get(void)
 {
 	return Memory::GetAddress<IDirect3DPixelShader9**>(0xA4B008);
 }
 
-void __cdecl rasterizer_dx9_lens_flares_create_pixel_shaders(void)
+static void __cdecl rasterizer_dx9_lens_flares_create_pixel_shaders(void)
 {
 	INVOKE(0x26CEC9, 0x0, rasterizer_dx9_lens_flares_create_pixel_shaders);
 
@@ -327,12 +350,12 @@ void __cdecl rasterizer_dx9_lens_flares_create_pixel_shaders(void)
 
 // Is the sun outside of our viewport
 // TODO: change the bounds depending on viewport bounds on the screen
-bool rasterizer_dx9_sun_is_in_bounds(const real_rectangle2d* sun_center)
+static bool rasterizer_dx9_sun_is_in_bounds(const real_rectangle2d* sun_center)
 {
 	return sun_center->x0 < 1.f && sun_center->y0 < 1.f && sun_center->x1 > -1.f && sun_center->y1 > -1.f;
 }
 
-void rasterizer_dx9_sun_glow_copy_source(const RECT* rect, e_rasterizer_target target)
+static void rasterizer_dx9_sun_glow_copy_source(const RECT* rect, e_rasterizer_target target)
 {
 	if (target)
 	{
@@ -378,7 +401,7 @@ void rasterizer_dx9_sun_glow_copy_source(const RECT* rect, e_rasterizer_target t
 	return;
 }
 
-e_rasterizer_target rasterizer_dx9_convolve_surfaces_original(e_rasterizer_target primary_target, e_rasterizer_target secondary_target, int16 pass_count)
+static e_rasterizer_target rasterizer_sun_glow_convolve(e_rasterizer_target primary_target, e_rasterizer_target secondary_target, int16 pass_count)
 {
 	ASSERT(VALID_INDEX(primary_target, k_rasterizer_target_count));
 	ASSERT(VALID_INDEX(secondary_target, k_rasterizer_target_count));
@@ -420,8 +443,9 @@ e_rasterizer_target rasterizer_dx9_convolve_surfaces_original(e_rasterizer_targe
 			global_d3d_device->SetVertexShaderConstantF(18, (real32*)geometry, NUMBEROF(geometry));
 		}
 
-		global_d3d_device->SetPixelShader(sun_glow_convolve_shader);
-
+		rasterizer_dx9_log(
+			global_d3d_device->SetPixelShader(sun_glow_convolve_shader)
+		);
 		for (uint8 pass_index = 0; pass_index < pass_count; pass_index++)
 		{
 			// Alternate between the targets at the different passes
@@ -456,4 +480,3 @@ e_rasterizer_target rasterizer_dx9_convolve_surfaces_original(e_rasterizer_targe
 	e_rasterizer_target final_sun_surface = (pass_count % 2 ? secondary_target : primary_target);
 	return final_sun_surface;
 }
-

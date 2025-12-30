@@ -224,7 +224,7 @@ static void __cdecl display_blackness_window(void);
 static HWND __cdecl rasterizer_dx9_create_main_window(void);
 
 // Initializes the prime vertex shader
-static void rasterizer_dx9_prime_shader_initialize(void);
+static bool rasterizer_dx9_prime_shader_initialize(void);
 
 // Returns true if we can use d3d9ex
 static bool rasterizer_dx9_should_use_d3d9ex(void);
@@ -433,11 +433,19 @@ bool rasterizer_dx9_draw_primitive_up(
 	const void* pVertexStreamZeroData,
 	uint32 VertexStreamZeroStride)
 {
-	return rasterizer_dx9_device_get_interface()->DrawPrimitiveUP(
-		PrimitiveType,
-		PrimitiveCount,
-		pVertexStreamZeroData,
-		VertexStreamZeroStride) >= 0;
+	IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
+
+	HRESULT hr;
+	rasterizer_dx9_log_hr(
+		hr,
+		global_d3d_device->DrawPrimitiveUP(
+			PrimitiveType,
+			PrimitiveCount,
+			pVertexStreamZeroData,
+			VertexStreamZeroStride
+		)
+	);
+	return SUCCEEDED(hr);
 }
 
 bool __cdecl rasterizer_dx9_create_2d_texture(uint32 width, uint32 height, int32 levels, uint32 usage, e_bitmap_data_format format, bool linear, IDirect3DTexture9** texture)
@@ -512,23 +520,22 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
 	D3DDISPLAYMODEEX fs_disp_mode;
 	if (rasterizer_dx9_main_globals->global_d3d_device)
 	{
-		HRESULT hr = XLiveOnResetDevice(&d3d_present_parameters);
-		succeeded = SUCCEEDED(hr);
-		if (!succeeded)
-		{
-			rasterizer_dx9_errors_log(hr, "XLiveOnResetDevice(&d3d_present_parameters)");
-		}
+		HRESULT hr;
+		rasterizer_dx9_log_hr(
+			hr,
+			XLiveOnResetDevice(&d3d_present_parameters)
+		);
 
+		succeeded = SUCCEEDED(hr);
 		if (rasterizer_globals->use_d3d9_ex)
 		{
 			if (!is_fullscreen)
 			{
-				hr = rasterizer_dx9_main_globals->global_d3d_device->ResetEx(&d3d_present_parameters, NULL);
+				rasterizer_dx9_log_hr(
+					hr,
+					rasterizer_dx9_main_globals->global_d3d_device->ResetEx(&d3d_present_parameters, NULL)
+				);
 				succeeded &= SUCCEEDED(hr);
-				if (!succeeded)
-				{
-					rasterizer_dx9_errors_log(hr, "global_d3d_device->ResetEx(&d3d_present_parameters, NULL)");
-				}
 			}
 			else
 			{
@@ -538,12 +545,11 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
 				fs_disp_mode.RefreshRate = d3d_present_parameters.FullScreen_RefreshRateInHz;
 				fs_disp_mode.Format = rasterizer_globals->display_parameters.backbuffer_format;
 				fs_disp_mode.ScanLineOrdering = D3DSCANLINEORDERING_PROGRESSIVE;
-				hr = rasterizer_dx9_main_globals->global_d3d_device->ResetEx(&d3d_present_parameters, &fs_disp_mode);
+				rasterizer_dx9_log_hr(
+					hr,
+					rasterizer_dx9_main_globals->global_d3d_device->ResetEx(&d3d_present_parameters, &fs_disp_mode)
+				);
 				succeeded &= SUCCEEDED(hr);
-				if (!succeeded)
-				{
-					rasterizer_dx9_errors_log(hr, "global_d3d_device->ResetEx(&d3d_present_parameters, &fs_disp_mode)");
-				}
 			}
 		}
 		else
@@ -552,12 +558,13 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
 			{
 				display_blackness_window();
 			}
-			const HRESULT reset_hr = rasterizer_dx9_main_globals->global_d3d_device->Reset(&d3d_present_parameters);
+
+			HRESULT reset_hr;
+			rasterizer_dx9_log_hr(
+				reset_hr,
+				rasterizer_dx9_main_globals->global_d3d_device->Reset(&d3d_present_parameters)
+			);
 			succeeded &= SUCCEEDED(reset_hr);
-			if (!succeeded)
-			{
-				rasterizer_dx9_errors_log(reset_hr, "global_d3d_device->Reset(&d3d_present_parameters)");
-			}
 
 			if (!d3d_present_parameters.SwapEffect)
 			{
@@ -586,51 +593,46 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
 			fs_disp_mode.ScanLineOrdering = D3DSCANLINEORDERING_PROGRESSIVE;
 			D3DDISPLAYMODEEX* p_fs_disp_mode = is_fullscreen ? &fs_disp_mode : NULL;
 			
-			device_create_hr = rasterizer_dx9_main_globals->global_d3d_interface->CreateDeviceEx(
-				monitor_count,
-				D3DDEVTYPE_HAL,
-				d3d_present_parameters.hDeviceWindow,
-				behavior_flags,
-				&d3d_present_parameters,
-				p_fs_disp_mode,
-				&rasterizer_dx9_main_globals->global_d3d_device);
-
+			rasterizer_dx9_log_hr(
+				device_create_hr,
+				rasterizer_dx9_main_globals->global_d3d_interface->CreateDeviceEx(
+					monitor_count,
+					D3DDEVTYPE_HAL,
+					d3d_present_parameters.hDeviceWindow,
+					behavior_flags,
+					&d3d_present_parameters,
+					p_fs_disp_mode,
+					&rasterizer_dx9_main_globals->global_d3d_device)
+			);
 			succeeded &= SUCCEEDED(device_create_hr);
-			if (!succeeded)
-			{
-				rasterizer_dx9_errors_log(device_create_hr, "CreateDeviceEx");
-			}
 		}
 		else
 		{
-			device_create_hr = rasterizer_dx9_main_globals->global_d3d_interface->CreateDevice(
-				monitor_count,
-				D3DDEVTYPE_HAL,
-				d3d_present_parameters.hDeviceWindow,
-				behavior_flags,
-				&d3d_present_parameters,
-				(IDirect3DDevice9**)&rasterizer_dx9_main_globals->global_d3d_device);
-
+			rasterizer_dx9_log_hr(
+				device_create_hr,
+				rasterizer_dx9_main_globals->global_d3d_interface->CreateDevice(
+					monitor_count,
+					D3DDEVTYPE_HAL,
+					d3d_present_parameters.hDeviceWindow,
+					behavior_flags,
+					&d3d_present_parameters,
+					(IDirect3DDevice9**)&rasterizer_dx9_main_globals->global_d3d_device)
+			);
 			succeeded &= SUCCEEDED(device_create_hr);
-			if (!succeeded)
-			{
-				rasterizer_dx9_errors_log(device_create_hr, "CreateDevice");
-			}
 		}
 
 		if (succeeded && g_rasterizer_dx9on12_enabled)
 		{
-			HRESULT d3d9on12_query_interface_hr = rasterizer_dx9_main_globals->global_d3d_device->QueryInterface(IID_PPV_ARGS(&g_d3d9on12_device));
-			if (FAILED(d3d9on12_query_interface_hr))
-			{
-				rasterizer_dx9_errors_log(d3d9on12_query_interface_hr, "QueryInterface IDirect3DDevice9On12");
-			}
+			rasterizer_dx9_log(
+				rasterizer_dx9_main_globals->global_d3d_device->QueryInterface(
+					IID_PPV_ARGS(&g_d3d9on12_device)
+				)
+			);
 		}
 		
 	}
 
-	// TODO: implement
-	//debug_end_tracking_nonheap_allocation()
+	debug_end_tracking_nonheap_allocation();
 
 	if (rasterizer_dx9_main_globals->global_d3d_device)
 	{
@@ -652,7 +654,11 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
 				xlive_init_info.pszAdapterName = (PCHAR)network_adapter_name_get(network_adapter_index);
 			}
 
-			const HRESULT hr = XLiveInitialize(&xlive_init_info);
+			HRESULT hr;
+			rasterizer_dx9_log_hr(
+				hr,
+				XLiveInitialize(&xlive_init_info)
+			);
 			succeeded &= SUCCEEDED(hr);
 			if (succeeded)
 			{
@@ -665,7 +671,6 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
 			else
 			{
 				*fatal_error_id_get() = hr == 0x80040317 ? 1018 : 105;
-				rasterizer_dx9_errors_log(hr, "XLiveInitialize");
 			}
 		}
 	}
@@ -675,7 +680,13 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
 	if (succeeded)
 	{
 		D3DCAPS9* caps = rasterizer_dx9_caps_get();
-		HRESULT hr = rasterizer_dx9_device_get_interface()->GetDeviceCaps(caps);
+		IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
+
+		HRESULT hr;
+		rasterizer_dx9_log_hr(
+			hr,
+			global_d3d_device->GetDeviceCaps(caps)
+		);
 		if (SUCCEEDED(hr))
 		{
 			if (!g_rasterizer_dx9_driver_globals.disable_amd_or_ati_patches)
@@ -690,10 +701,6 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
 				caps->NumSimultaneousRTs >= 2 &&
 				!H2Config_force_off_sm3 &&                          // Force disable sm3 if setting is set in H2Config
 				!g_rasterizer_dx9_driver_globals.using_amd_or_ati_gpu;
-		}
-		else
-		{
-			rasterizer_dx9_errors_log(hr, "global_d3d_device->GetDeviceCaps(&global_d3d_caps)");
 		}
 	}
 	else
@@ -985,11 +992,18 @@ static bool rasterizer_dx9_get_vertex_declaration_format(D3DVERTEXELEMENT9* vert
 	IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
 
 	IDirect3DVertexDeclaration9* vertex_dcl;
-	global_d3d_device->GetVertexDeclaration(&vertex_dcl);
-	bool res = SUCCEEDED(vertex_dcl->GetDeclaration(vertex_elements, vertex_element_count));
+	
+	HRESULT hr;
+	rasterizer_dx9_log_hr(
+		hr,
+		global_d3d_device->GetVertexDeclaration(&vertex_dcl)
+	);
 
-	vertex_dcl->Release();
-
+	const bool res = SUCCEEDED(hr);
+	if (res)
+	{
+		vertex_dcl->Release();
+	}
 	return res;
 }
 
@@ -1008,7 +1022,18 @@ static bool __cdecl DrawPrimitiveUP_hook_get_vertex_decl(
 	{
 	}
 
-	return SUCCEEDED(global_d3d_device->DrawPrimitiveUP(PrimitiveType, PrimitiveCount, pVertexStreamZeroData, VertexStreamZeroStride));
+	HRESULT hr;
+	rasterizer_dx9_log_hr(
+		hr,
+		global_d3d_device->DrawPrimitiveUP(
+			PrimitiveType,
+			PrimitiveCount,
+			pVertexStreamZeroData,
+			VertexStreamZeroStride
+		)
+	);
+
+	return SUCCEEDED(hr);
 }
 
 static void __cdecl display_blackness_window(void)
@@ -1147,54 +1172,58 @@ static HWND __cdecl rasterizer_dx9_create_main_window(void)
 	return (success ? window_globals->hWnd : 0);
 }
 
-static void rasterizer_dx9_prime_shader_initialize(void)
+static bool rasterizer_dx9_prime_shader_initialize(void)
 {
 	IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
-	HRESULT hr = global_d3d_device->CreateVertexDeclaration(global_d3d_vd_source, global_d3d_vd_prime_get());
+	
+	HRESULT hr;
+	rasterizer_dx9_log_hr(
+		hr,
+		global_d3d_device->CreateVertexDeclaration(
+			global_d3d_vd_source,
+			global_d3d_vd_prime_get()
+		)
+	);
 	
 	bool succeeded = SUCCEEDED(hr);
-	if (!succeeded)
-	{
-		rasterizer_dx9_errors_log(hr, "global_d3d_device->CreateVertexDeclaration(global_d3d_vd_source, &global_d3d_vd_prime)");
-	}
 
 	s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
 	const char* shader_version = rasterizer_globals->d3d9_sm3_supported ? "vs_3_0" : "vs_2_0";
 
 	LPD3DXBUFFER pShader;
-	hr = D3DXCompileShader(
-		global_d3d_vs_prime_source,
-		strlen(global_d3d_vs_prime_source),
-		NULL,
-		NULL,
-		"main",
-		shader_version,
-		0,
-		&pShader,
-		NULL,
-		NULL
+	rasterizer_dx9_log_hr(
+		hr,
+		D3DXCompileShader(
+			global_d3d_vs_prime_source,
+			strlen(global_d3d_vs_prime_source),
+			NULL,
+			NULL,
+			"main",
+			shader_version,
+			0,
+			&pShader,
+			NULL,
+			NULL
+		)
 	);
 
 	succeeded &= SUCCEEDED(hr);
 
-	if (!succeeded)
-	{
-		rasterizer_dx9_errors_log(hr, "D3DXCompileShader(global_d3d_vs_prime_source, strlen(global_d3d_vs_prime_source), NULL, NULL, \"main\", shader_version, 0, &pShader, NULL, NULL)");
-	}
-
-	hr = global_d3d_device->CreateVertexShader((DWORD*)pShader->GetBufferPointer(), global_d3d_vs_prime_get());
+	rasterizer_dx9_log_hr(
+		hr,
+		global_d3d_device->CreateVertexShader(
+			(DWORD*)pShader->GetBufferPointer(),
+			global_d3d_vs_prime_get()
+		)
+	);
 	succeeded &= SUCCEEDED(hr);
-	if (!succeeded)
-	{
-		rasterizer_dx9_errors_log(hr, "global_d3d_device->CreateVertexShader((DWORD*)pShader->GetBufferPointer(), &global_d3d_vs_prime)");
-	}
 
 	if (pShader)
 	{
 		pShader->Release();
 	}
 
-	return;
+	return succeeded;
 }
 
 static bool rasterizer_dx9_should_use_d3d9ex(void)
