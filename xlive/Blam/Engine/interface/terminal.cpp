@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "terminal.h"
 
+#ifdef TERMINAL_ENABLED
+
 #include "cseries/threads_windows.h"
 #include "interface/hud.h"
 #include "main/console.h"
@@ -11,8 +13,6 @@
 #include "render/render.h"
 #include "text/draw_string.h"
 #include "text/font_group.h"
-
-#ifdef TERMINAL_ENABLED
 
 /* constants */
 
