@@ -2052,6 +2052,9 @@
     <ClInclude Include="Blam\Engine\math\crypto_windows.h" />
     <ClInclude Include="Blam\Engine\units\vehicles.h" />
     <ClInclude Include="Blam\Engine\networking\network_constants.h" />
+    <ClInclude Include="3rdparty\havok\hkbase\memory\hkMemory.h" />
+    <ClInclude Include="3rdparty\havok\hkbase\memoryclasses\hkMemoryClasses.h" />
+    <ClInclude Include="3rdparty\havok\hkbase\types\hkBaseTypes.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

@@ -1,5 +1,19 @@
 #pragma once
 
+/* headers */
+
+#include <havok/hkbase/memory/hkMemory.h>
+
+/* enums */
+
+enum e_memory_allocator_type
+{
+	_memory_allocator_type_none= 0,
+	_memory_allocator_type_startup,
+	_memory_allocator_type_runtime,
+	k_memory_allocator_type_count,
+};
+
 /* structures */
 
 struct s_runtime_pool_memory_usage

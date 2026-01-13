@@ -1,7 +1,24 @@
 #include "stdafx.h"
 #include "havok_memory.h"
 
+/* structures */
+
+struct s_havok_memory_globals
+{
+	bool initialized;
+	int32 last_cleanup_time;
+	char* memory_allocator_buffer;
+	void* second_overflow_pool_buffer;
+	e_memory_allocator_type active_memory_allocator_type;
+	class hkMemory* startup_pool_memory;
+	class hkMemory* runtime_pool_memory;
+	class hkMemory* overflow_pool_memory;
+	class hkMemory* second_overflow_pool_memory;
+};
+
 /* prototypes */
+
+static s_havok_memory_globals* havok_memory_globals_get(void);
 
 static bool* region_memory_being_borrowed_get(void);
 
@@ -24,6 +41,12 @@ void __cdecl havok_memory_garbage_collect(void)
 }
 
 /* private code */
+
+static s_havok_memory_globals* havok_memory_globals_get(void)
+{
+	return Memory::GetAddress<s_havok_memory_globals*>(0x41D4F4, 0x0);
+}
+
 
 static bool* region_memory_being_borrowed_get(void)
 {
