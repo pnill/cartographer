@@ -38,7 +38,7 @@ bool havok_can_allocate_space_for_instance_of_object_definition(datum tag_index)
 	ASSERT(havok_can_modify_state());
 
 	bool result = true;
-	if (TEST_FLAG(definition->object.object_type, _object_mask_havok))
+	if (TEST_BIT(_object_mask_havok, definition->object.object_type))
 	{
 		const s_havok_game_state* g_havok_game_state = havok_game_state_get();
 		if (havok_globals_get()->rigid_bodies_active)
