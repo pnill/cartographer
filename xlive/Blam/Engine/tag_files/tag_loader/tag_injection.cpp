@@ -45,6 +45,15 @@ void tag_injection_set_active_map(const wchar_t* map_name)
 	}
 }
 
+void tag_injection_clear_active_map(void)
+{
+	if (!shell_is_dedicated_server())
+	{
+		g_tag_injection_manager->close_active_map();
+	}
+	return;
+}
+
 bool tag_injection_active_map_verified()
 {
 	if (!shell_is_dedicated_server())

@@ -176,17 +176,27 @@ bool c_tag_injecting_manager::get_active_map_verified(void) const
 	return m_active_map_verified;
 }
 
-void c_tag_injecting_manager::reset()
+void c_tag_injecting_manager::close_active_map(void)
 {
 	// Set map verified too false, to prevent things from being loaded after a commit
 	m_active_map_verified = false;
 
 	// close the handle to the active map
 	if (m_active_map_file_handle)
+	{
 		fclose(m_active_map_file_handle);
+	}
 
 	// just for safety clear the stored data for active map
 	m_active_map.clear();
+
+	return;
+}
+
+void c_tag_injecting_manager::reset(void)
+{
+	close_active_map();
+
 	csmemset(&m_active_map_cache_header, 0, sizeof(cache_file_header));
 	csmemset(&m_active_map_tags_header, 0, sizeof(cache_file_tags_header));
 	m_active_map_scenario_instance_offset = 0;

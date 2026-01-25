@@ -522,8 +522,14 @@ static bool __cdecl OnMapLoad(s_game_options* options)
 
 		resetAfterMatch = true;
 	}
+
+
 	EventHandler::MapLoadEventExecute(EventExecutionType::execute_after, options->game_mode);
 	CustomVariantHandler::OnMapLoad(ExecTime::_postEventExec, options);
+
+	// Clear remaining handle open in the tag injector at the end of post loading injections
+	tag_injection_clear_active_map();
+
 	return result;
 }
 

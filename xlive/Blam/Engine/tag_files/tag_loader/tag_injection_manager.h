@@ -34,6 +34,7 @@ public:
 	void set_active_map(const wchar_t* map_name);
 	
 	bool get_active_map_verified(void) const;
+	void close_active_map(void);
 	void reset(void);
 	datum get_tag_datum_by_name(e_tag_group group, const char* tag_name) const;
 	void get_name_by_tag_datum(e_tag_group group, datum cache_datum, char* out_name) const;

@@ -19,6 +19,10 @@ bool tag_injection_check_map_exists(const wchar_t* map_name);
  * \param map_name the filename of the map file without .map
  */
 void tag_injection_set_active_map(const wchar_t* map_name);
+
+// Closes handle to the active map
+void tag_injection_clear_active_map(void);
+
 bool tag_injection_active_map_verified(void);
 
 datum tag_injection_load(e_tag_group group, const char* tag_name, bool load_dependencies);
