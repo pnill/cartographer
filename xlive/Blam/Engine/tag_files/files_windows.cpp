@@ -94,12 +94,6 @@ s_file_reference* __cdecl file_reference_create_from_path(s_file_reference* file
 	return INVOKE(0x8C409, 0x86D37, file_reference_create_from_path, file_reference, path, path_is_directory);
 }
 
-void __cdecl file_create_parent_directories_if_not_present(s_file_reference* file_reference)
-{
-	INVOKE(0x8C531, 0x0, file_create_parent_directories_if_not_present, file_reference);
-	return;
-}
-
 bool __cdecl file_open(s_file_reference* file_reference, e_file_open_flags flags, e_file_open_error* out_error_code)
 {
 	return INVOKE(0x638BF, 0x65BBF, file_open, file_reference, flags, out_error_code);
@@ -347,6 +341,118 @@ void file_location_get_full_path(int16 location, char const* path, char(&full_pa
 		csstrncpy(full_path, "\\:?", NUMBEROF(full_path));
 		csstrncat(full_path, path, NUMBEROF(full_path));
 	}
+	return;
+}
+
+void file_path_add_name(
+	char* out_path,
+	char const* name)
+{
+	if (name[0])
+	{
+		size_t dwPathLen = cstrlen(out_path);
+		ASSERT(dwPathLen+1+strlen(name)<k_maximum_filename_length);
+		
+		char* out_path_insertion_point = &out_path[dwPathLen];
+		if (out_path_insertion_point!=out_path &&
+			*(out_path_insertion_point-1)!='\\')
+		{
+			*out_path_insertion_point++ = '\\';
+			*out_path_insertion_point = '\0';
+			++dwPathLen;
+		}
+		strncpy_s(
+			out_path_insertion_point,
+			k_maximum_filename_length-dwPathLen,
+			name,
+			k_maximum_filename_length-dwPathLen
+		);
+		out_path[k_maximum_filename_length-1] = '\0';
+	}
+
+	return;
+}
+
+void file_path_add_extension(
+	char* out_path,
+	char const* extension)
+{
+	if (extension[0])
+	{
+		size_t dwPathLen = cstrlen(out_path);
+		ASSERT(dwPathLen+1+strlen(extension)<k_maximum_filename_length);
+
+		char* out_path_insertion_point = &out_path[dwPathLen];
+		if (*out_path_insertion_point!='.')
+		{
+			*out_path_insertion_point++ = '.';
+			*out_path_insertion_point = '\0';
+			++dwPathLen;
+		}
+		strncpy_s(
+			out_path_insertion_point,
+			k_maximum_filename_length-dwPathLen,
+			extension,
+			k_maximum_filename_length-dwPathLen
+		);
+		out_path[k_maximum_filename_length - 1] = '\0';
+	}
+
+	return;
+}
+
+void file_path_split(
+	char* path,
+	char** directory,
+	char** parent_directory,
+	char** filename,
+	char** extension,
+	bool has_filename)
+{
+	int16 length = (int16)cstrlen(path);
+	*directory = &path[length];
+	*parent_directory = &path[length];
+	*filename = &path[length];
+	*extension = &path[length];
+	
+	while (length>0)
+	{
+		if (path[length]=='.')
+		{
+			if (has_filename && !**filename && !**extension)
+			{
+				path[length] = '\0';
+				*extension = &path[length+1];
+			}
+		}
+		else if (path[length]=='\\')
+		{
+			if (!has_filename || **filename)
+			{
+				if (!**parent_directory)
+				{
+					*parent_directory = &path[length+1];
+				}
+			}
+			else
+			{
+				path[length] = '\0';
+				*filename = &path[length+1];
+			}
+		}
+		--length;
+	}
+
+	if (has_filename && !**filename)
+	{
+		*filename = path;
+	}
+	
+	if (*filename != path)
+	{
+		*directory = path;
+	}
+
 	return;
 }
 

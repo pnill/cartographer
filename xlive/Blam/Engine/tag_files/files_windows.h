@@ -44,8 +44,6 @@ void files_windows_apply_patches(void);
 
 struct s_file_reference* __cdecl file_reference_create_from_path(struct s_file_reference* file_reference, const char* path, bool path_is_directory);
 
-void __cdecl file_create_parent_directories_if_not_present(struct s_file_reference* file_reference);
-
 /* Returns success */
 bool __cdecl file_open(struct s_file_reference* file_reference, e_file_open_flags flags, e_file_open_error* out_error_code);
 
@@ -95,3 +93,15 @@ bool __cdecl file_set_hidden(struct s_file_reference* file_reference, bool hidde
 bool compress_file_to_zip(zipFile zip_file, struct s_file_reference* file_to_add, const char* path_in_zip);
 
 void file_location_get_full_path(int16 location, char const* path, char(&full_path)[k_maximum_filename_length]);
+
+void file_path_add_name(char* out_path, char const* name);
+
+void file_path_add_extension(char* out_path, char const* extension);
+
+void file_path_split(
+	char* path,
+	char** directory,
+	char** parent_directory,
+	char** filename,
+	char** extension,
+	bool has_filename);

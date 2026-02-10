@@ -78,6 +78,13 @@ enum
 #define LLVM_JMP_ERROR (void)0
 #endif
 
+/* structures */
+
+struct csstrtok_data
+{
+	char* next_string;
+};
+
 /* globals */
 
 #ifdef ASSERTS_ENABLED
@@ -261,6 +268,8 @@ int32 csstrncmp(const char* s1, const char* s2, size_t size);
 
 // Convert string to lowercase
 char* csstrnlwr(char* s, size_t size);
+
+char* csstrtok(char* s, const char* delimiters, bool skip_multiple_delimiters, struct csstrtok_data *data);
 
 char* strchr(char* str, int32 ch);
 

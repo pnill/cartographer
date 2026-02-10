@@ -340,6 +340,40 @@ char* csstrnlwr(char* s, size_t size)
 	return s;
 }
 
+char* csstrtok(
+	char* s,
+	const char* delimiters,
+	bool skip_multiple_delimiters,
+	csstrtok_data* data)
+{
+	ASSERT(data);
+	ASSERT(delimiters);
+
+	char* next_string = s ? s : data->next_string;
+	if (skip_multiple_delimiters && next_string)
+	{
+		next_string += strspn(next_string, delimiters);
+		ASSERT(next_string);
+		if (!next_string[0])
+		{
+			next_string = NULL;
+		}
+	}
+	
+	char* result = next_string;
+	if (next_string)
+	{
+		next_string = strpbrk(next_string, delimiters);
+		if (next_string)
+		{
+			*next_string++ = '\0';
+		}
+	}
+	data->next_string = next_string;
+
+	return result;
+}
+
 char* strchr(char* str, int32 ch)
 {
 	return std::strchr(str, ch);

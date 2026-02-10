@@ -21,6 +21,16 @@ enum
 	NUMBER_OF_FILE_REFERENCE_LOCATIONS,
 };
 
+enum
+{
+	_name_directory_bit= 0,
+	_name_parent_directory_bit,
+	_name_filename_bit,
+	_name_extension_bit,
+	NUMBER_OF_NAME_FLAGS,
+	_name_full_mask = FLAG(_name_directory_bit) | FLAG(_name_filename_bit) | FLAG(_name_extension_bit),
+};
+
 /* structures */
 
 struct s_file_reference_info
@@ -41,5 +51,11 @@ ASSERT_STRUCT_SIZE(s_file_reference, 272);
 /* prototypes */
 
 s_file_reference_info* file_reference_get_info(s_file_reference* info);
+
+s_file_reference* file_reference_add_directory(s_file_reference* reference, const char* directory);
+
+char* __cdecl file_reference_get_name(const s_file_reference* reference, uint8 flags, char* out_name);
+
+void file_create_parent_directories_if_not_present(struct s_file_reference* file_reference);
 
 void file_trim(s_file_reference* reference, size_t max_size);

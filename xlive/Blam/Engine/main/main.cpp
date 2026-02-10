@@ -414,6 +414,10 @@ void __cdecl main_loop_body_server(void)
 	main_game_change_update();
 	main_save_map_private();
 
+#ifdef ERRORS_ENABLED
+	error_idle();
+#endif
+
 	cache_files_copy_do_work();
 	if (!shell_application_is_paused())
 	{
