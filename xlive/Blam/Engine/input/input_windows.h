@@ -2,7 +2,6 @@
 #include "controllers.h"
 #include "input_abstraction.h"
 #include "input_constants.h"
-#include "tag_files/tag_groups.h"
 
 /* constants */
 

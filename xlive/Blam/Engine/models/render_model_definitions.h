@@ -4,7 +4,6 @@
 #include "geometry/geometry_definitions_new.h"
 #include "render/render_prt.h"
 #include "structures/structures.h"
-#include "tag_files/tag_groups.h"
 #include "tag_files/tag_import_definitions.h"
 
 enum e_render_model_definition_flags : int16

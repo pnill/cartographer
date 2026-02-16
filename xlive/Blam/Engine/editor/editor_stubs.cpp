@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "editor_stubs.h"
 
-#include "tag_files/tag_groups.h"
 
 /* public code */
 

@@ -1,7 +1,6 @@
 #pragma once
 #include "xml_definition_block.h"
 
-#include "tag_files/tag_groups.h"
 #include "tag_files/tag_loader/tag_injection_define.h"
 
 /* classes */

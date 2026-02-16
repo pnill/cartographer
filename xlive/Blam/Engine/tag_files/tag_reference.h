@@ -1,5 +1,4 @@
 #pragma once
-#include "tag_files/tag_groups.h"
 
 struct tag_reference
 {

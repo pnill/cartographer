@@ -8,7 +8,6 @@
 #include "networking/network_event.h"
 #include "tag_files/data_reference.h"
 #include "tag_files/tag_block.h"
-#include "tag_files/tag_groups.h"
 #include "tag_files/tag_reference.h"
 #include "tag_files/tag_loader/tag_injection.h"
 #include "tag_files/tag_loader/tag_injection_define.h"

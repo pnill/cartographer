@@ -1,7 +1,6 @@
 #pragma once
 #include "user_interface_widget.h"
 #include "user_interface_text_block.h"
-#include "tag_files/tag_groups.h"
 
 /* classes */
 

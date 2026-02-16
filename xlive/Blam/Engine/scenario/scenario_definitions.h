@@ -2,7 +2,6 @@
 #include "game/game_allegiance.h"
 #include "math/periodic_functions.h"
 #include "tag_files/data_reference.h"
-#include "tag_files/tag_groups.h"
 #include "tag_files/tag_reference.h"
 
 /* constants */

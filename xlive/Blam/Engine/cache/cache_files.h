@@ -1,6 +1,5 @@
 #pragma once
 #include "main/game_preferences.h"
-#include "tag_files/tag_groups.h"
 
 /* constants */
 

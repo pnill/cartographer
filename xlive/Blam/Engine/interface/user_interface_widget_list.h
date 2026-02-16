@@ -2,7 +2,6 @@
 #include "user_interface_widget.h"
 #include "signal_slot.h"
 #include "memory/data.h"
-#include "tag_files/tag_groups.h"
 
 /* enums */
 

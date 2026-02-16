@@ -1,6 +1,5 @@
 #pragma once
 #include "simulation_game_objects.h"
-#include "tag_files/tag_groups.h"
 
 struct s_simulation_generic_creation_data
 {

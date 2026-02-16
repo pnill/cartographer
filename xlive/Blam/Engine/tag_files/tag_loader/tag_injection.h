@@ -1,6 +1,5 @@
 #pragma once
 #include "tag_injection_manager.h"
-#include "tag_files/tag_groups.h"
 
 /* constants */
 

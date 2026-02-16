@@ -2,7 +2,6 @@
 #include "tag_injection_table.h"
 
 #include "cache/cache_files.h"
-#include "tag_files/tag_groups.h"
 #include "xml/xml_agent.h"
 
 /* constants */

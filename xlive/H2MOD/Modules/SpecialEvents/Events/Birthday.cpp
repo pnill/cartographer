@@ -5,7 +5,6 @@
 
 #include "cache/cache_files.h"
 #include "tag_files/tag_loader/tag_injection.h"
-#include "tag_files/tag_groups.h"
 
 /* public code */
 

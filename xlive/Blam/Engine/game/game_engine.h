@@ -5,7 +5,6 @@
 #include "main/game_preferences.h"
 #include "math/color_math.h"
 #include "saved_games/game_variant.h"
-#include "tag_files/tag_groups.h"
 #include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"
 

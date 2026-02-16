@@ -1,5 +1,4 @@
 #pragma once
-#include "tag_files/tag_groups.h"
 #include "tag_files/tag_reference.h"
 
 #define NUMBER_OF_MATERIAL_TYPES 33

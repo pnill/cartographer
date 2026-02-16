@@ -99,6 +99,8 @@
 #include "math/real_math.h"
 #include "memory/static_arrays.h"
 
+#include "tag_files/tag_groups.h"
+
 #include <contrib/minizip/zip.h>
 
 #pragma comment(lib, "IPHLPAPI.lib")

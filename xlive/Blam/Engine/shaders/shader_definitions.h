@@ -4,7 +4,6 @@
 #include "cache/predicted_resources.h"
 #include "math/color_math.h"
 #include "math/function_definitions.h"
-#include "tag_files/tag_groups.h"
 #include "tag_files/tag_reference.h"
 
 #define k_number_of_shader_animation_property_types 14

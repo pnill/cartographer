@@ -1,6 +1,5 @@
 #pragma once
 #include "input/controllers.h"
-#include "tag_files/tag_groups.h"
 #include "tag_files/tag_reference.h"
 
 /* constants */

@@ -2,7 +2,6 @@
 #include "math/function_definitions.h"
 #include "memory/static_arrays.h"
 #include "render/render.h"
-#include "tag_files/tag_groups.h"
 #include "tag_files/tag_reference.h"
 #include "text/text.h"
 

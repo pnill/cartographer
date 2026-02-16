@@ -2,7 +2,6 @@
 #include "math/color_math.h"
 #include "math/integer_math.h"
 #include "text/text.h"
-#include "tag_files/tag_groups.h"
 
 /* structures */
 

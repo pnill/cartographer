@@ -9,7 +9,6 @@
 #include "main/level_definitions.h"
 #include "objects/damage.h"
 #include "saved_games/player_profile.h"
-#include "tag_files/tag_groups.h"
 #include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"
 #include "text/text_group.h"

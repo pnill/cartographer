@@ -6,7 +6,6 @@
 #include "object_scenario_definitions.h"
 
 #include "math/color_math.h"
-#include "tag_files/tag_groups.h"
 
 /* structures */
 

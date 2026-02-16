@@ -1,5 +1,4 @@
 #pragma once
-#include "tag_files/tag_groups.h"
 
 #define k_maximum_effect_locations_count 32
 

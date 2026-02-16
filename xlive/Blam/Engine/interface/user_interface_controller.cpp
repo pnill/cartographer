@@ -14,7 +14,6 @@
 #include "scenario/scenario.h"
 #include "sound/sound_manager.h"
 
-#include "tag_files/tag_groups.h"
 #include "text/unicode.h"
 
 /* typedefs */

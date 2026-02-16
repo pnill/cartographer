@@ -1,6 +1,5 @@
 #pragma once
 #include "math/color_math.h"
-#include "tag_files/tag_groups.h"
 
 struct s_cinematic_globals_flags
 {
