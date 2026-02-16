@@ -552,6 +552,7 @@
     <ClCompile Include="Blam\Engine\physics\character_physics_mode_dead.cpp" />
     <ClCompile Include="Blam\Engine\physics\character_physics_mode_flying.cpp" />
     <ClCompile Include="Blam\Engine\physics\character_physics_mode_sentinel.cpp" />
+    <ClCompile Include="Blam\Engine\render\render_prt.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />

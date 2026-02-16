@@ -25,6 +25,19 @@ enum e_screen_split_type : uint8
 	k_split_screen_type_count
 };
 
+enum e_frame_type
+{
+	_render_frame_none= 0,
+	_render_frame_1,
+	_render_frame_2,
+	_render_frame_3,
+	_render_frame_4,
+	_render_frame_5,
+	_render_frame_6,
+	_render_frame_7,
+	NUMBER_OF_RENDER_FRAME_TYPES
+};
+
 /* structures */
 
 struct s_bloom_window_data

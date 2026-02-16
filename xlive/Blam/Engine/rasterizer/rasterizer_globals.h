@@ -2,7 +2,10 @@
 
 /* constants */
 
-#define k_max_texture_stages 4
+enum
+{
+	k_max_texture_stages = 4,
+};
 
 /* enums */
 

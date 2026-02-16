@@ -40,6 +40,8 @@
 #include "rasterizer/rasterizer_stipple.h"
 #include "rasterizer/rasterizer_text.h"
 #include "rasterizer/rasterizer_transparent_geometry.h"
+#include "render/render.h"
+#include "render/render_prt.h"
 #include "render/render_weather.h"
 #include "saved_games/game_state.h"
 #include "shell/shell.h"
@@ -192,6 +194,10 @@ static datum g_last_bitmap_tag_index = 0;
 
 static s_rasterizer_parameters g_rasterizer_parameters = {};
 
+static D3DCAPS9 global_d3d_caps;
+
+static real32 g_gamma_ramp;
+
 /* prototypes */
 
 static PALETTEENTRY* g_d3d_palettes_get(void);
@@ -255,14 +261,10 @@ void rasterizer_dx9_main_apply_patches(void)
 	// Redirect dx9 initialization function so we can use d3d9on12 and do other cool stuff
 	DETOUR_ATTACH(p_rasterizer_dx9_initialize, Memory::GetAddress<rasterizer_dx9_initialize_t>(0x263359, 0x0), rasterizer_initialize);
 
-	// disable gamma correction by using D3D9::SetGammaRamp, TODO: implement a shader to take care of this, because D3D9::SetGammaRamp function seems to have 2 issues:
-	// 1) it's very heavy on NVIDIA/Intel (not sure about AMD) GPUs (or there is something wrong with the drivers), causing stuttering on maps that override gamma (like Warlock, Turf, Backwash)
-	// 2) it doesn't apply the gamma override when playing in windowed mode (thus why some people like using windowed mode, because it doesn't cause stuttering on these maps)
-
-	// maybe we could find a way to use the gamma shader built in by converting the override gamma ramp to something that shader could understand
-	BYTE SetGammaRampSkipBytes[] = { 0xE9, 0x94, 0x00, 0x00, 0x00, 0x90 };
-	NopFill(Memory::GetAddress(0x26192F), 15);
-	WriteBytes(Memory::GetAddress(0x26193E), SetGammaRampSkipBytes, sizeof(SetGammaRampSkipBytes));
+	// Replace calls to rasterizer_frame_begin with our own
+	PatchCall(Memory::GetAddress(0x190EC3), rasterizer_frame_begin);
+	PatchCall(Memory::GetAddress(0x19204C), rasterizer_frame_begin);
+	PatchCall(Memory::GetAddress(0x19220C), rasterizer_frame_begin);
 	return;
 }
 
@@ -285,11 +287,6 @@ IDirect3DDevice9Ex* rasterizer_dx9_device_get_interface(void)
 datum last_bitmap_tag_index_get(void)
 {
 	return g_last_bitmap_tag_index;
-}
-
-D3DCAPS9* rasterizer_dx9_caps_get(void)
-{
-	return Memory::GetAddress<D3DCAPS9*>(0x9DA900);
 }
 
 int32* hardware_vertex_processing_get(void)
@@ -363,7 +360,7 @@ void rasterizer_dx9_present(bitmap_data* screenshot_bitmap, bool a2)
 #endif
 			++rasterizer_globals->display_parameters.frame_presented_count;
 			// nullsub_69();
-			if (!loading_screen_in_progress())
+			if (!rasterizer_loading_screen_active())
 			{
 				rasterizer_cache_bitmaps();
 			}
@@ -679,14 +676,14 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
 
 	if (succeeded)
 	{
-		D3DCAPS9* caps = rasterizer_dx9_caps_get();
 		IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
 
 		HRESULT hr;
 		rasterizer_dx9_log_hr(
 			hr,
-			global_d3d_device->GetDeviceCaps(caps)
+			global_d3d_device->GetDeviceCaps(&global_d3d_caps)
 		);
+
 		if (SUCCEEDED(hr))
 		{
 			if (!g_rasterizer_dx9_driver_globals.disable_amd_or_ati_patches)
@@ -696,9 +693,9 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
 
 			// Tells the game to make use of MRT and shader model 3 if the gpu supports it
 			rasterizer_globals_get()->d3d9_sm3_supported =
-				caps->MaxVertexShader30InstructionSlots >= 512 &&
-				caps->MaxPixelShader30InstructionSlots >= 512 &&
-				caps->NumSimultaneousRTs >= 2 &&
+				global_d3d_caps.MaxVertexShader30InstructionSlots >= 512 &&
+				global_d3d_caps.MaxPixelShader30InstructionSlots >= 512 &&
+				global_d3d_caps.NumSimultaneousRTs >= 2 &&
 				!H2Config_force_off_sm3 &&                          // Force disable sm3 if setting is set in H2Config
 				!g_rasterizer_dx9_driver_globals.using_amd_or_ati_gpu;
 		}
@@ -912,6 +909,103 @@ bool __cdecl rasterizer_dx9_render_scene_start(const rasterizer_scene_begin_para
 bool __cdecl rasterizer_dx9_render_scene_end(void)
 {
 	return INVOKE(0x262215, 0x0, rasterizer_dx9_render_scene_end);
+}
+
+void __cdecl rasterizer_frame_begin(
+	const s_frame_parameters* parameters)
+{
+	IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
+
+	ASSERT(global_d3d_device);
+	ASSERT(parameters);
+	ASSERT(parameters->frame_type>_render_frame_none && parameters->frame_type<NUMBER_OF_RENDER_FRAME_TYPES);
+	ASSERT(parameters->time>=0.0f);
+
+	s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
+
+	*global_frame_parameters_get() = *parameters;
+
+	rasterizer_globals->clipping_parameters.depth_near = PIN(rasterizer_globals->clipping_parameters.z_near, 0.f, 1.f);
+	rasterizer_globals->clipping_parameters.depth_far = PIN(rasterizer_globals->clipping_parameters.z_far, 0.f, 1.f);
+	
+	// Original code did this but it's redundant since values are overriden below anyways
+	/*
+	if (rasterizer_globals->clipping_parameters.z_near == 0.f)
+	{
+		rasterizer_globals->clipping_parameters.z_near = *Memory::GetAddress<real32*>(0x468150);	// global_z_near
+	}
+	if (rasterizer_globals->clipping_parameters.z_far == 0.f)
+	{
+		rasterizer_globals->clipping_parameters.z_far = *Memory::GetAddress<real32*>(0x468154);		// global_z_far
+	}
+	*/
+
+	rasterizer_globals->clipping_parameters.z_near = rasterizer_get_near_clip_distance();
+	rasterizer_globals->clipping_parameters.z_far = rasterizer_get_far_clip_distance();
+
+	ASSERT(!rasterizer_loading_screen_active());
+
+	HRESULT hr;
+	rasterizer_dx9_log_hr(
+		hr,
+		global_d3d_device->BeginScene()
+	);
+
+	if (FAILED(hr))
+	{
+		error(_error_silent, "### ERROR rasterizer_frame_begin failed");
+	}
+
+	if (TEST_FLAG(global_d3d_caps.Caps2, D3DCAPS2_FULLSCREENGAMMA))
+	{
+		real32 gamma_ramp = rasterizer_cinematics_get_gamma_ramp();
+		real32 bloom_override_amount = 0.f;
+		real32 bloom_override_gamma_power = 0.f;
+		scenario_fog_bloom_override_get_parameters(&bloom_override_amount, &bloom_override_gamma_power);
+	
+		if (bloom_override_amount>0.f)
+		{
+			bloom_override_amount= PIN(bloom_override_amount, 0.f, 1.f);
+			gamma_ramp = (bloom_override_gamma_power-gamma_ramp) * bloom_override_amount+gamma_ramp;
+		}
+
+		if (gamma_ramp<0.1f)
+		{
+			gamma_ramp = 1.f;
+		}
+
+		// disable gamma correction by using D3D9::SetGammaRamp, TODO: implement a shader to take care of this, because D3D9::SetGammaRamp function seems to have 2 issues:
+		// 1) it's very heavy on NVIDIA/Intel (not sure about AMD) GPUs (or there is something wrong with the drivers), causing stuttering on maps that override gamma (like Warlock, Turf, Backwash)
+		// 2) it doesn't apply the gamma override when playing in windowed mode (thus why some people like using windowed mode, because it doesn't cause stuttering on these maps)
+		if (false)
+		{
+			if (gamma_ramp != g_gamma_ramp)
+			{
+				D3DGAMMARAMP ramp;
+
+				for (int32 i = 0; i<256; ++i)
+				{
+					real32 brightness = i / 255.f;
+					uint16 v6 = (uint16)(((int32)(pow(brightness, gamma_ramp) * 255.f)) << 8);
+
+					ramp.red[i] = v6;
+					ramp.green[i] = v6;
+					ramp.blue[i] = v6;
+				}
+
+				global_d3d_device->SetGammaRamp(0, 0, &ramp);
+				g_gamma_ramp = gamma_ramp;
+			}
+		}
+	}
+
+	*Memory::GetAddress<bool*>(0xA3E3B5) = true;	// only used here?
+	*Memory::GetAddress<bool*>(0xA3E3B6) = true;	// rendering shadows?
+	rasterizer_globals->bitmaps.field_91 = true;
+	rasterizer_globals->bitmaps.field_90 = true;
+	render_prt_begin_frame();
+
+	return;
 }
 
 void __cdecl rasterizer_dx9_clear_render_target(uint32 flags, pixel32 color, real32 z, bool stencil)

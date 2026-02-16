@@ -3,8 +3,11 @@
 
 /* constants */
 
-#define k_screen_effect_script_value_count 4
-#define k_cinematic_layer_count 32
+enum
+{
+	k_screen_effect_script_value_count = 4,
+	k_cinematic_layer_count = 32,
+};
 
 /* structures */
 
@@ -104,5 +107,11 @@ ASSERT_STRUCT_SIZE(s_rasterizer_cinematics_globals, 1020)
 /* prototypes */
 
 void __cdecl rasterizer_cinematics_initialize(void);
+
+real32 rasterizer_get_near_clip_distance(void);
+
+real32 rasterizer_get_far_clip_distance(void);
+
+real32 rasterizer_cinematics_get_gamma_ramp(void);
 
 s_rasterizer_cinematics_globals* __cdecl rasterizer_cinematic_screen_effect_update(s_rasterizer_cinematics_globals* globals);

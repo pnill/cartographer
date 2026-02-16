@@ -267,7 +267,7 @@ void __cdecl render_window(window_bound* window, bool is_texture_camera)
 	bool draw_sky = structure_get_sky(cluster_index, &visible_sky_index, &clear_color, &clear_color_active);
 
 	s_scenario_fog_result fog;
-	scenario_get_atmospheric_fog(cluster_index, &window->render_camera, &window->render_camera.forward, draw_sky, *get_render_fog_enabled(), &fog);
+	render_scenario_fog(cluster_index, &window->render_camera, &window->render_camera.forward, draw_sky, *get_render_fog_enabled(), &fog);
 	if (clear_color_active)
 	{
 		fog.clear_color = clear_color;

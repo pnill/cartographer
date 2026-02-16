@@ -77,8 +77,6 @@ IDirect3DDevice9Ex* rasterizer_dx9_device_get_interface(void);
 
 datum last_bitmap_tag_index_get(void);
 
-D3DCAPS9* rasterizer_dx9_caps_get(void);
-
 int32* hardware_vertex_processing_get(void);
 
 bool __cdecl rasterizer_dx9_reset(bool create_window);
@@ -132,6 +130,8 @@ bool __cdecl rasterizer_dx9_vertex_shaders_initialize(void);
 bool __cdecl rasterizer_dx9_render_scene_start(const struct rasterizer_scene_begin_parameters* parameters);
 
 bool __cdecl rasterizer_dx9_render_scene_end(void);
+
+void __cdecl rasterizer_frame_begin(const struct s_frame_parameters* parameters);
 
 void __cdecl rasterizer_dx9_clear_render_target(uint32 flags, pixel32 color, real32 z, bool stencil);
 

@@ -1,3 +1,3 @@
 #pragma once
 
-bool __cdecl loading_screen_in_progress(void);
+bool __cdecl rasterizer_loading_screen_active(void);

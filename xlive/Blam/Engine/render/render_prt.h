@@ -1,8 +1,15 @@
 #pragma once
 #include "geometry/geometry_block.h"
 
-#define k_max_cluster_data_size 34560
-#define k_max_pca_per_vertex_data_size 150405120
+/* constants */
+
+enum
+{
+	k_max_cluster_data_size = 34560,
+	k_max_pca_per_vertex_data_size = 150405120
+};
+
+/* structures */
 
 // max count: MAXIMUM_SECTIONS_PER_RENDER_MODEL
 struct prt_section_info
@@ -16,7 +23,7 @@ ASSERT_STRUCT_SIZE(prt_section_info, 8);
 struct prt_lod_info
 {
 	int32 cluster_offset;
-	tag_block<prt_section_info> sectionInfo;
+	s_tag_block section_info;	// prt_section_info
 };
 ASSERT_STRUCT_SIZE(prt_lod_info, 12);
 
@@ -31,11 +38,21 @@ struct prt_info
 	real32 length_scale;
 	uint16 number_of_lods_in_model;
 	int16 pad;
-	tag_block<prt_lod_info> lod_info;
+	s_tag_block lod_info;			// prt_lod_info
 
-	tag_block<real32> cluster_basis;    // max count: k_max_cluster_data_size
-	tag_block<real32> rawpcadata;       // max count: k_max_pca_per_vertex_data_size
-	tag_block<rasterizer_vertex_buffer> vertex_buffers; // max count: MAXIMUM_SECTIONS_PER_RENDER_MODEL
+	// max count: k_max_cluster_data_size
+	s_tag_block cluster_basis;		// real32
+
+	// max count: k_max_pca_per_vertex_data_size
+	s_tag_block rawpcadata;			// real32
+
+	// max count: MAXIMUM_SECTIONS_PER_RENDER_MODEL
+	s_tag_block vertex_buffers;		// rasterizer_vertex_buffer
+
 	geometry_block_info geometry_block_info;
 };
 ASSERT_STRUCT_SIZE(prt_info, 88);
+
+/* prototypes */
+
+void __cdecl render_prt_begin_frame(void);
