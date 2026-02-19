@@ -3,7 +3,6 @@
 
 /* macros */
 
-#define WIN32_LEAN_AND_MEAN
 #define JMP_OP_CODE 0xEB
 #define JNZ_OP_CODE 0x75
 
@@ -23,46 +22,6 @@ do \
 
 #define DETOUR_COMMIT() \
 	DetourTransactionCommit();
-
-#ifdef LLVM
-#define CLASS_HOOK_DECLARE_LABEL(name, member) static auto name = &member
-
-#else
-#define CLASS_HOOK_DECLARE_LABEL(name, member)
-#endif
-
-#ifdef LLVM
-#define CLASS_HOOK_JMP(name, member) __asm jmp (name)
-#else
-#define CLASS_HOOK_JMP(name, member) __asm jmp (member)
-#endif
-
-
-// Invokes a function
-// ADDR_CLIENT: file offset in halo2.exe
-// ADDR_SERVER: file offset in h2server.exe
-// TYPE: function
-// __VA_ARGS__: arguments for the function we want to invoke
-// NOTE:
-// if server or client is equal to 0 then we pass the same address for both (ONLY ON RELEASE BUILDS)
-// REASON:
-// optimizes out a cmov or related instruction when building release whenever we call a function that doesn't have a dedi address specified
-#ifdef NDEBUG
-#define INVOKE_BY_TYPE(_addr_client, _addr_server, _type, ...)	\
-Memory::GetAddress<_type>(_addr_client == 0 ? _addr_server : _addr_client, _addr_server == 0 ? _addr_client : _addr_server)(__VA_ARGS__)
-#else
-#define INVOKE_BY_TYPE(_addr_client, _addr_server, _type, ...)	\
-Memory::GetAddress<_type>(_addr_client, _addr_server)(__VA_ARGS__)
-#endif
-
-#define INVOKE(_addr_client, _addr_server, _fn_decl, ...) INVOKE_BY_TYPE(_addr_client, _addr_server, decltype(_fn_decl)*, __VA_ARGS__)
-// ### TODO find better name
-#define INVOKE_TYPE(_addr_client, _addr_server, _type, ...) INVOKE_BY_TYPE(_addr_client, _addr_server, _type, __VA_ARGS__)
-
-#define INVOKE_VFPTR_FN(_get_table_fn, _index, _type, ...) \
-	(this->**_get_table_fn<_type>(_index))(__VA_ARGS__)
-
-#define INVOKE_CLASS_FN(classobj, functionPtr)  ((classobj)->*(functionPtr))
 
 /* prototypes */
 

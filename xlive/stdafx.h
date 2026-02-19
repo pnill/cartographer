@@ -84,8 +84,6 @@
 #include "CartographerDllConf.h"
 
 #include "Util/curl-interface.h"
-#include "Util/Hooks/Hook.h"
-#include "Util/Memory.h"
 
 // blam includes
 
@@ -100,6 +98,11 @@
 #include "memory/static_arrays.h"
 
 #include "tag_files/tag_groups.h"
+
+/* hooking */
+
+#include "Util/Hooks/Hook.h"
+#include "Util/Memory.h"
 
 #include <contrib/minizip/zip.h>
 
