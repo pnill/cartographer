@@ -323,19 +323,19 @@ static void setup_game_options_text(const wchar_t* reports_path)
 		fwprintf(file, L"%u\n", game_options->menu_context);
 
 		fwprintf(file, L"Valid Machine Mask: ");
-		fwprintf(file, L"%u\n", game_options->valid_machine_mask);
+		fwprintf(file, L"%u\n", game_options->machines.valid_machine_mask);
 
 		fwprintf(file, L"Machine Identifiers: ");
 		for (size_t i = 0; i < 17; i++)
 		{
-			print_array_to_file(file, game_options->machines[i].machine_identifier, 6);
+			print_array_to_file(file, game_options->machines.machines[i].machine_identifier, 6);
 		}
 
 		fwprintf(file, L"Local Machine Exists: ");
 		print_bool_to_file(file, game_options->coop);
 
 		fwprintf(file, L"Local Machine Identifier: ");
-		print_array_to_file(file, game_options->local_machine_identifier.machine_identifier, 6);
+		print_array_to_file(file, game_options->machines.local_machine_identifier.machine_identifier, 6);
 
 		fclose(file);
 	}

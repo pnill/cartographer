@@ -54,7 +54,7 @@ typedef struct
 	char core_name[255];
 } s_main_game_globals_debug;
 
-s_main_game_globals_debug g_main_game_globals_debug;
+static s_main_game_globals_debug g_main_game_globals_debug;
 
 /* prototypes */
 
@@ -146,18 +146,21 @@ bool __cdecl main_game_change_update(void)
 	return INVOKE(0x985E, 0x1FB49, main_game_change_update);
 }
 
-void main_game_launch_set_map_name(const char* map_name)
+void main_game_launch_set_map_name(
+	const char* map_name)
 {
 	MultiByteToWideChar(CP_UTF8, 0, map_name, -1, g_main_game_launch_options.scenario_path, 260);
 	return;
 }
 
-void main_game_load_from_core()
+void main_game_load_from_core(void)
 {
 	main_game_load_from_core_name("core");
+	return;
 }
 
-void main_game_load_from_core_name(const char* core_name)
+void main_game_load_from_core_name(
+	char const* core_name)
 {
 	s_game_options game_options;
 	if (game_state_get_game_options_from_core(core_name, &game_options))
@@ -172,27 +175,32 @@ void main_game_load_from_core_name(const char* core_name)
 	}
 }
 
-void main_game_load_post_game_launch()
+void main_game_load_post_game_launch(void)
 {
 	if (g_main_game_globals_debug.load_core_on_game_launch)
 	{
 		main_load_core_name(g_main_game_globals_debug.core_name);
 		g_main_game_globals_debug.load_core_on_game_launch = false;
 	}
+
+	return;
 }
 
 // TODO rewrite the obfuscated function
-bool __cdecl main_game_change(const s_game_options* options)
+bool __cdecl main_game_change(
+	s_game_options const* options)
 {
 	return INVOKE(0x89BA, 0x1E4EC, main_game_change, options);
 }
 
-bool __cdecl main_game_change_immediate(const s_game_options* options)
+bool __cdecl main_game_change_immediate(
+	s_game_options const* options)
 {
 	return INVOKE(0x911B, 0x1F523, main_game_change_immediate, options);
 }
 
-void main_game_launch_set_difficulty(int16 difficulty)
+void main_game_launch_set_difficulty(
+	int16 difficulty)
 {
 	ASSERT(VALID_INDEX(difficulty, k_campaign_difficulty_levels_count));
 	g_main_game_launch_options.difficulty = difficulty;
@@ -200,7 +208,8 @@ void main_game_launch_set_difficulty(int16 difficulty)
 	return;
 }
 
-void main_game_launch_set_coop_player_count(int32 player_count)
+void main_game_launch_set_coop_player_count(
+	int32 player_count)
 {
 	if (IN_RANGE(player_count, 1, k_number_of_users))
 	{
@@ -210,12 +219,13 @@ void main_game_launch_set_coop_player_count(int32 player_count)
 	}
 	else
 	{
-		error(_error_delayed, "%s: invalid player count %d (must be from 1-%d)", __FUNCTION__, player_count, k_number_of_users);
+		error(_error_silent, "%s: invalid player count %d (must be from 1-%d)", __FUNCTION__, player_count, k_number_of_users);
 	}
 	return;
 }
 
-void main_game_launch_set_multiplayer_splitscreen_count(int32 player_count)
+void main_game_launch_set_multiplayer_splitscreen_count(
+	int32 player_count)
 {
 	if (IN_RANGE(player_count, 1, k_number_of_users))
 	{
@@ -229,12 +239,13 @@ void main_game_launch_set_multiplayer_splitscreen_count(int32 player_count)
 	}
 	else
 	{
-		error(_error_delayed, "%s: invalid player count %d (must be from 1-%d)", __FUNCTION__, player_count, k_number_of_users);
+		error(_error_silent, "%s: invalid player count %d (must be from 1-%d)", __FUNCTION__, player_count, k_number_of_users);
 	}
 	return;
 }
 
-void main_game_launch_set_multiplayer_variant(const char* variant_name)
+void main_game_launch_set_multiplayer_variant(
+	char const* variant_name)
 {	
 	size_t i = 0;
 	for (; i < k_variant_count; ++i)
@@ -247,7 +258,7 @@ void main_game_launch_set_multiplayer_variant(const char* variant_name)
 
 	if (i == k_variant_count)
 	{
-		error(_error_delayed, "%s: invalid variant name [%s] provided, defaulting to slayer", __FUNCTION__, variant_name);
+		error(_error_silent, "%s: invalid variant name [%s] provided, defaulting to slayer", __FUNCTION__, variant_name);
 		game_variant_build_default(&g_main_game_launch_options.game_variant, _game_variant_description_slayer);
 	}
 	else
@@ -268,19 +279,21 @@ void main_game_launch_set_game_mode(int32 game_mode)
 	}
 	else
 	{
-		error(_error_delayed, "%s: invalid game mode [%d] provided", __FUNCTION__, game_mode);
+		error(_error_silent, "%s: invalid game mode [%d] provided", __FUNCTION__, game_mode);
 	}
 	return;
 }
 
-void main_game_launch_legacy(const char* map_name)
+void main_game_launch_legacy(
+	char const* map_name)
 {
 	damaged_media_clear_error();
 	main_game_launch(map_name);
 	return;
 }
 
-void main_game_launch(const char* map_name)
+void main_game_launch(
+	char const* map_name)
 {
 	cache_file_map_clear_all_failures();
 	main_game_launch_set_map_name(map_name);
@@ -322,6 +335,107 @@ void main_menu_launch_force(void)
 	return;
 }
 
+bool map_memory_configuration_is_campaign(
+	e_map_memory_configuration configuration)
+{
+	bool result = false;
+
+	switch (configuration)
+	{
+	case _map_memory_configuration_none:
+	case _map_memory_configuration_multiplayer:
+		result= false;
+		break;
+	case _map_memory_configuration_online_campaign:
+	case _map_memory_configuration_online_campaign_splitscreen:
+	case _map_memory_configuration_solo_campaign:
+	case _map_memory_configuration_campaign_splitscreen:
+		result= true;
+		break;
+	default:
+		unreachable();
+		break;
+	}
+
+	return result;
+}
+
+bool map_memory_configuration_is_campaign_splitscreen(
+	e_map_memory_configuration configuration)
+{
+	bool result= false;
+
+	switch (configuration)
+	{
+	case _map_memory_configuration_none:
+	case _map_memory_configuration_multiplayer:
+	case _map_memory_configuration_online_campaign:
+	case _map_memory_configuration_solo_campaign:
+		result= false;
+		break;
+	case _map_memory_configuration_online_campaign_splitscreen:
+	case _map_memory_configuration_campaign_splitscreen:
+		result= true;
+		break;
+	default:
+		unreachable();
+		break;
+	}
+
+	return result;
+}
+
+bool map_memory_configuration_is_campaign_online(
+	e_map_memory_configuration configuration)
+{
+	bool result= false;
+
+	switch (configuration)
+	{
+	case _map_memory_configuration_none:
+	case _map_memory_configuration_multiplayer:
+	case _map_memory_configuration_solo_campaign:
+	case _map_memory_configuration_campaign_splitscreen:
+		result= false;
+		break;
+	case _map_memory_configuration_online_campaign:
+	case _map_memory_configuration_online_campaign_splitscreen:
+		result= true;
+		break;
+	default:
+		unreachable();
+		break;
+	}
+
+	return result;
+}
+
+
+bool map_memory_configuration_is_campaign_offline(
+	e_map_memory_configuration configuration)
+{
+	bool result= false;
+
+	switch (configuration)
+	{
+	case _map_memory_configuration_none:
+	case _map_memory_configuration_multiplayer:
+	case _map_memory_configuration_online_campaign:
+	case _map_memory_configuration_online_campaign_splitscreen:
+		result= false;
+		break;
+	case _map_memory_configuration_solo_campaign:
+	case _map_memory_configuration_campaign_splitscreen:
+		result= true;
+		break;
+	default:
+		unreachable();
+		break;
+	}
+
+	return result;
+}
+
 /* private code */
 
 static s_main_game_globals* main_game_globals_get(void)
@@ -350,7 +464,7 @@ static void main_game_launch_setup_game_mode_details(void)
 	}
 	default:
 	{
-		error(_error_delayed, "%s: unknown game mode %d!", __FUNCTION__, (int32)g_main_game_launch_options.game_mode);
+		error(_error_silent, "%s: unknown game mode %d!", __FUNCTION__, (int32)g_main_game_launch_options.game_mode);
 	}
 	}
 
@@ -412,8 +526,8 @@ static void main_game_load_panic(void)
 	static bool x_recursion_lock = false;
 	if (debug_load_panic_to_main_menu)
 	{
-		error(_error_immediate, "### ERROR main_game_load_panic: recursion lock triggered (we must have failed to load the main menu from a panic state)");
-		error(_error_immediate, "### ERROR main game load failed, unable to recover, aborting to pregame");
+		error(_error_log, "### ERROR main_game_load_panic: recursion lock triggered (we must have failed to load the main menu from a panic state)");
+		error(_error_log, "### ERROR main game load failed, unable to recover, aborting to pregame");
 		main_game_internal_pregame_load();
 		main_halt_and_display_errors();
 	}
@@ -421,7 +535,7 @@ static void main_game_load_panic(void)
 	{
 		if (x_recursion_lock)
 		{
-			error(_error_immediate, "### ERROR main game load failed, unable to recover, aborting to pregame");
+			error(_error_log, "### ERROR main game load failed, unable to recover, aborting to pregame");
 			main_game_internal_pregame_load();
 			main_halt_and_display_errors();
 		}
@@ -439,7 +553,9 @@ static void main_game_load_panic(void)
 	return;
 }
 
-static void main_menu_build_game_options(s_game_options* options, int32 menu_context)
+static void main_menu_build_game_options(
+	s_game_options* options,
+	int32 menu_context)
 {
 	ASSERT(options);
 	

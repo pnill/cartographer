@@ -42,6 +42,15 @@ struct game_player_options
 };
 ASSERT_STRUCT_SIZE(game_player_options, 212);
 
+struct game_machine_options
+{
+	uint32 valid_machine_mask;
+	s_machine_identifier machines[k_network_maximum_machines_per_session];
+	bool local_machine_exists;
+	s_machine_identifier local_machine_identifier;
+};
+ASSERT_STRUCT_SIZE(game_machine_options, 0x74);
+
 struct s_game_options
 {
 	e_game_mode game_mode;
@@ -73,11 +82,7 @@ struct s_game_options
 	int16 pad_29E;
 	s_game_variant game_variant;
 	uint32 menu_context;
-	uint32 valid_machine_mask;
-	s_machine_identifier machines[k_network_maximum_machines_per_session];
-	bool local_machine_exists;
-	s_machine_identifier local_machine_identifier;
-	int8 pad_444[3];
+	game_machine_options machines;
 	game_player_options players[k_maximum_players]; 
 };
 ASSERT_STRUCT_SIZE(s_game_options, 4488);
