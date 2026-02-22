@@ -36,6 +36,7 @@ enum e_weapon_barrel_flags : uint16
 	_weapon_barrel_did_firing_effect_this_burst_bit,
 	k_weapon_barrel_flag_count
 };
+typedef c_flags_no_init<e_weapon_barrel_flags, uint16, k_weapon_barrel_flag_count> c_weapon_barrel_flags;
 
 enum e_weapon_trigger_state : uint8
 {
@@ -64,6 +65,7 @@ enum e_weapon_trigger_flags : uint16
 	_weapon_trigger_began_tracking_cycle,
 	k_weapon_trigger_flag_count,
 };
+typedef c_flags_no_init<e_weapon_trigger_flags, uint16, k_weapon_trigger_flag_count> c_weapon_trigger_flags;
 
 enum e_weapon_magazine_state : uint16
 {
@@ -83,25 +85,35 @@ enum e_weapon_magazine_state : uint16
 
 struct weapon_barrel
 {
-	//todo: go back through this structure
-	int8 data_0[4];
-	bool field_4;
-	bool field_5;
-	int8 data_6[2];
-	c_flags_no_init<e_weapon_barrel_flags, uint16, k_weapon_barrel_flag_count> flags;
-	int16 field_A;
-	int8 data3[4];
-	int32 recovery_timer;
-	real32 reload_ticks_maybe;
-	int8 data2[28];
+	int8_t firing_idle_ticks;
+	e_weapon_barrel_state state;
+	int16_t state_timer;
+	c_weapon_barrel_flags flags;
+	uint16_t fire_count;
+	uint16_t firing_effects_used_flags;
+	int16_t firing_effect_index;
+	int16_t firing_effect_shots_remaining;
+	int16_t sequential_non_tracer_rounds;
+	float rate_of_fire;
+	float ejection_port_position;
+	float illumination;
+	float current_error;
+	float angle_change_scale;
+	float bonus_shot_fraction;
+	float recovery_overflow;
+	uint16_t bonus_shot_count;
+	uint8_t staggered_marker_offset;
+	uint8_t _pad_2F;
+	int32_t effect_index;
 };
+
 
 struct weapon_trigger
 {
 	e_weapon_trigger_state state;
 	uint8 utility_timer;
 	int16 state_timer;
-	c_flags_no_init<e_weapon_trigger_flags, uint16, k_weapon_trigger_flag_count> flags;
+	c_weapon_trigger_flags flags;
 	int16 pad;
 	int32 charging_effect_index;
 };

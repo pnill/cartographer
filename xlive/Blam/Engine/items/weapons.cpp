@@ -44,9 +44,9 @@ void weapon_barrel_idle(uint32 weapon_index, uint16 barrel_index)
     weapon_barrel* weapon_barrel = &weapon->weapon.barrels[barrel_index];
     weapon_barrel_definition* barrel_def = weapon_def->weapon.barrels[barrel_index];
 
-    weapon_barrel->field_4 = false;
-    weapon_barrel->field_A = 0;
-    weapon_barrel->field_5 = false;
+    weapon_barrel->firing_idle_ticks = 0;
+    weapon_barrel->fire_count = 0;
+    weapon_barrel->state = _weapon_barrel_state_idle;
 
     bool dub_shot_test = barrel_def->damage_effect_reporting_type == _damage_reporting_type_battle_rifle && currentVariantSettings.disable_dub_shot;
 
