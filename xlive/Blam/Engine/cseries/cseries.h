@@ -1,4 +1,5 @@
 #pragma once
+#include <stdlib.h>
 
 // 8-bit character that's specified as a multibyte utf8 string
 typedef char utf8;
@@ -53,7 +54,6 @@ struct utf32
 	uint32 character;
 };
 
-
 enum
 {
 	BYTE_MAX = 255,
@@ -94,6 +94,10 @@ extern bool g_catch_exceptions;
 #endif
 
 /* macros */
+
+#define TEST_N_DEF(TEST)
+
+#define STRINGIFY(x) #x
 
 #define J( symbol1, symbol2 ) _DO_JOIN( symbol1, symbol2 )
 #define _DO_JOIN( symbol1, symbol2 ) symbol1##symbol2
@@ -207,6 +211,8 @@ while(0)
 #endif // ASSERTS_ENABLED
 
 /* prototypes */
+
+extern bool is_debugger_present(void);
 
 void cseries_initialize(void);
 

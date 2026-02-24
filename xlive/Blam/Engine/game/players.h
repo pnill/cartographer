@@ -6,13 +6,6 @@
 #include "networking/network_game_definitions.h"
 #include "simulation/machine_id.h"
 
-/* constants */
-
-enum
-{
-	k_shot_entries_per_player = 8
-};
-
 /* enums */
 
 enum e_player_flags : int16

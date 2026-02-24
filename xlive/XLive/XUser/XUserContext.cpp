@@ -16,7 +16,7 @@ DWORD WINAPI XUserGetContext(DWORD dwUserIndex, XUSER_CONTEXT* pContext, PXOVERL
 DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwContextValue)
 {
 	LOG_TRACE_XLIVE("XUserSetContext  (userIndex = {0}, contextId = {1}, contextValue = {2})", dwUserIndex, dwContextId, dwContextValue);
-	discord_interface_set_context((e_context_id)dwContextId, dwContextValue);
+	discord_interface_set_context(dwContextId, dwContextValue);
 	return ERROR_SUCCESS;
 }
 

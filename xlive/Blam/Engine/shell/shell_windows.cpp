@@ -6,10 +6,11 @@
 #include "shell_windows_ipc.h"
 #include "shell_windows_pcc.h"
 
+#include "cartographer/discord/discord_interface.h"
 #include "input/input_windows.h"
 #include "main/main.h"
-#include "rasterizer/dx9/rasterizer_dx9_main.h"
 #include "interface/user_interface_networking.h"
+#include "rasterizer/rasterizer_main.h"
 
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
@@ -18,13 +19,7 @@
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 
 #ifndef IMGUI_DISABLE
-
 #include "imgui.h"
-
-/* prototypes */
-
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
 #endif
 
 /* constants */
@@ -33,6 +28,18 @@ enum
 {
 	k_max_monitor_count = 9
 };
+
+static const wchar_t k_discord_dll_filename[] = L"discord_game_sdk.dll";
+
+/* prototypes */
+
+extern void h2log_onscreen_initialize(void);
+
+extern void h2log_initialize(void);
+
+#ifndef IMGUI_DISABLE
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+#endif
 
 /* globals */
 
@@ -84,6 +91,8 @@ static void shell_windows_initialize_arguments(void);
 
 static bool __cdecl shell_windows_is_remote_desktop(void);
 
+static void discord_initialize(void);
+
 static bool shell_set_game_cursor_state_hook(bool enabled);
 
 static void DuplicateDataBlob(DATA_BLOB* pDataIn, DATA_BLOB* pDataOut);
@@ -134,6 +143,7 @@ bool shell_platform_initialize(void)
 
 	shell_windows_throttle_framerate_initialize();
 
+	h2log_onscreen_initialize();
 	InitOnScreenDebugText();
 
 	// TODO: initialize the ini config in the same place between client and dedi 
@@ -142,6 +152,8 @@ bool shell_platform_initialize(void)
 		InitH2Config();
 		PostH2Config();
 	}
+
+	discord_initialize();
 
 	h2log_initialize();
 
@@ -279,7 +291,7 @@ uint32 shell_windows_get_monitor_index(void)
 		result = shell_command_line_flag_get(_shell_command_line_flag_monitor_count);
 
 		// Set monitor index to 0 if the monitor index set by the shell flag isn't a valid monitor
-		if (result >= rasterizer_dx9_main_globals_get()->global_d3d_interface->GetAdapterCount())
+		if (result >= rasterizer_get_adapter_count())
 		{
 			result = 0;
 		}
@@ -734,6 +746,22 @@ static void shell_windows_initialize_arguments(void)
 static bool __cdecl shell_windows_is_remote_desktop(void)
 {
 	return INVOKE(0x39EA2, 0x0, shell_windows_is_remote_desktop);
+}
+
+static void discord_initialize(void)
+{
+	HMODULE module = LoadLibraryW(k_discord_dll_filename);
+	if (module && !shell_is_dedicated_server()
+		&& H2Config_discord_enable
+#ifdef TEST_DISCORD_INSTANCE
+		&& g_instance_number == 1
+#endif
+		)
+	{
+		discord_game_status_create(module);
+	}
+
+	return;
 }
 
 static void DuplicateDataBlob(DATA_BLOB* pDataIn, DATA_BLOB* pDataOut)

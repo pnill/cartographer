@@ -1,14 +1,38 @@
 #include "stdafx.h"
 #include "XnIp.h"
 
-#include "H2MOD/GUI/imgui_integration/Console/CommandHandler.h"
 #include "H2MOD/Utils/Utils.h"
 
 #include "XLive/Cryptography/Rc4.h"
+#include "Xlive/xnet/Sockets/XSocket.h"
 #include "XLive/xnet/NIC.h"
 #include "XLive/xnet/net_utils.h"
 
 TEST_N_DEF(XL1);
+
+#pragma region NAT handling
+
+/* forward declarations */
+
+typedef int(__cdecl TextOutputCb)(int strFlags, const char* fmt, ...);
+
+// TODO: currently we use multiple system sockets
+// to send data to the corresponding virtual socket
+// when in practice we could just use one
+struct PortMapping
+{
+	enum class PortMapState : int
+	{
+		XNIP_NET_ADDRESS_MAPPINGS_UNAVAILABLE,
+		XNIP_NET_ADDRESS_MAP_AVAILABLE,
+	};
+
+	PortMapState state;
+	sockaddr_in address;
+	WORD virtualPort;
+};
+
+#pragma endregion
 
 XnIpManager gXnIpMgr;
 
@@ -16,6 +40,83 @@ XnIpManager gXnIpMgr;
 XnIp XnIpManager::m_ipLocal;
 
 XECRYPT_RC4_STATE gRc4StateRand;
+
+XBroadcastPacket::XBroadcastPacket()
+{
+	pckHeader.signature = EXNIP_PACKET_SIGNATURE_XNET_BROADCAST;
+	strncpy_s(pckHeader.signatureString, XNIP_BROADCAST_HEADER_STR, XNIP_MAX_PCK_STR_HDR_LEN);
+	ZeroMemory(&data, sizeof(data));
+	data.titleId = (DWORD)-1;
+	data.name.sin_addr.s_addr = htonl(INADDR_BROADCAST);
+};
+
+
+void XnIpPckTransportStats::PckDataSampleUpdate()
+{
+	if (!initialized)
+	{
+		initialized = true;
+		pckSent = 0;
+		pckRecvd = 0;
+		pckBytesSent = 0;
+		pckBytesRecvd = 0;
+
+		pckSentPerSecIdx = 0;
+		pckRecvdPerSecIdx = 0;
+		pckCurrentSendPerSecIdx = -1;
+		pckCurrentRecvdPerSecIdx = -1;
+
+		memset(pckSentPerSec, 0, sizeof(pckSentPerSec));
+		memset(pckRecvdPerSec, 0, sizeof(pckRecvdPerSec));
+
+		lastTimeUpdate = timeGetTime();
+	}
+	else
+	{
+		const ULONGLONG sample_end_time = 1ull * 1000ull;
+
+		if (timeGetTime() - lastTimeUpdate >= sample_end_time)
+		{
+			pckSentPerSecIdx = (pckSentPerSecIdx + 1) % XNIP_MAX_NET_STATS_SAMPLES;
+			pckRecvdPerSecIdx = (pckRecvdPerSecIdx + 1) % XNIP_MAX_NET_STATS_SAMPLES;
+
+			pckSentPerSec[pckSentPerSecIdx] = 0;
+			pckBytesSentPerSec[pckSentPerSecIdx] = 0;
+
+			pckRecvdPerSec[pckRecvdPerSecIdx] = 0;
+			pckBytesRecvdPerSec[pckRecvdPerSecIdx] = 0;
+
+			pckCurrentSendPerSecIdx = (pckCurrentSendPerSecIdx + 1) % XNIP_MAX_NET_STATS_SAMPLES;
+			pckCurrentRecvdPerSecIdx = (pckCurrentRecvdPerSecIdx + 1) % XNIP_MAX_NET_STATS_SAMPLES;
+
+			lastTimeUpdate = timeGetTime();
+		}
+	}
+}
+
+void XnIpPckTransportStats::PckSendStatsUpdate(unsigned int _pckXmit, unsigned int _pckXmitBytes)
+{
+	PckDataSampleUpdate();
+
+	pckSent += _pckXmit;
+	pckBytesSent += _pckXmitBytes;
+
+	pckSentPerSec[pckSentPerSecIdx] += _pckXmit;
+	pckBytesSentPerSec[pckSentPerSecIdx] += _pckXmitBytes;
+}
+
+void XnIpPckTransportStats::PckRecvdStatsUpdate(unsigned int _pckRecvd, unsigned int _pckRecvdBytes)
+{
+	PckDataSampleUpdate();
+
+	pckRecvd += _pckRecvd;
+	pckBytesRecvd += _pckRecvdBytes;
+
+	pckRecvdPerSec[pckRecvdPerSecIdx] += _pckRecvd;
+	pckBytesRecvdPerSec[pckRecvdPerSecIdx] += _pckRecvdBytes;
+
+	lastPacketReceivedTime = timeGetTime();
+}
 
 void XnIpManager::Initialize(const XNetStartupParams* netStartupParams)
 {
@@ -81,14 +182,14 @@ void XnIpManager::LogConnectionsToConsole(TextOutputCb* outputCb) const
 		const char* err_message = "cannot log XNet connections when no keys are registered (you need to host/be in a game)";
 		LOG_CRITICAL_NETWORK(err_message);
 		if (outputCb)
-			outputCb(StringFlag_None, "# %s", err_message);
+			outputCb(0, "# %s", err_message);
 		return;
 	}
 
 	const char* xnet_connections_str = "XNet connections: ";
 	LOG_CRITICAL_NETWORK(xnet_connections_str);
 	if (outputCb)
-		outputCb(StringFlag_None, "# %s", xnet_connections_str);
+		outputCb(0, "# %s", xnet_connections_str);
 
 	for (int i = 0; i < GetMaxXnConnections(); i++)
 	{
@@ -112,13 +213,13 @@ void XnIpManager::LogConnectionsToConsole(TextOutputCb* outputCb) const
 			}
 
 			if (outputCb)
-				outputCb(StringFlag_None, "# %s", logString.c_str());
+				outputCb(0, "# %s", logString.c_str());
 		}
 	}
 
 	LOG_CRITICAL_NETWORK("available XnIp connection slots: {}", GetMaxXnConnections());
 	if (outputCb)
-		outputCb(StringFlag_None, "# available XnIp connection slots: %d", GetMaxXnConnections());
+		outputCb(0, "# available XnIp connection slots: %d", GetMaxXnConnections());
 }
 #endif
 
@@ -183,6 +284,16 @@ void XnIpManager::LogConnectionsErrorDetails(const sockaddr_in* address, int err
 		LOG_CRITICAL_NETWORK("{} - no keys are registered, cannot create connections with no registered keys!!", __FUNCTION__);
 	}
 }
+
+int XnIpManager::GetMinSockRecvBufferSizeInBytes() const
+{ 
+	return m_startupParams.cfgSockDefaultRecvBufsizeInK * SOCK_K_UNIT; 
+}
+int XnIpManager::GetMinSockSendBufferSizeInBytes() const
+{
+	return m_startupParams.cfgSockDefaultSendBufsizeInK * SOCK_K_UNIT;
+}
+
 
 int XnIpManager::HandleRecvdPacket(XVirtualSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, DWORD dwBufferCount, LPDWORD lpBytesRecvdCount)
 {
@@ -762,6 +873,30 @@ int XnIp::GetConnectionIndex(IN_ADDR connectionId)
 	return (int)(connectionId.s_addr >> 24);
 }
 
+bool XnIp::IsValid(IN_ADDR identifier) const
+{
+	bool valid = m_valid
+		&& identifier.s_addr == GetConnectionId().s_addr;
+
+	if (!valid)
+	{
+		LOG_CRITICAL_NETWORK("{} - m_valid: {} or {:X} != {:X}", __FUNCTION__, m_valid, identifier.s_addr, GetConnectionId().s_addr);
+		return false;
+	}
+
+	return valid;
+}
+
+void XnIp::UpdateInteractionTimeHappened()
+{
+	m_lastConnectionInteractionTime = timeGetTime();
+}
+
+bool XnIp::ConnectionTimedOut() const
+{
+	return timeGetTime() - m_lastConnectionInteractionTime >= XnIp_ConnectionTimeOut;
+}
+
 void XnIp::SavePortMapping(XVirtualSocket* xsocket, WORD virtualPort, const sockaddr_in* addr) const
 {
 	LOG_TRACE_NETWORK("{} - socket: {}, connection index: {}, identifier: {:X}", __FUNCTION__,
@@ -794,6 +929,91 @@ void XnIp::SendXNetRequestAllSockets(eXnip_ConnectRequestType reqType)
 		}
 	}
 	return;
+}
+
+void XnIp::InsertPortMapping(PortMapping* mapping)
+{
+	PortMapping* pMap = (PortMapping*)malloc(sizeof(*mapping));
+	memcpy(pMap, mapping, sizeof(*pMap));
+	m_netAddrMappings.insert(pMap);
+}
+
+const sockaddr_in* XnIp::GetPortMapping(WORD virtualPort) const
+{
+	NetElement* elem = m_netAddrMappings.first();
+	while (elem)
+	{
+		PortMapping* mapping = (PortMapping*)elem->data;
+		if (mapping->virtualPort == virtualPort)
+		{
+			return &mapping->address;
+		}
+
+		elem = elem->next;
+	}
+
+	return NULL;
+}
+
+void XnIp::UpdatePortMapping(WORD virtualPort, const sockaddr_in* addr) const
+{
+	NetElement* elem = m_netAddrMappings.first();
+	while (elem)
+	{
+		PortMapping* mapping = (PortMapping*)elem->data;
+		if (mapping->virtualPort == virtualPort)
+		{
+			mapping->state = PortMapping::PortMapState::XNIP_NET_ADDRESS_MAP_AVAILABLE;
+			memcpy(&mapping->address, addr, sizeof(mapping->address));
+			break;
+		}
+
+		elem = elem->next;
+	}
+}
+
+bool XnIp::PortMappingAvailable(WORD virtualPort) const
+{
+	NetElement* elem = m_netAddrMappings.first();
+
+	bool result = false;
+	while (elem)
+	{
+		PortMapping* mapping = (PortMapping*)elem->data;
+		if (mapping->virtualPort == virtualPort
+			&& mapping->state == PortMapping::PortMapState::XNIP_NET_ADDRESS_MAP_AVAILABLE)
+		{
+			return true;
+		}
+
+		elem = elem->next;
+	}
+
+	return result;
+}
+
+bool XnIp::PortMappingsAvailable() const
+{
+	NetElement* elem = m_netAddrMappings.first();
+
+	bool result = true;
+	if (!elem)
+	{
+		return false;
+	}
+
+	while (elem)
+	{
+		PortMapping* mapping = (PortMapping*)elem->data;
+		if (mapping->state != PortMapping::PortMapState::XNIP_NET_ADDRESS_MAP_AVAILABLE)
+		{
+			return false;
+		}
+
+		elem = elem->next;
+	}
+
+	return result;
 }
 
 void XnIp::SendXNetRequest(XVirtualSocket* xsocket, eXnip_ConnectRequestType reqType)

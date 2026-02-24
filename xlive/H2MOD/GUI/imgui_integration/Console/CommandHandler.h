@@ -3,7 +3,6 @@
 #ifdef TERMINAL_ENABLED
 
 #include "CommandsUtil.h"
-#include "ComVar.h"
 
 struct ConsoleCommandCtxData;
 typedef int CommandFlags;
@@ -32,7 +31,7 @@ public:
 	ConsoleCommand(const char* _name, const char* _command_description, int _min_parameter_count, int _max_parameter_count, ExecuteCommandCallbackT* _callback,
 		CommandFlags _flags = CommandFlag_None);
 
-	ConsoleCommand(ComVarBase* _command_var, const char* _name, const char* _command_description, int _min_parameter_count, int _max_parameter_count, ExecuteCommandCallbackT* _input_callback, CommandFlags _flags = CommandFlag_None);
+	ConsoleCommand(class ComVarBase* _command_var, const char* _name, const char* _command_description, int _min_parameter_count, int _max_parameter_count, ExecuteCommandCallbackT* _input_callback, CommandFlags _flags = CommandFlag_None);
 
 	~ConsoleCommand() = default;
 
@@ -92,13 +91,7 @@ public:
 	// returns true if command line has been handled
 	static bool HandleCommandLine(const char* command_line, size_t command_line_length, TextOutputCb* consoleOutputCb);
 
-	void VarAsStr(char* outVar, size_t outSize) const
-	{
-		if (SetsVariable())
-		{
-			csstrncpy(outVar, m_var_ptr->AsString().c_str(), outSize - 1);
-		}
-	}
+	void VarAsStr(char* outVar, size_t outSize) const;
 
 protected:
 

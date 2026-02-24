@@ -22,6 +22,13 @@ struct s_transport_unique_identifier
 	uint8 ab[6];
 };
 
+struct s_transport_session_description
+{
+	s_transport_secure_identifier id;
+	s_transport_secure_key key;
+	s_transport_secure_address host_address;
+};
+
 /* prototypes */
 
 // Return true if both secure addresses are the same

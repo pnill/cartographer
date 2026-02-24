@@ -12,7 +12,7 @@
 #include "math/real_math.h"
 #include "networking/network_configuration.h"
 #include "networking/session/network_observer.h"
-#include "rasterizer/dx9/rasterizer_dx9_main.h"
+#include "rasterizer/rasterizer_main.h"
 #include "saved_games/game_state.h"
 #ifdef _WINDOWS
 #include "shell/shell_windows.h"

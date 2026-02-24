@@ -5,7 +5,7 @@
 #include "game/game_options.h"
 #include "game/players.h"
 #include "networking/network_event.h"
-#include "networking/Session/network_session.h"
+#include "networking/session/network_session.h"
 #include "simulation/game_interface/simulation_game_action.h"
 #include "units/bipeds.h"
 

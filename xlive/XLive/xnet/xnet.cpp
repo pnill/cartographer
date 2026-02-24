@@ -58,16 +58,16 @@ INT WINAPI XNetXnAddrToMachineId(const XNADDR * pxnaddr, ULONGLONG * pqwMachineI
 }
 
 // #67: XNetDnsLookup
-int WINAPI XNetDnsLookup(const char * pszHost, DWORD hEvent, void ** ppxndns)
+INT WINAPI XNetDnsLookup(const char* pszHost, WSAEVENT hEvent, XNDNS** ppxndns)
 {
 	LOG_TRACE_NETWORK("XNetDnsLookup");
 	if (ppxndns)
 		*ppxndns = NULL;
-	return 1;   // ERROR
+	return ERROR_INVALID_FUNCTION;   // ERROR
 }
 
 // #68: XNetDnsRelease
-int WINAPI XNetDnsRelease(void * pxndns)
+INT WINAPI XNetDnsRelease(XNDNS* pxndns)
 {
 	LOG_TRACE_NETWORK("XNetDnsRelease");
 	return 0;

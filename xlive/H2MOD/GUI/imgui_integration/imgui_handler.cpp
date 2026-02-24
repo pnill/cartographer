@@ -5,7 +5,6 @@
 
 #include "game/player_control.h"
 #include "interface/user_interface_guide.h"
-#include "rasterizer/dx9/rasterizer_dx9_main.h"
 
 #include "imgui.h"
 #include "backends/imgui_impl_dx9.h"
@@ -17,6 +16,8 @@
 
 #include "imgui_ProdigyCleanTTF.h"
 
+#include <d3dx9.h>
+#include <XLive/XAM/uithread.h>
 
 const char* k_advanced_settings_window_name = "advanced_settings";
 const char* k_weapon_offsets_window_name = "Weapon Offsets";
@@ -188,7 +189,7 @@ namespace ImGuiHandler
 			fontConfig.SizePixels,
 			&fontConfig);
 
-		ImGui_ImplDX9_Init(rasterizer_dx9_device_get_interface());
+		ImGui_ImplDX9_Init(g_xlive_d3d_device);
 
 		atexit([]() {
 			ImGui_ImplDX9_Shutdown();
@@ -196,6 +197,7 @@ namespace ImGuiHandler
 			ImGui::DestroyContext();
 		});
 	}
+
 	float WidthPercentage(float percent)
 	{
 		auto Width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
@@ -217,7 +219,7 @@ namespace ImGuiHandler
 		D3DXIMAGE_INFO imgInfo;
 		PDIRECT3DTEXTURE9 texture = nullptr;
 		//HRESULT hr = D3DXCreateTextureFromFileA(g_pDevice, filename, &texture);
-		const HRESULT hr = D3DXCreateTextureFromFileEx(rasterizer_dx9_device_get_interface(), filename, D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, D3DX_FROM_FILE, 0,
+		const HRESULT hr = D3DXCreateTextureFromFileEx(g_xlive_d3d_device, filename, D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, D3DX_FROM_FILE, 0,
 			D3DFMT_FROM_FILE, D3DPOOL_DEFAULT, D3DX_FILTER_NONE, D3DX_FILTER_NONE, 0, &imgInfo, NULL, &texture);
 
 		if (hr != S_OK)
@@ -246,7 +248,7 @@ namespace ImGuiHandler
 	}
 
 
-	PDIRECT3DTEXTURE9 GetTexture(s_imgui_images image)
+	void* GetTexture(s_imgui_images image)
 	{
 		switch (image) {
 		case patch_notes:

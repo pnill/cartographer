@@ -114,7 +114,7 @@ void c_display_mode_edit_list::set_using_mp_screen(bool param)
 void c_display_mode_edit_list::handle_item_pressed_event(s_event_record** pevent, datum* pitem_index)
 {
 	int16 absolute_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(*pitem_index);
-	// ASSERT(absolute_index <= _rasterizer_settings_display_mode_last_user_selectable);
+	ASSERT(absolute_index <= _rasterizer_settings_display_mode_last_user_selectable);
 
 	absolute_index = absolute_index > _item_last ? _item_first : absolute_index;
 	const e_rasterizer_window_mode display_mode = item_type_to_display_mode((e_display_mode_settings_list_items)absolute_index);

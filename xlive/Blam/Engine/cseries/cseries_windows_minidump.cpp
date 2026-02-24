@@ -6,6 +6,8 @@
 
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
+#include <ShlObj_core.h>	// SHGetFolderPathW
+
 static const char k_initial_dump_path[] = "C:\\TEMP\\";
 static const wchar_t k_initial_dump_path_wide[] = L"C:\\TEMP\\";
 static const char k_minidump_folder_name[] = "crash_file_archive\\";

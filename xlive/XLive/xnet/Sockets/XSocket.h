@@ -42,29 +42,7 @@ class XSocketManager
 		SOCKET m_systemSockHandle = INVALID_SOCKET;
 		bool m_multicast;
 
-		void Dispose()
-		{
-			if (m_systemSockHandle != INVALID_SOCKET)
-			{
-				if (m_multicast)
-				{
-					ip_mreq mreq;
-
-					// localhost only
-					mreq.imr_interface.s_addr = htonl(INADDR_LOOPBACK);
-					mreq.imr_multiaddr.s_addr = htonl(XSOCK_MUTICAST_ADDR);
-
-					setsockopt(
-						m_systemSockHandle, IPPROTO_IP, IP_DROP_MEMBERSHIP, (char*)&mreq, sizeof(mreq)
-					);
-				}
-
-				closesocket(m_systemSockHandle);
-
-			}
-			m_systemSockHandle = INVALID_SOCKET;
-			m_port = 0;
-		}
+		void Dispose();
 
 		~XInternalSocket()
 		{
@@ -87,10 +65,7 @@ public:
 	bool MainLinkSocketReset(WORD port);
 	void MainLinkDispose();
 
-	SOCKET GetMainUdpSocketSystemHandle() const
-	{
-		return m_mainUdpSocket.m_systemSockHandle;
-	}
+	SOCKET GetMainUdpSocketSystemHandle() const;
 
 	bool CreateSocketUDP(XInternalSocket* sock, unsigned long interfaceAddress, WORD port, bool multicast, bool allow_address_reuse);
 
@@ -167,15 +142,9 @@ struct XVirtualSocket
 	/* sets the socket send/recv buffer size */
 	int SetBufferSize(int optName, INT bufSize);
 
-	static bool SockAddrInEqual(const sockaddr_in* a1, const sockaddr_in* a2)
-	{
-		return (a1->sin_addr.s_addr == a2->sin_addr.s_addr && a1->sin_port == a2->sin_port);
-	}
+	static bool SockAddrInEqual(const sockaddr_in* a1, const sockaddr_in* a2);
 
-	static bool SockAddrInInvalid(const sockaddr_in* a1)
-	{
-		return a1->sin_addr.s_addr == 0 || a1->sin_port == 0;
-	}
+	static bool SockAddrInInvalid(const sockaddr_in* a1);
 
 	int UdpSend(const char* buf, int len, int flags, sockaddr *to, int tolen);
 

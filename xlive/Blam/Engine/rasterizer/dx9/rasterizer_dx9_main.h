@@ -3,32 +3,18 @@
 
 #include "bitmaps/bitmap_group.h"
 #include "math/color_math.h"
-#include "rasterizer/rasterizer_globals.h"
+#include "rasterizer/rasterizer_main.h"
 
 /* enums */
 
-enum e_framebuffer_blend_function : int16
-{
-	_framebuffer_blend_function_alpha_blend = 0,
-	_framebuffer_blend_function_multiply = 1,
-	_framebuffer_blend_function_double_multiply = 2,
-	_framebuffer_blend_function_add = 3,
-	_framebuffer_blend_function_subtract = 4,
-	_framebuffer_blend_function_component_min = 5,
-	_framebuffer_blend_function_component_max = 6,
-	_framebuffer_blend_function_alpha_multiply_add = 7,
-	_framebuffer_blend_function_constant_color_blend = 8,
-	_framebuffer_blend_function_inverse_constant_color_blend = 9,
-	_framebuffer_blend_function_none = 10,
-	k_shader_framebuffer_blend_function_count = 12
-};
+
 
 /* structures */
 
 struct s_rasterizer_dx9_main_globals
 {
 	IDirect3D9Ex* global_d3d_interface;
-	D3DMULTISAMPLE_TYPE global_d3d_primary_multisampletype;
+	uint32 global_d3d_primary_multisampletype;	// D3DMULTISAMPLE_TYPE
 	uint32 global_d3d_primary_multisamplequality;
 	IDirect3DSurface9* global_d3d_surface_render_primary;
 	IDirect3DSurface9* global_d3d_surface_render_primary_z;
@@ -75,9 +61,10 @@ s_rasterizer_dx9_main_globals* rasterizer_dx9_main_globals_get(void);
 
 IDirect3DDevice9Ex* rasterizer_dx9_device_get_interface(void);
 
-datum last_bitmap_tag_index_get(void);
 
 int32* hardware_vertex_processing_get(void);
+
+bool rasterizer_dx9_device_is_lost(void);
 
 bool __cdecl rasterizer_dx9_reset(bool create_window);
 
@@ -123,7 +110,7 @@ void __cdecl rasterizer_dx9_initialize_camera_projection(
 	const struct render_projection* projection,
 	e_rasterizer_target rasterizer_target);
 
-bool __cdecl rasterizer_initialize(void);
+bool __cdecl rasterizer_dx9_initialize(void);
 
 bool __cdecl rasterizer_dx9_vertex_shaders_initialize(void);
 
@@ -136,3 +123,9 @@ void __cdecl rasterizer_frame_begin(const struct s_frame_parameters* parameters)
 void __cdecl rasterizer_dx9_clear_render_target(uint32 flags, pixel32 color, real32 z, bool stencil);
 
 void __cdecl rasterizer_dx9_window_change_display_settings(DWORD flags);
+
+void rasterizer_dx9_main_render_pregame(void);
+
+bool rasterizer_dx9_initialize_screenshot_render_target(uint32 screen_width, uint32 screen_height);
+
+void rasterizer_dx9_cleanup_screenshot_render_target(void);

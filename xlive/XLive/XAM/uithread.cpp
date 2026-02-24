@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "XLiveRendering.h"
+#include "uithread.h"
 
 #include "imgui.h"
 
@@ -7,18 +7,17 @@
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 
-extern void initialize_instance();
-
 #ifndef IMGUI_DISABLE
 extern LRESULT IMGUI_IMPL_API ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 #endif
 
 static HWND H2hWnd;
 static D3DPRESENT_PARAMETERS g_d3dPresentParameters;
-static IDirect3DDevice9Ex* g_xlive_d3d_device;
-static CRITICAL_SECTION g_render_section;
 
-void XLiveRendering::InitializeD3D9(D3DPRESENT_PARAMETERS* presentParameters)
+IDirect3DDevice9Ex* g_xlive_d3d_device;
+CRITICAL_SECTION g_render_section;
+
+void InitializeD3D9(D3DPRESENT_PARAMETERS* presentParameters)
 {
 	InitializeCriticalSection(&g_render_section);
 
@@ -29,7 +28,7 @@ void XLiveRendering::InitializeD3D9(D3DPRESENT_PARAMETERS* presentParameters)
 #endif
 }
 
-void XLiveRendering::D3D9ReleaseResources()
+void D3D9ReleaseResources()
 {
 #ifndef IMGUI_DISABLE
 	ImGuiHandler::release_motd_texture();
@@ -37,43 +36,9 @@ void XLiveRendering::D3D9ReleaseResources()
 #endif
 }
 
-// #5297: XLiveInitializeEx
-int WINAPI XLiveInitializeEx(XLIVE_INITIALIZE_INFO* pXii, DWORD dwVersion)
-{
-	LOG_TRACE_XLIVE("XLiveInitializeEx()");
-
-	initialize_instance();
-
-	g_xlive_d3d_device = pXii->pD3D;
-	if (g_xlive_d3d_device)
-	{
-		XLiveRendering::InitializeD3D9((D3DPRESENT_PARAMETERS*)pXii->pD3DPP);
-	}
-
-	LOG_TRACE_XLIVE("XLiveInitializeEx() - dwVersion = {0:x}", dwVersion);
-	return 0;
-}
-
-// #5000: XLiveInitialize
-HRESULT WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pXii)
-{
-	return XLiveInitializeEx(pXii, 0);
-}
-
-// #5003: XLiveUninitialize
-int WINAPI XLiveUninitialize()
-{
-	LOG_TRACE_XLIVE("XLiveUninitialize");
-	
-	XLiveRendering::D3D9ReleaseResources();
-	
-	DeleteCriticalSection(&g_render_section);
-	return 0;
-}
-
 // #5005: XLiveOnCreateDevice
 int WINAPI XLiveOnCreateDevice(IUnknown* pD3D, VOID* vD3DPP)
-{	
+{
 	//LOG_TRACE_XLIVE("XLiveOnCreateDevice  (pD3D = %X, pD3DPP = %X)", pD3D, vD3DPP);
 	return 0;
 }
@@ -86,7 +51,7 @@ int WINAPI XLiveOnResetDevice(D3DPRESENT_PARAMETERS* pD3DPP)
 	//Have to invalidate ImGUI on device reset, otherwise it hangs the device in a reset loop.
 	//https://github.com/ocornut/imgui/issues/1464#issuecomment-347469716
 
-	XLiveRendering::D3D9ReleaseResources();
+	D3D9ReleaseResources();
 
 	//LOG_TRACE_XLIVE("XLiveOnResetDevice");
 	return 0;
@@ -95,8 +60,8 @@ int WINAPI XLiveOnResetDevice(D3DPRESENT_PARAMETERS* pD3DPP)
 // #5006 XLiveOnDestroyDevice
 HRESULT WINAPI XLiveOnDestroyDevice()
 {
-	XLiveRendering::D3D9ReleaseResources();
-	
+	D3D9ReleaseResources();
+
 	//LOG_TRACE_XLIVE("XLiveOnDestroyDevice");
 	return S_OK;
 }
@@ -117,7 +82,7 @@ int WINAPI XLiveInput(XLIVE_INPUT_INFO* pPii)
 		// hotkeys
 		KeyboardInput::ExecuteHotkey(pPii->wParam);
 	}
-	
+
 	return S_OK;
 }
 
@@ -138,7 +103,7 @@ HRESULT WINAPI XLiveRender()
 		return E_UNEXPECTED;
 	}
 
-	if (FAILED(g_xlive_d3d_device->TestCooperativeLevel())) 
+	if (FAILED(g_xlive_d3d_device->TestCooperativeLevel()))
 	{
 		LeaveCriticalSection(&g_render_section);
 		return E_UNEXPECTED;
@@ -151,4 +116,6 @@ HRESULT WINAPI XLiveRender()
 	LeaveCriticalSection(&g_render_section);
 	return S_OK;
 }
+
+
 

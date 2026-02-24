@@ -3,6 +3,7 @@
 
 #include "game/game.h"
 #include "game/game_globals.h"
+#include "game/game_options.h"
 #include "interface/user_interface_networking.h"
 #include "networking/logic/life_cycle_manager.h" 
 #include "networking/session/network_session.h"
@@ -14,6 +15,7 @@
 #include "H2MOD/Modules/Shell/Config.h"
 
 #include <discord_game_sdk.h>
+#include <Xlive/xbox/xbox.h>
 
 
 
@@ -75,6 +77,18 @@ static const char* k_valid_scenario_names[] = {
 
 	// custom maps
 	"salvation"
+};
+
+/* enums */
+
+enum e_context_id
+{
+	_context_id_variant = 2,
+	_context_id_difficulty = 3,
+	_context_id_map = 5,
+	_context_id_presence = X_CONTEXT_PRESENCE,
+	_context_id_game_type = X_CONTEXT_GAME_TYPE,
+	_context_id_game_mode = X_CONTEXT_GAME_MODE
 };
 
 /* structures */
@@ -309,7 +323,7 @@ void discord_interface_update_map_info_campaign(int32 map_id, const utf8* scenar
 }
 
 
-void discord_interface_set_context(e_context_id context_id, uint32 contex_value)
+void discord_interface_set_context(uint32 context_id, uint32 contex_value)
 {
 	if (shell_is_dedicated_server() || !H2Config_discord_enable || g_instance_number > 1)
 	{
@@ -495,7 +509,7 @@ static void discord_rich_presence_update(s_discord_data* discord)
 		session.sessionID = identifier.id;
 
 		session.hostAddress = 
-			(session_host ? network_session->m_session_virtual_couch.xsession_info.hostAddress : network_session->m_network_observer->m_observer_channels[observer_index].xnaddr);
+			(session_host ? network_session->m_session_virtual_couch.xsession_info.hostAddress : network_session->m_network_observer->m_observer_channels[observer_index].xnaddr.addr);
 
 		XUID host;
 		XUserGetXUID(0, &host);

@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "motion_sensor.h"
 
-#include "camera/camera.h"
 #include "game/game_time.h"
 #include "game/players.h"
 #include "render/render.h"

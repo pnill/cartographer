@@ -1,5 +1,6 @@
 #pragma once
-#include "networking/transport/transport.h"
+#include "game/player_constants.h"
+#include "networking/transport/transport_security.h"
 #include "saved_games/player_profile.h"
 
 /* enums */
@@ -33,7 +34,7 @@ ASSERT_STRUCT_SIZE(s_clan_identifiers, 12);
 
 struct s_player_configuration
 {
-	wchar_t player_name[XUSER_NAME_SIZE];
+	wchar_t player_name[k_player_name_length];
 	int32 spawn_protection_time;
 	int8 gap_24[28];
 

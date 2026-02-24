@@ -387,4 +387,9 @@ do \
 #endif
 
 void h2log_initialize();
+
+void h2log_onscreen_initialize(void);
+
+void h2log_onscreen_log(const char* text);
+
 void h2log_dispose();

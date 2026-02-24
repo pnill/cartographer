@@ -14,7 +14,7 @@
 #include "saved_games/game_state.h"
 #include "saved_games/game_variant.h"
 
-#include <XLive/XAM/xam.h>
+#include <XLive/XAM/notify.h>
 
 /* constants */
 
@@ -72,7 +72,7 @@ static void main_game_launch_set_multiplayer_details(void);
 // Set default details for the mainmenu
 static void main_game_launch_set_ui_shell_details(void);
 
-static void main_game_internal_pregame_load(void);
+static bool main_game_internal_pregame_load(void);
 
 static void main_game_load_panic(void);
 
@@ -393,14 +393,14 @@ static void main_game_launch_set_ui_shell_details(void)
 	return;
 }
 
-static void main_game_internal_pregame_load(void)
+static bool main_game_internal_pregame_load(void)
 {
 	s_main_game_globals* main_game_globals = main_game_globals_get();
 	ASSERT(main_game_globals->game_loaded_status == _game_loaded_status_none);
 
-	texture_cache_open_pregame();
+	bool result = texture_cache_open_pregame() != false;
 	main_game_globals->game_loaded_status = _game_loaded_status_none;
-	return;
+	return result;
 }
 
 static void main_game_load_panic(void)

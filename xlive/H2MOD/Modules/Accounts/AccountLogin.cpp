@@ -440,30 +440,9 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password, int* out_mas
 	return result;
 }
 
-#pragma region Online Server Sign-in
 
-// 5257: ??
-HRESULT WINAPI XLiveManageCredentials(LPCWSTR lpszLiveIdName, LPCWSTR lpszLiveIdPassword, DWORD dwCredFlags, PXOVERLAPPED pXOverlapped)
+void AccountDediLogin(PXOVERLAPPED pOverlapped)
 {
-	LOG_TRACE_XLIVE(L"XLiveManageCredentials (lpszLiveIdName = {}, lpszLiveIdPassword = {}, dwCredFlags = {:#x}, pXOverlapped = {:p})",
-		lpszLiveIdName, lpszLiveIdPassword, dwCredFlags, (void*)pXOverlapped);
-
-	if (pXOverlapped)
-	{
-		pXOverlapped->InternalLow = ERROR_SUCCESS;
-		pXOverlapped->InternalHigh = 0;
-		pXOverlapped->dwExtendedError = 0;
-	}
-
-	// not done - error now
-	return S_OK;
-}
-
-// #5259: XLiveSignin
-HRESULT WINAPI XLiveSignin(PWSTR pszLiveIdName, PWSTR pszLiveIdPassword, DWORD dwFlags, PXOVERLAPPED pOverlapped)
-{
-	LOG_TRACE_XLIVE("XLiveSignin() - signin in");
-
 	addDebugText("Logging the Dedi Server in...");
 
 	// clear LAN login info if we are logged in locally
@@ -484,34 +463,15 @@ HRESULT WINAPI XLiveSignin(PWSTR pszLiveIdName, PWSTR pszLiveIdPassword, DWORD d
 			XUserSignInSetStatusChanged(0);
 		}
 	}
-	
+
 	if (pOverlapped)
 	{
 		pOverlapped->InternalLow = ERROR_SUCCESS;
 		pOverlapped->InternalHigh = 0;
 		pOverlapped->dwExtendedError = S_OK;
 	}
-
-	return S_OK;
+	return;
 }
-
-// #5258: XLiveSignout
-HRESULT WINAPI XLiveSignout(PXOVERLAPPED pXOverlapped)
-{
-	LOG_TRACE_XLIVE("XLiveSignout");
-
-	XUserSignOut(0);
-
-	if (pXOverlapped)
-	{
-		pXOverlapped->InternalLow = ERROR_SUCCESS;
-		pXOverlapped->InternalHigh = 0;
-		pXOverlapped->dwExtendedError = S_OK;
-	}
-
-	return S_OK;
-}
-#pragma endregion Online Server Sign-in
 
 #pragma endregion Halo 2 Master Login
 

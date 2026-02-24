@@ -283,7 +283,7 @@ public:
 };
 
 template<size_t string_length>
-struct c_static_string
+class c_static_string
 {
 public:
 	c_static_string(void)

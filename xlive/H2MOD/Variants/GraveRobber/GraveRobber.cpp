@@ -7,6 +7,7 @@
 #include "game/game_engine_util.h"
 #include "game/game_statborg.h"
 #include "game/players.h"
+#include "game/game_options.h"
 #include "items/weapons.h"
 #include "main/game_preferences.h"
 #include "networking/network_event.h"

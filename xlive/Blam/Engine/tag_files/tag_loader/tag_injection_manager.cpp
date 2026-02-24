@@ -17,6 +17,7 @@
 #include "render/weather_definitions.h"
 #include "scenario/scenario_definitions.h"
 #include "shell/shell.h"
+#include "tag_files/files.h"
 #include "tag_files/tag_loader/xml/xml_definition_loader.h"
 #include "units/biped_definitions.h"
 #include "units/vehicle_definitions.h"
@@ -85,30 +86,41 @@ bool c_tag_injecting_manager::find_map(const wchar_t* map_name, c_static_wchar_s
 {
 	bool result = false;
 
-	c_static_wchar_string<MAX_PATH> test_path;
-	test_path.set(m_base_map_directory.get_string());
-	test_path.append(map_name);
-	test_path.append(L".map");
+
+	c_static_wchar_string<MAX_PATH> test_path_wide;
+	test_path_wide.set(m_base_map_directory.get_string());
+	test_path_wide.append(map_name);
+	test_path_wide.append(L".map");
 	
-	if (PathFileExists(test_path.get_string()))
+	char test_path[MAX_PATH];
+	wchar_string_to_utf8_string(test_path_wide.get_string(), test_path, MAX_PATH);
+
+	s_file_reference reference;
+	file_reference_create_from_path(&reference, test_path, false);
+	if (file_exists(&reference))
 	{
 		if (out_string)
 		{
-			out_string->set(test_path.get_string());
+			out_string->set(test_path_wide.get_string());
 		}
 		result = true;
 	}
 	else
 	{
 		// Test if map exists in mods folder
-		test_path.set(m_mods_map_directory.get_string());
-		test_path.append(map_name);
-		test_path.append(L".map");
-		if (PathFileExists(test_path.get_string()))
+		test_path_wide.set(m_mods_map_directory.get_string());
+		test_path_wide.append(map_name);
+		test_path_wide.append(L".map");
+
+		// Setup file reference with new path
+		wchar_string_to_utf8_string(test_path_wide.get_string(), test_path, MAX_PATH);
+		file_reference_create_from_path(&reference, test_path, false);
+
+		if (file_exists(&reference))
 		{
 			if (out_string)
 			{
-				out_string->set(test_path.get_string());
+				out_string->set(test_path_wide.get_string());
 			}
 			result = true;
 		}
@@ -501,20 +513,25 @@ bool c_tag_injecting_manager::initialize_agent(tag_group group)
 		wchar_t wide_tag_class[5];
 		utf8_string_to_wchar_string(tag_class, wide_tag_class, NUMBEROF(wide_tag_class));
 
-		c_static_wchar_string<MAX_PATH> plugin_path;
-		plugin_path.set(m_plugins_directory.get_string());
-		plugin_path.append(wide_tag_class);
-		plugin_path.append(L".xml");
+		c_static_wchar_string<MAX_PATH> plugin_path_wide;
+		plugin_path_wide.set(m_plugins_directory.get_string());
+		plugin_path_wide.append(wide_tag_class);
+		plugin_path_wide.append(L".xml");
 
 		// Exit and create a popup if a plugin is missing
-		if (!PathFileExists(plugin_path.get_string()))
+		char plugin_path[MAX_PATH];
+		wchar_string_to_utf8_string(plugin_path_wide.get_string(), plugin_path, MAX_PATH);
+
+		s_file_reference plugin_fileref;
+		file_reference_create_from_path(&plugin_fileref, plugin_path, false);
+		if (!file_exists(&plugin_fileref))
 		{
-			event(_event_error, "tags:injection: [%s] Plugin file could not be located %ws", __FUNCTION__, plugin_path.get_string());
+			event(_event_error, "tags:injection: [%s] Plugin file could not be located %ws", __FUNCTION__, plugin_path_wide.get_string());
 			g_force_cartographer_update = true;
 		}
 		else
 		{
-			m_agents[tag_group_index].init(group, plugin_path.get_string());
+			m_agents[tag_group_index].init(group, plugin_path_wide.get_string());
 			m_agents_initialized.set(tag_group_index, true);
 			result = true;
 		}

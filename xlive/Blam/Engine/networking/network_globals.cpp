@@ -33,6 +33,7 @@
 #include "networking/session/network_session.h"
 #include "networking/session/network_session_manager.h"
 #include "networking/session/network_text_chat_manager.h"
+#include "transport/transport.h"
 
 #include "shell/shell.h"
 

@@ -3,6 +3,24 @@
 
 #include "math/color_math.h"
 
+/* enums */
+
+enum e_framebuffer_blend_function : int16
+{
+	_framebuffer_blend_function_alpha_blend = 0,
+	_framebuffer_blend_function_multiply = 1,
+	_framebuffer_blend_function_double_multiply = 2,
+	_framebuffer_blend_function_add = 3,
+	_framebuffer_blend_function_subtract = 4,
+	_framebuffer_blend_function_component_min = 5,
+	_framebuffer_blend_function_component_max = 6,
+	_framebuffer_blend_function_alpha_multiply_add = 7,
+	_framebuffer_blend_function_constant_color_blend = 8,
+	_framebuffer_blend_function_inverse_constant_color_blend = 9,
+	_framebuffer_blend_function_none = 10,
+	k_shader_framebuffer_blend_function_count = 12
+};
+
 /* structures */
 
 struct s_rasterizer_debug_options
@@ -207,8 +225,26 @@ ASSERT_STRUCT_SIZE(s_rasterizer_debug_options, 736);
 
 void rasterizer_main_apply_patches(void);
 
+void rasterizer_sapien_apply_patches(void);
+
 struct s_rasterizer_debug_options* rasterizer_debug_options_get(void);
 
 void rasterizer_present_frame_screenshot_wrapper(struct bitmap_data* bitmap);
 
 e_display_type rasterizer_get_display_type(void);
+
+uint32 rasterizer_get_adapter_count(void);
+
+bool rasterizer_is_initialized(void);
+
+bool rasterizer_initialize(void);
+
+void rasterizer_reset(bool create_window);
+
+bool rasterizer_initialize_screenshot_render_target(uint32 screen_width, uint32 screen_height);
+
+void rasterizer_cleanup_screenshot_render_target(void);
+
+bool rasterizer_device_is_lost(void);
+
+void rasterizer_main_render_pregame(void);

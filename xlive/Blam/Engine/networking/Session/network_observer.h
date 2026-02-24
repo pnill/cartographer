@@ -65,7 +65,7 @@ struct s_observer_channel
 	uint16 field_A;
 	int32 channel_index;
 	int32 field_10;
-	XNADDR xnaddr;
+	s_transport_secure_address xnaddr;
 	int32 field_38;
 	int32 session_index;
 	int32 field_40;
@@ -150,7 +150,7 @@ struct s_observer_channel
 	int32 throughput_bps;
 	int32 field_730;
 	int32 field_734;
-	LONGLONG field_738;
+	int64 field_738;
 };
 ASSERT_STRUCT_SIZE(s_observer_channel, 0x740);
 
@@ -164,10 +164,10 @@ public:
 	struct s_network_observer_configuration* m_configuration;
 	int32 *field_14;
 	uint8 gap_18[8];
-	XNKID session_id;
+	s_transport_secure_identifier session_id;
 	uint8 gap28[32];
 	uint8 field_48;
-	XNKEY xnkey;
+	s_transport_secure_key xnkey;
 	int32 field_5C;
 	uint8 gap_60[4];
 	int32 field_64;

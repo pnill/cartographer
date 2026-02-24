@@ -4,10 +4,9 @@
 #include "rasterizer_globals.h"
 
 #include "interface/user_interface_text.h"
+#include "rasterizer/dx9/rasterizer_dx9_main.h"
 #include "shell/shell.h"
 #include "shell/shell_windows.h"
-#include "rasterizer/dx9/rasterizer_dx9_main.h"
-
 
 /* typedefs */
 
@@ -145,21 +144,21 @@ void __cdecl rasterizer_settings_set_antialiasing(uint32* out_quality)
 
 	s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
 	IDirect3D9Ex* d3d9_interface = dx9_globals->global_d3d_interface;
-	
+
 	uint32 backbuffer_quality = 0;
 	uint32 depth_quality = 0;
 	if (multisample_type && 
 		SUCCEEDED(d3d9_interface->CheckDeviceMultiSampleType(
 			D3DADAPTER_DEFAULT,
 			D3DDEVTYPE_HAL,
-			rasterizer_globals->display_parameters.backbuffer_format,
-			D3DFORMAT(rasterizer_globals->display_parameters.window_mode != _rasterizer_window_mode_real_fullscreen),
+			(D3DFORMAT)rasterizer_globals->display_parameters.backbuffer_format,
+			(rasterizer_globals->display_parameters.window_mode != _rasterizer_window_mode_real_fullscreen),
 			multisample_type,
 			&backbuffer_quality)) &&
 		SUCCEEDED(d3d9_interface->CheckDeviceMultiSampleType(
 			D3DADAPTER_DEFAULT,
 			D3DDEVTYPE_HAL,
-			rasterizer_globals->display_parameters.depthstencil_format,
+			(D3DFORMAT)rasterizer_globals->display_parameters.depthstencil_format,
 			rasterizer_globals->display_parameters.window_mode != _rasterizer_window_mode_real_fullscreen,
 			multisample_type,
 			&depth_quality)))

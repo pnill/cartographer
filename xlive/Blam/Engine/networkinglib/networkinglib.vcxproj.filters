@@ -1,0 +1,567 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\simulation\game_interface\simulation_game_action.cpp">
+      <Filter>simulation\game_interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\simulation\game_interface\simulation_game_entities.cpp">
+      <Filter>simulation\game_interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\simulation\game_interface\simulation_game_events.cpp">
+      <Filter>simulation\game_interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\simulation\game_interface\simulation_game_interface.cpp">
+      <Filter>simulation\game_interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\simulation\game_interface\simulation_game_internal.cpp">
+      <Filter>simulation\game_interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\simulation\game_interface\simulation_game_objects.cpp">
+      <Filter>simulation\game_interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\simulation\game_interface\simulation_game_units.cpp">
+      <Filter>simulation\game_interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\simulation\game_interface\simulation_game_vehicles.cpp">
+      <Filter>simulation\game_interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\simulation\simulation_world.cpp">
+      <Filter>simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\simulation\simulation.cpp">
+      <Filter>simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\simulation\simulation_actors.cpp">
+      <Filter>simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\simulation\simulation_encoding.cpp">
+      <Filter>simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\simulation\simulation_entity_database.cpp">
+      <Filter>simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\simulation\simulation_event_handler.cpp">
+      <Filter>simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\simulation\simulation_gamestate_entities.cpp">
+      <Filter>simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\simulation\simulation_players.cpp">
+      <Filter>simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\simulation\simulation_queue.cpp">
+      <Filter>simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\simulation\simulation_queue_entities.cpp">
+      <Filter>simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\simulation\simulation_queue_events.cpp">
+      <Filter>simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\simulation\simulation_queue_global_events.cpp">
+      <Filter>simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\simulation\simulation_type_collection.cpp">
+      <Filter>simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>networkinglib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\couch\xsession_manager.cpp">
+      <Filter>networking\couch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\delivery\network_channel.cpp">
+      <Filter>networking\delivery</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\delivery\network_link.cpp">
+      <Filter>networking\delivery</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\locator\network_locator.cpp">
+      <Filter>networking\locator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\logic\network_broadcast_search.cpp">
+      <Filter>networking\logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\logic\network_life_cycle.cpp">
+      <Filter>networking\logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\logic\network_search.cpp">
+      <Filter>networking\logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\logic\network_session_interface.cpp">
+      <Filter>networking\logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\logic\life_cycle_manager.cpp">
+      <Filter>networking\logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\logic\network_bandwidth.cpp">
+      <Filter>networking\logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\logic\storage\network_storage.cpp">
+      <Filter>networking\logic\storage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\messages\network_message_handler.cpp">
+      <Filter>networking\messages</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\messages\network_message_type_collection.cpp">
+      <Filter>networking\messages</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\messages\network_messages_cartographer.cpp">
+      <Filter>networking\messages</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\messages\network_messages_connect.cpp">
+      <Filter>networking\messages</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\messages\network_messages_out_of_band.cpp">
+      <Filter>networking\messages</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\messages\network_messages_session_membership.cpp">
+      <Filter>networking\messages</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\messages\network_messages_session_parameters.cpp">
+      <Filter>networking\messages</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\messages\network_messages_session_protocol.cpp">
+      <Filter>networking\messages</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\messages\network_messages_simulation.cpp">
+      <Filter>networking\messages</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\messages\network_messages_simulation_distributed.cpp">
+      <Filter>networking\messages</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\messages\network_messages_simulation_synchronous.cpp">
+      <Filter>networking\messages</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\messages\network_messages_test.cpp">
+      <Filter>networking\messages</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\messages\network_messages_text_chat.cpp">
+      <Filter>networking\messages</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\messages\network_message_gateway.cpp">
+      <Filter>networking\messages</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\online\online_strings.cpp">
+      <Filter>networking\online</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\online\online_task_xbox.cpp">
+      <Filter>networking\online</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\online\voice_engine.cpp">
+      <Filter>networking\online</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\online\online_account_xbox.cpp">
+      <Filter>networking\online</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\online\online_cheater.cpp">
+      <Filter>networking\online</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\panorama\panorama_favorites.cpp">
+      <Filter>networking\panorama</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\panorama\panorama_friends.cpp">
+      <Filter>networking\panorama</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\panorama\panorama_presence.cpp">
+      <Filter>networking\panorama</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\panorama\panorama_user_history.cpp">
+      <Filter>networking\panorama</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\panorama\panorama_achievements.cpp">
+      <Filter>networking\panorama</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\replication\replication_entity_manager_view.cpp">
+      <Filter>networking\replication</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\replication\replication_event_manager.cpp">
+      <Filter>networking\replication</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\replication\replication_entity.cpp">
+      <Filter>networking\replication</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\replication\replication_entity_manager.cpp">
+      <Filter>networking\replication</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\Session\network_text_chat_manager.cpp">
+      <Filter>networking\session</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\Session\network_observer.cpp">
+      <Filter>networking\session</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\Session\network_session.cpp">
+      <Filter>networking\session</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\Session\network_session_manager.cpp">
+      <Filter>networking\session</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\transport\transport_security.cpp">
+      <Filter>networking\transport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\transport\transport.cpp">
+      <Filter>networking\transport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\transport\transport_address.cpp">
+      <Filter>networking\transport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\transport\transport_qos.cpp">
+      <Filter>networking\transport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\network_configuration.cpp">
+      <Filter>networking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\network_event.cpp">
+      <Filter>networking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\network_globals.cpp">
+      <Filter>networking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\network_loading.cpp">
+      <Filter>networking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\network_memory.cpp">
+      <Filter>networking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\network_statistics.cpp">
+      <Filter>networking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\network_time.cpp">
+      <Filter>networking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\networking\network_utilities.cpp">
+      <Filter>networking</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\simulation\game_interface\simulation_game_action.h">
+      <Filter>simulation\game_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\simulation\game_interface\simulation_game_damage.h">
+      <Filter>simulation\game_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\simulation\game_interface\simulation_game_device_machines.h">
+      <Filter>simulation\game_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\simulation\game_interface\simulation_game_engine_player.h">
+      <Filter>simulation\game_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\simulation\game_interface\simulation_game_entities.h">
+      <Filter>simulation\game_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\simulation\game_interface\simulation_game_events.h">
+      <Filter>simulation\game_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\simulation\game_interface\simulation_game_generics.h">
+      <Filter>simulation\game_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\simulation\game_interface\simulation_game_interface.h">
+      <Filter>simulation\game_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\simulation\game_interface\simulation_game_internal.h">
+      <Filter>simulation\game_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\simulation\game_interface\simulation_game_items.h">
+      <Filter>simulation\game_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\simulation\game_interface\simulation_game_objects.h">
+      <Filter>simulation\game_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\simulation\game_interface\simulation_game_projectiles.h">
+      <Filter>simulation\game_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\simulation\game_interface\simulation_game_turrets.h">
+      <Filter>simulation\game_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\simulation\game_interface\simulation_game_units.h">
+      <Filter>simulation\game_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\simulation\game_interface\simulation_game_vehicles.h">
+      <Filter>simulation\game_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\simulation\game_interface\simulation_game_weapons.h">
+      <Filter>simulation\game_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\simulation\simulation_world.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\simulation\machine_id.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\simulation\simulation.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\simulation\simulation_actors.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\simulation\simulation_encoding.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\simulation\simulation_entity_database.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\simulation\simulation_event_handler.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\simulation\simulation_gamestate_entities.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\simulation\simulation_players.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\simulation\simulation_queue.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\simulation\simulation_queue_entities.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\simulation\simulation_queue_events.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\simulation\simulation_queue_global_events.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\simulation\simulation_type_collection.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\simulation\simulation_view.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\simulation\simulation_watcher.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>networkinglib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\couch\xsession_manager.h">
+      <Filter>networking\couch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\delivery\network_channel.h">
+      <Filter>networking\delivery</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\delivery\network_link.h">
+      <Filter>networking\delivery</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\locator\network_locator.h">
+      <Filter>networking\locator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\logic\network_bandwidth.h">
+      <Filter>networking\logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\logic\network_broadcast_search.h">
+      <Filter>networking\logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\logic\network_life_cycle.h">
+      <Filter>networking\logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\logic\network_logic.h">
+      <Filter>networking\logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\logic\network_search.h">
+      <Filter>networking\logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\logic\network_session_interface.h">
+      <Filter>networking\logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\logic\life_cycle_manager.h">
+      <Filter>networking\logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\logic\storage\network_storage.h">
+      <Filter>networking\logic\storage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\messages\network_message_handler.h">
+      <Filter>networking\messages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\messages\network_message_type_collection.h">
+      <Filter>networking\messages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\messages\network_messages_cartographer.h">
+      <Filter>networking\messages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\messages\network_messages_connect.h">
+      <Filter>networking\messages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\messages\network_messages_out_of_band.h">
+      <Filter>networking\messages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\messages\network_messages_session_membership.h">
+      <Filter>networking\messages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\messages\network_messages_session_parameters.h">
+      <Filter>networking\messages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\messages\network_messages_session_protocol.h">
+      <Filter>networking\messages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\messages\network_messages_simulation.h">
+      <Filter>networking\messages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\messages\network_messages_simulation_distributed.h">
+      <Filter>networking\messages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\messages\network_messages_simulation_synchronous.h">
+      <Filter>networking\messages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\messages\network_messages_test.h">
+      <Filter>networking\messages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\messages\network_messages_text_chat.h">
+      <Filter>networking\messages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\messages\network_message_gateway.h">
+      <Filter>networking\messages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\online\online_strings.h">
+      <Filter>networking\online</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\online\online_task_xbox.h">
+      <Filter>networking\online</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\online\voice_engine.h">
+      <Filter>networking\online</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\online\online_account_xbox.h">
+      <Filter>networking\online</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\online\online_cheater.h">
+      <Filter>networking\online</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\panorama\panorama_achievements.h">
+      <Filter>networking\panorama</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\panorama\panorama_favorites.h">
+      <Filter>networking\panorama</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\panorama\panorama_friends.h">
+      <Filter>networking\panorama</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\panorama\panorama_presence.h">
+      <Filter>networking\panorama</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\panorama\panorama_user_history.h">
+      <Filter>networking\panorama</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\replication\replication_entity_manager.h">
+      <Filter>networking\replication</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\replication\replication_entity_manager_view.h">
+      <Filter>networking\replication</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\replication\replication_event_manager.h">
+      <Filter>networking\replication</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\replication\replication_control_view.h">
+      <Filter>networking\replication</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\replication\replication_entity.h">
+      <Filter>networking\replication</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\Session\network_session_manager.h">
+      <Filter>networking\session</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\Session\network_text_chat_manager.h">
+      <Filter>networking\session</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\Session\network_observer.h">
+      <Filter>networking\session</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\Session\network_session.h">
+      <Filter>networking\session</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\transport\transport_qos.h">
+      <Filter>networking\transport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\transport\transport_security.h">
+      <Filter>networking\transport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\transport\transport.h">
+      <Filter>networking\transport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\transport\transport_address.h">
+      <Filter>networking\transport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\player_motion.h">
+      <Filter>networking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\player_prediction.h">
+      <Filter>networking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\network_configuration.h">
+      <Filter>networking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\network_constants.h">
+      <Filter>networking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\network_event.h">
+      <Filter>networking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\network_game_definitions.h">
+      <Filter>networking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\network_globals.h">
+      <Filter>networking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\network_loading.h">
+      <Filter>networking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\network_memory.h">
+      <Filter>networking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\network_statistics.h">
+      <Filter>networking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\network_time.h">
+      <Filter>networking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\networking\network_utilities.h">
+      <Filter>networking</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="networkinglib">
+      <UniqueIdentifier>{8a05898e-225a-4a19-9128-51b3b99e70ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="simulation">
+      <UniqueIdentifier>{7fee07fb-503a-486a-9a63-99c8be795358}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="simulation\game_interface">
+      <UniqueIdentifier>{f0a123dc-f8c4-4dd3-b6bb-83fc6d157a05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="networking">
+      <UniqueIdentifier>{539df1da-83a0-4c00-9264-d1eaca55d2fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="networking\couch">
+      <UniqueIdentifier>{bceea38e-cbd8-4164-8b40-b22268b15a3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="networking\delivery">
+      <UniqueIdentifier>{caa79337-f117-45e6-85cf-2b6492aa1305}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="networking\locator">
+      <UniqueIdentifier>{d07045b0-28f6-433c-8958-8c7eb83e7a86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="networking\logic">
+      <UniqueIdentifier>{f16909b5-c119-4bf3-bbc1-45c7dd5282dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="networking\logic\storage">
+      <UniqueIdentifier>{fd8b8754-f12d-46f1-a9fb-4ad2f67ae325}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="networking\messages">
+      <UniqueIdentifier>{3a968000-4ea9-4f3c-a97e-b0cc9b98dabe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="networking\online">
+      <UniqueIdentifier>{42aa1856-491e-4e16-a296-9bc8d12fafc4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="networking\panorama">
+      <UniqueIdentifier>{841c15f4-ac4b-4861-9ced-83568e2e41a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="networking\replication">
+      <UniqueIdentifier>{360fddc3-c85d-4c22-bf6d-41a689805168}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="networking\session">
+      <UniqueIdentifier>{d80e8216-0104-48cf-8f52-2b3490f90f7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="networking\transport">
+      <UniqueIdentifier>{06fb9377-dc68-48d3-86ed-065c82bf6e3a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

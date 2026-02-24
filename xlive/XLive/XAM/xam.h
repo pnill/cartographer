@@ -107,4 +107,19 @@
 #define XN_PARTY_MEMBERS_CHANGED                         XNID(4, _XNAREA_PARTY, 0x0002)
 #define XN_PARTY_LAST                                    XNID(XNID_CURRENTVERSION+1, _XNAREA_PARTY, 0x0006)
 
-int WINAPI XNotifyDelayUI(int a1);
+
+typedef struct _XLIVE_INITIALIZE_INFO {
+	UINT cbSize;
+	DWORD dwFlags;
+	IDirect3DDevice9Ex* pD3D;
+	VOID* pD3DPP;
+	LANGID langID;
+	WORD wReserved1;
+	PCHAR pszAdapterName;
+	WORD wLivePortOverride;
+	WORD wReserved2;
+} XLIVE_INITIALIZE_INFO;
+
+HRESULT WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pXii);
+
+int WINAPI XLiveOnResetDevice(D3DPRESENT_PARAMETERS* pD3DPP);

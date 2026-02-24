@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="debug_msvc|Win32">
+      <Configuration>debug_msvc</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release_min_msvc|Win32">
+      <Configuration>release_min_msvc</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release_msvc|Win32">
+      <Configuration>release_msvc</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>18.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{E5F3AACF-82B6-49ED-ABE8-8E256E7909CD}</ProjectGuid>
+    <RootNamespace>h2modlib</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">
+    <OutDir>$(SolutionDir)\objects\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)\objects\$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)$(Platform)$(Configuration)</TargetName>
+    <ExternalIncludePath>$(DXSDK_DIR)Include;$(ExternalIncludePath)</ExternalIncludePath>
+    <LibraryPath>$(DXSDK_DIR)Lib\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">
+    <OutDir>$(SolutionDir)\objects\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)\objects\$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)$(Platform)$(Configuration)</TargetName>
+    <ExternalIncludePath>$(DXSDK_DIR)Include;$(ExternalIncludePath)</ExternalIncludePath>
+    <LibraryPath>$(DXSDK_DIR)Lib\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">
+    <OutDir>$(SolutionDir)\objects\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)\objects\$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)$(Platform)$(Configuration)</TargetName>
+    <ExternalIncludePath>$(DXSDK_DIR)Include;$(ExternalIncludePath)</ExternalIncludePath>
+    <LibraryPath>$(DXSDK_DIR)Lib\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;CURL_STATICLIB;_DEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ASSERTS_ENABLED;EVENTS_ENABLED;ERRORS_ENABLED;DEBUG_MEMORY_ENABLED;RASTERIZER_PROFILE_ENABLED;VALIDATE_REAL_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;DEBUG_MENU_ENABLED;HS_COMPILER_ENABLED;_ALLOW_RTCc_IN_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeaderOutputFile>$(IntDir)h2modlib.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..\3rdparty;..\3rdparty\imgui\imgui;..\3rdparty\libcurl;..\3rdparty\spdlog\include;..\3rdparty\zlib\src;.\;..\;..\Blam\Engine;..\XLive</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <DisableSpecificWarnings>4505;4100;4201</DisableSpecificWarnings>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <AdditionalOptions>/DPSAPI_VERSION=1 /utf-8</AdditionalOptions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
+      <SupportJustMyCode>false</SupportJustMyCode>
+      <TreatSpecificWarningsAsErrors>4700</TreatSpecificWarningsAsErrors>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <PreprocessorDefinitions>WIN32;CURL_STATICLIB;NDEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ERRORS_ENABLED;EVENTS_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;HS_COMPILER_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeaderOutputFile>$(IntDir)h2modlib.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <AdditionalIncludeDirectories>..\3rdparty;..\3rdparty\imgui\imgui;..\3rdparty\libcurl;..\3rdparty\spdlog\include;..\3rdparty\zlib\src;.\;..\;..\Blam\Engine;..\XLive</AdditionalIncludeDirectories>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DisableSpecificWarnings>4505;4100;4201</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <AdditionalOptions>/DPSAPI_VERSION=1 /utf-8</AdditionalOptions>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
+      <TreatSpecificWarningsAsErrors>4700</TreatSpecificWarningsAsErrors>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <PreprocessorDefinitions>WIN32;CURL_STATICLIB;NDEBUG;_WINDOWS;_USRDLL;SPDLOG_DISABLED;IMGUI_DISABLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeaderOutputFile>$(IntDir)h2modlib.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <AdditionalIncludeDirectories>..\3rdparty;..\3rdparty\imgui\imgui;..\3rdparty\libcurl;..\3rdparty\spdlog\include;..\3rdparty\zlib\src;.\;..\;..\Blam\Engine;..\XLive</AdditionalIncludeDirectories>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DisableSpecificWarnings>4505;4100;4201</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <AdditionalOptions>/DPSAPI_VERSION=1 /utf-8</AdditionalOptions>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
+      <TreatSpecificWarningsAsErrors>4700</TreatSpecificWarningsAsErrors>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\H2MOD.cpp" />
+    <ClCompile Include="GUI\imgui_integration\AdvancedSettings.cpp" />
+    <ClCompile Include="GUI\imgui_integration\Console\CommandCollection.cpp" />
+    <ClCompile Include="GUI\imgui_integration\Console\CommandHandler.cpp" />
+    <ClCompile Include="GUI\imgui_integration\Console\ComVar.cpp" />
+    <ClCompile Include="GUI\imgui_integration\Console\ImGui_ConsoleImpl.cpp" />
+    <ClCompile Include="GUI\imgui_integration\ImGui_CartographerStyle.cpp" />
+    <ClCompile Include="GUI\imgui_integration\imgui_handler.cpp" />
+    <ClCompile Include="GUI\imgui_integration\ImGui_NetworkStatsOverlay.cpp" />
+    <ClCompile Include="GUI\imgui_integration\MessageBox.cpp" />
+    <ClCompile Include="GUI\imgui_integration\MOTD.cpp" />
+    <ClCompile Include="GUI\imgui_integration\WeaponOffsets.cpp" />
+    <ClCompile Include="Modules\Accounts\AccountCreate.cpp" />
+    <ClCompile Include="Modules\Accounts\AccountLogin.cpp" />
+    <ClCompile Include="Modules\Accounts\Accounts.cpp" />
+    <ClCompile Include="Modules\Achievements\Achievements.cpp" />
+    <ClCompile Include="Modules\CustomMenu\CustomLanguage.cpp" />
+    <ClCompile Include="Modules\CustomMenu\CustomMenuGlobals.cpp" />
+    <ClCompile Include="Modules\CustomVariantSettings\CustomVariantSettings.cpp" />
+    <ClCompile Include="Modules\DirectorHooks\DirectorHooks.cpp" />
+    <ClCompile Include="Modules\EventHandler\EventHandler.cpp" />
+    <ClCompile Include="Modules\GamePhysics\Patches\ProjectileFix.cpp" />
+    <ClCompile Include="Modules\Input\ControllerInput.cpp" />
+    <ClCompile Include="Modules\Input\KeyboardInput.cpp" />
+    <ClCompile Include="Modules\MainMenu\MapSlots.cpp" />
+    <ClCompile Include="Modules\MainMenu\Ranks.cpp" />
+    <ClCompile Include="Modules\MapManager\MapManager.cpp" />
+    <ClCompile Include="Modules\OnScreenDebug\OnscreenDebug.cpp" />
+    <ClCompile Include="Modules\PlaylistLoader\PlaylistLoader.cpp" />
+    <ClCompile Include="Modules\RenderHooks\RenderHooks.cpp" />
+    <ClCompile Include="Modules\Shell\Config.cpp" />
+    <ClCompile Include="Modules\Shell\H2MODShell.cpp" />
+    <ClCompile Include="Modules\Shell\Startup\Startup.cpp" />
+    <ClCompile Include="Modules\SpecialEvents\Events\Birthday.cpp" />
+    <ClCompile Include="Modules\SpecialEvents\Events\Christmas.cpp" />
+    <ClCompile Include="Modules\SpecialEvents\Events\Halloween.cpp" />
+    <ClCompile Include="Modules\SpecialEvents\Events\MapObjectPlacements\Halloween\Coagulation.cpp" />
+    <ClCompile Include="Modules\SpecialEvents\Events\MapObjectPlacements\Halloween\Lockout.cpp" />
+    <ClCompile Include="Modules\SpecialEvents\Events\Mook.cpp" />
+    <ClCompile Include="Modules\SpecialEvents\Events\Paddy.cpp" />
+    <ClCompile Include="Modules\SpecialEvents\SpecialEventHelpers.cpp" />
+    <ClCompile Include="Modules\SpecialEvents\SpecialEvents.cpp" />
+    <ClCompile Include="Modules\TagFixes\TagFixes.cpp" />
+    <ClCompile Include="Modules\Updater\Updater.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Utils\curl-interface.cpp" />
+    <ClCompile Include="Utils\Utils.cpp" />
+    <ClCompile Include="Variants\GraveRobber\GraveRobber.cpp" />
+    <ClCompile Include="Variants\GunGame\GunGame.cpp" />
+    <ClCompile Include="Variants\H2X\H2X.cpp" />
+    <ClCompile Include="Variants\Infection\Infection.cpp" />
+    <ClCompile Include="Variants\VariantSystem.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\H2MOD.h" />
+    <ClInclude Include="GUI\imgui_integration\AdvancedSettingsStringTable.h" />
+    <ClInclude Include="GUI\imgui_integration\Console\CommandCollection.h" />
+    <ClInclude Include="GUI\imgui_integration\Console\CommandHandler.h" />
+    <ClInclude Include="GUI\imgui_integration\Console\CommandsUtil.h" />
+    <ClInclude Include="GUI\imgui_integration\Console\ComVar.h" />
+    <ClInclude Include="GUI\imgui_integration\Console\ImGui_ConsoleImpl.h" />
+    <ClInclude Include="GUI\imgui_integration\ImGui_CartographerStyle.h" />
+    <ClInclude Include="GUI\imgui_integration\imgui_handler.h" />
+    <ClInclude Include="GUI\imgui_integration\ImGui_NetworkStatsOverlay.h" />
+    <ClInclude Include="GUI\imgui_integration\imgui_ProdigyCleanTTF.h" />
+    <ClInclude Include="GUI\imgui_integration\WeaponOffsetsStringTable.h" />
+    <ClInclude Include="Modules\Accounts\AccountCreate.h" />
+    <ClInclude Include="Modules\Accounts\AccountLogin.h" />
+    <ClInclude Include="Modules\Accounts\Accounts.h" />
+    <ClInclude Include="Modules\Achievements\Achievements.h" />
+    <ClInclude Include="Modules\CustomMenu\CustomLanguage.h" />
+    <ClInclude Include="Modules\CustomMenu\CustomMenuGlobals.h" />
+    <ClInclude Include="Modules\CustomVariantSettings\CustomVariantSettings.h" />
+    <ClInclude Include="Modules\DirectorHooks\DirectorHooks.h" />
+    <ClInclude Include="Modules\EventHandler\EventHandler.hpp" />
+    <ClInclude Include="Modules\GamePhysics\Patches\ProjectileFix.h" />
+    <ClInclude Include="Modules\Input\ControllerInput.h" />
+    <ClInclude Include="Modules\Input\KeyboardInput.h" />
+    <ClInclude Include="Modules\MainMenu\MapSlots.h" />
+    <ClInclude Include="Modules\MainMenu\Ranks.h" />
+    <ClInclude Include="Modules\MapManager\MapManager.h" />
+    <ClInclude Include="Modules\OnScreenDebug\OnscreenDebug.h" />
+    <ClInclude Include="Modules\PlaylistLoader\PlaylistLoader.h" />
+    <ClInclude Include="Modules\RenderHooks\RenderHooks.h" />
+    <ClInclude Include="Modules\Shell\Config.h" />
+    <ClInclude Include="Modules\Shell\H2MODShell.h" />
+    <ClInclude Include="Modules\Shell\Startup\Startup.h" />
+    <ClInclude Include="Modules\SpecialEvents\Events\Birthday.h" />
+    <ClInclude Include="Modules\SpecialEvents\Events\Christmas.h" />
+    <ClInclude Include="Modules\SpecialEvents\Events\Halloween.h" />
+    <ClInclude Include="Modules\SpecialEvents\Events\MapObjectPlacements\Halloween\Coagulation.h" />
+    <ClInclude Include="Modules\SpecialEvents\Events\MapObjectPlacements\Halloween\Lockout.h" />
+    <ClInclude Include="Modules\SpecialEvents\Events\Mook.h" />
+    <ClInclude Include="Modules\SpecialEvents\Events\Paddy.h" />
+    <ClInclude Include="Modules\SpecialEvents\SpecialEventHelpers.h" />
+    <ClInclude Include="Modules\SpecialEvents\SpecialEvents.h" />
+    <ClInclude Include="Modules\TagFixes\TagFixes.h" />
+    <ClInclude Include="Modules\Updater\Updater.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Utils\curl-interface.h" />
+    <ClInclude Include="Utils\curl_constants.h" />
+    <ClInclude Include="Utils\Utils.h" />
+    <ClInclude Include="Variants\GraveRobber\GraveRobber.h" />
+    <ClInclude Include="Variants\GunGame\GunGame.h" />
+    <ClInclude Include="Variants\H2X\H2X.h" />
+    <ClInclude Include="Variants\Infection\Infection.h" />
+    <ClInclude Include="Variants\VariantSystem.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

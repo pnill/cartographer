@@ -21,7 +21,7 @@
 
 CustomVariantSettings::s_variant_settings currentVariantSettings;
 CustomVariantSettings::s_variant_settings defaultCustomVariantSettings;
-std::unordered_map<std::wstring, CustomVariantSettings::s_variant_settings> customVariantSettingsMap;
+std::unordered_map<const wchar_t*, CustomVariantSettings::s_variant_settings> customVariantSettingsMap;
 
 namespace CustomVariantSettings
 {

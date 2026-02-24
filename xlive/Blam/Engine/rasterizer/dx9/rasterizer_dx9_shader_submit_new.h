@@ -1,7 +1,5 @@
 #pragma once
 #include "math/real_math.h"
-#include "shaders/shader_postprocess_definitions.h"
-#include "shaders/shader_passes.h"
 
 // TODO: finish reversing
 
@@ -30,13 +28,13 @@ private:
 	int32 field_0;
 	int32 field_4;
 	datum m_extern_shader_index;
-	s_shader_postprocess_definition_new* m_shader_postprocess_definition;
-	s_shader_template_postprocess_definition_new* m_template_postprocess_definition;
-	s_shader_template_postprocess_level_of_detail_new* m_levels_of_detail;
-	s_shader_template_postprocess_pass_new* m_passes;
-	s_shader_template_postprocess_implementation_new* m_implementations;
-	s_shader_pass_postprocess_definition_new* m_shader_pass_postprocess_definition;
-	s_shader_pass_postprocess_implementation_new* m_shader_pass_implementation;
+	struct s_shader_postprocess_definition_new* m_shader_postprocess_definition;
+	struct s_shader_template_postprocess_definition_new* m_template_postprocess_definition;
+	struct s_shader_template_postprocess_level_of_detail_new* m_levels_of_detail;
+	struct s_shader_template_postprocess_pass_new* m_passes;
+	struct s_shader_template_postprocess_implementation_new* m_implementations;
+	struct s_shader_pass_postprocess_definition_new* m_shader_pass_postprocess_definition;
+	struct s_shader_pass_postprocess_implementation_new* m_shader_pass_implementation;
 	real32 m_field_28;
 	real32 m_field_2C;
 	int8 m_dirty_value_externs[8];
@@ -60,7 +58,7 @@ private:
 	int32 field_182C;
 	int32 m_vertex_shader_constant_count;
 	int8 field_1834[8];
-	IDirect3DPixelShader9* m_pixel_shader_handle;
+	struct IDirect3DPixelShader9* m_pixel_shader_handle;
 	int32 m_pixel_shader_index;
 	int32 field_1844;
 	real_vector4d field_1848[32];
@@ -86,3 +84,5 @@ void __cdecl rasterizer_flags_unknown_function_2(int32* a1);
 
 // referenced before submitting a shader
 int32* rasterizer_unknown_shader_submit_unknown_value_get();
+
+void rasterizer_dx9_setup_2d_vertex_shader_user_interface_constants(void);

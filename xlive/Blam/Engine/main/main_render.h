@@ -19,4 +19,4 @@ void __cdecl main_render(void);
 
 void __cdecl main_render_player_view(void);
 
-void __cdecl main_render_previous_backbuffer(int32 a1, int32 a2);
+void __cdecl main_render_pregame(int32 a1, int32 a2);

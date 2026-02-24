@@ -1,0 +1,186 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\ai\actor_dynamic_firing_position.cpp">
+      <Filter>ai</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ai\actor_types.cpp">
+      <Filter>ai</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ai\actors.cpp">
+      <Filter>ai</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ai\ai.cpp">
+      <Filter>ai</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ai\ai_debug.cpp">
+      <Filter>ai</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ai\ai_dialogue.cpp">
+      <Filter>ai</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ai\ai_flocks.cpp">
+      <Filter>ai</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ai\ai_mission_dialogue.cpp">
+      <Filter>ai</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ai\ai_orders.cpp">
+      <Filter>ai</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ai\ai_player.cpp">
+      <Filter>ai</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ai\ai_script.cpp">
+      <Filter>ai</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ai\behavior.cpp">
+      <Filter>ai</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ai\cl_engine.cpp">
+      <Filter>ai</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ai\clumps.cpp">
+      <Filter>ai</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ai\event_handling.cpp">
+      <Filter>ai</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ai\gravemind.cpp">
+      <Filter>ai</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ai\joint_behavior.cpp">
+      <Filter>ai</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ai\props.cpp">
+      <Filter>ai</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ai\squads.cpp">
+      <Filter>ai</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ai\swarms.cpp">
+      <Filter>ai</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>ailib</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\ai\actor_dynamic_firing_position.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\actor_firing_position.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\actor_moving.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\actor_types.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\actors.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\ai.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\ai_debug.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\ai_dialogue.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\ai_flocks.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\ai_hint_definitions.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\ai_mission_dialogue.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\ai_orders.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\ai_player.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\ai_scenario_definitions.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\ai_script.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\behavior.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\character_definitions.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\cl_engine.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\clumps.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\event_handling.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\gravemind.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\joint_behavior.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\path.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\path_flying.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\pathfinding_utilities.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\props.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\sector.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\sector_environment_objects.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\sector_geometry.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\squads.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\swarms.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\zone.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>ailib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\ai_destination.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\ai_direction.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ai\ai_path.h">
+      <Filter>ai</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="ai">
+      <UniqueIdentifier>{cde9d563-8757-4a37-a5c0-b5d2a860523b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ailib">
+      <UniqueIdentifier>{7b9da3f7-98b9-4f8b-b26f-14141d15efe1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,218 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\H2MOD\Modules\h2log\h2log.cpp">
+      <Filter>H2MOD\Modules\h2log</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>xlive</Filter>
+    </ClCompile>
+    <ClCompile Include="xlive.cpp">
+      <Filter>xlive</Filter>
+    </ClCompile>
+    <ClCompile Include="xliveless.cpp">
+      <Filter>xlive</Filter>
+    </ClCompile>
+    <ClCompile Include="ServerList\ServerList.cpp">
+      <Filter>xlive\ServerList</Filter>
+    </ClCompile>
+    <ClCompile Include="Cryptography\Rc4.cpp">
+      <Filter>xlive\Cryptography</Filter>
+    </ClCompile>
+    <ClCompile Include="achievements\XAchievements.cpp">
+      <Filter>xlive\achievements</Filter>
+    </ClCompile>
+    <ClCompile Include="Voice\XHVEngine.cpp">
+      <Filter>xlive\Voice</Filter>
+    </ClCompile>
+    <ClCompile Include="XAM\uithread.cpp">
+      <Filter>xlive\XAM</Filter>
+    </ClCompile>
+    <ClCompile Include="XAM\xam.cpp">
+      <Filter>xlive\XAM</Filter>
+    </ClCompile>
+    <ClCompile Include="XAM\notify.cpp">
+      <Filter>xlive\XAM</Filter>
+    </ClCompile>
+    <ClCompile Include="xbox\xbox.cpp">
+      <Filter>xlive\xbox</Filter>
+    </ClCompile>
+    <ClCompile Include="xnet\NIC.cpp">
+      <Filter>xlive\xnet</Filter>
+    </ClCompile>
+    <ClCompile Include="xnet\upnp.cpp">
+      <Filter>xlive\xnet</Filter>
+    </ClCompile>
+    <ClCompile Include="xnet\xnet.cpp">
+      <Filter>xlive\xnet</Filter>
+    </ClCompile>
+    <ClCompile Include="xnet\XNetQoS.cpp">
+      <Filter>xlive\xnet</Filter>
+    </ClCompile>
+    <ClCompile Include="xnet\net_utils.cpp">
+      <Filter>xlive\xnet</Filter>
+    </ClCompile>
+    <ClCompile Include="xnet\Sockets\XSocket.cpp">
+      <Filter>xlive\xnet\Sockets</Filter>
+    </ClCompile>
+    <ClCompile Include="xnet\IpManagement\XnIp.cpp">
+      <Filter>xlive\xnet\IpManagement</Filter>
+    </ClCompile>
+    <ClCompile Include="XSession\XSession.cpp">
+      <Filter>xlive\XSession</Filter>
+    </ClCompile>
+    <ClCompile Include="XStorage\XStorage.cpp">
+      <Filter>xlive\XStorage</Filter>
+    </ClCompile>
+    <ClCompile Include="XUser\XUserContext.cpp">
+      <Filter>xlive\XUser</Filter>
+    </ClCompile>
+    <ClCompile Include="XUser\XUserProperty.cpp">
+      <Filter>xlive\XUser</Filter>
+    </ClCompile>
+    <ClCompile Include="XUser\XCustomAction.cpp">
+      <Filter>xlive\XUser</Filter>
+    </ClCompile>
+    <ClCompile Include="XUser\XUser.cpp">
+      <Filter>xlive\XUser</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\H2MOD\Modules\h2log\h2log.h">
+      <Filter>H2MOD\Modules\h2log</Filter>
+    </ClInclude>
+    <ClInclude Include="xlivedefs.h">
+      <Filter>xlive</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>xlive</Filter>
+    </ClInclude>
+    <ClInclude Include="xlive.h">
+      <Filter>xlive</Filter>
+    </ClInclude>
+    <ClInclude Include="xliveless.h">
+      <Filter>xlive</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerList\ServerList.h">
+      <Filter>xlive\ServerList</Filter>
+    </ClInclude>
+    <ClInclude Include="Cryptography\Rc4.h">
+      <Filter>xlive\Cryptography</Filter>
+    </ClInclude>
+    <ClInclude Include="achievements\XAchievements.h">
+      <Filter>xlive\achievements</Filter>
+    </ClInclude>
+    <ClInclude Include="Voice\XHVEngine.h">
+      <Filter>xlive\Voice</Filter>
+    </ClInclude>
+    <ClInclude Include="XAM\uithread.h">
+      <Filter>xlive\XAM</Filter>
+    </ClInclude>
+    <ClInclude Include="XAM\xam.h">
+      <Filter>xlive\XAM</Filter>
+    </ClInclude>
+    <ClInclude Include="XAM\notify.h">
+      <Filter>xlive\XAM</Filter>
+    </ClInclude>
+    <ClInclude Include="xbox\xbox.h">
+      <Filter>xlive\xbox</Filter>
+    </ClInclude>
+    <ClInclude Include="xnet\NIC.h">
+      <Filter>xlive\xnet</Filter>
+    </ClInclude>
+    <ClInclude Include="xnet\upnp.h">
+      <Filter>xlive\xnet</Filter>
+    </ClInclude>
+    <ClInclude Include="xnet\xnet.h">
+      <Filter>xlive\xnet</Filter>
+    </ClInclude>
+    <ClInclude Include="xnet\XNetQoS.h">
+      <Filter>xlive\xnet</Filter>
+    </ClInclude>
+    <ClInclude Include="xnet\net_utils.h">
+      <Filter>xlive\xnet</Filter>
+    </ClInclude>
+    <ClInclude Include="xnet\Sockets\XSocket.h">
+      <Filter>xlive\xnet\Sockets</Filter>
+    </ClInclude>
+    <ClInclude Include="xnet\IpManagement\XnIp.h">
+      <Filter>xlive\xnet\IpManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="XSession\XSession.h">
+      <Filter>xlive\XSession</Filter>
+    </ClInclude>
+    <ClInclude Include="XStorage\XStorage.h">
+      <Filter>xlive\XStorage</Filter>
+    </ClInclude>
+    <ClInclude Include="XUser\XUser.h">
+      <Filter>xlive\XUser</Filter>
+    </ClInclude>
+    <ClInclude Include="XUser\XUserContext.h">
+      <Filter>xlive\XUser</Filter>
+    </ClInclude>
+    <ClInclude Include="XUser\XUserProperty.h">
+      <Filter>xlive\XUser</Filter>
+    </ClInclude>
+    <ClInclude Include="XUser\XCustomAction.h">
+      <Filter>xlive\XUser</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="xlive_exports.def">
+      <Filter>xlive</Filter>
+    </None>
+    <None Include="xlive_exports_debug.def">
+      <Filter>xlive</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="H2MOD">
+      <UniqueIdentifier>{8e002223-e530-4f53-b783-b4596e32b376}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="H2MOD\Modules">
+      <UniqueIdentifier>{f534d894-5e53-4c53-9ce6-d66ea9da3820}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="H2MOD\Modules\h2log">
+      <UniqueIdentifier>{4b987489-4a0d-46f3-962d-acf3e581fe5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xlive">
+      <UniqueIdentifier>{35f21df1-f855-492b-a106-82e51b3d2ae1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xlive\achievements">
+      <UniqueIdentifier>{24f4ec0c-fc5b-47fe-a8aa-54305443e044}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xlive\Cryptography">
+      <UniqueIdentifier>{8a4b41ff-32a0-4e25-93f2-980b1b66a490}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xlive\ServerList">
+      <UniqueIdentifier>{6390c75d-f004-4043-b0ac-4b5c9dc8b4c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xlive\Voice">
+      <UniqueIdentifier>{c779b558-c5fa-4fa4-8c73-2e7edd6b806f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xlive\XAM">
+      <UniqueIdentifier>{2dee9268-8ec9-4240-b79c-4d9c881aec65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xlive\xbox">
+      <UniqueIdentifier>{17ff870b-a041-46b0-90f8-b2abe66e4eb5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xlive\xnet">
+      <UniqueIdentifier>{ff0a40ab-ca94-41a2-ac58-16c2062ef438}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xlive\XSession">
+      <UniqueIdentifier>{2cb295a5-4879-4223-bdd9-82313517a098}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xlive\XStorage">
+      <UniqueIdentifier>{9e06a581-4c06-445a-b649-06284f7d560f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xlive\XUser">
+      <UniqueIdentifier>{40cf4065-c376-4606-bc94-1022ddb53354}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xlive\xnet\Sockets">
+      <UniqueIdentifier>{9303eb66-809d-432f-9b15-b41a9ffb050e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xlive\xnet\IpManagement">
+      <UniqueIdentifier>{12a8a9cf-6d3e-46ac-97e4-7ae1a5203844}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

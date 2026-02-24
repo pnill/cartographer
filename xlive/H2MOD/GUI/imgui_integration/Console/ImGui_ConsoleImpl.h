@@ -3,6 +3,7 @@
 #ifdef TERMINAL_ENABLED
 
 #include "CommandHandler.h"
+#include "ComVar.h"
 
 class CartographerConsole;
 typedef CartographerConsole CartConsole;

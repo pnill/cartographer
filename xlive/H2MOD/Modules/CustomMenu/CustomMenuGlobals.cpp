@@ -1,8 +1,10 @@
 #include "stdafx.h"
 #include "CustomMenuGlobals.h"
 
-std::chrono::time_point<std::chrono::high_resolution_clock> lastOuterMenuUse;
-void* lastOuterMenuFuncPtr = 0;
+#include <chrono>
+
+static std::chrono::time_point<std::chrono::high_resolution_clock> lastOuterMenuUse;
+static void* lastOuterMenuFuncPtr = 0;
 
 void* ui_custom_cartographer_load_menu(proc_ui_screen_load_cb_t p_ui_screen_proc_cb) {
 	return ui_custom_cartographer_load_menu(p_ui_screen_proc_cb, 1, 0);

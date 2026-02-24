@@ -33,8 +33,8 @@ struct s_rasterizer_globals_display_parameters
 	int64 pad_3;
 	int16 refresh_rate;
 	int16 pad;
-	D3DFORMAT backbuffer_format;
-	D3DFORMAT depthstencil_format;
+	uint32 backbuffer_format;	// D3DFORMAT
+	uint32 depthstencil_format;	// D3DFORMAT
 	int16 font_width;
 	int16 font_height;
 	e_display_type display_type;
@@ -89,7 +89,7 @@ struct s_rasterizer_globals
 	bool rasterizer_initialized;
 	bool use_d3d9_ex;
 	int8 pad[2];
-	decltype(Direct3DCreate9Ex)* d3d9_create_ex_proc;
+	void* d3d9_create_ex_proc;	// decltype(Direct3DCreate9Ex)*
 	uint32 resolution_x;
 	uint32 resolution_y;
 	rectangle2d screen_bounds;
@@ -130,10 +130,10 @@ uint32 rasterizer_get_width(void);
 
 uint32 rasterizer_get_height(void);
 
-void rasterizer_get_screen_bounds(rectangle2d* screen_bounds);
+void rasterizer_get_screen_bounds(union rectangle2d* screen_bounds);
 
-void rasterizer_get_frame_bounds(rectangle2d* frame_bounds);
+void rasterizer_get_frame_bounds(union rectangle2d* frame_bounds);
 
-void rasterizer_get_screen_and_frame_bounds(rectangle2d* screen_bounds, rectangle2d* frame_bounds);
+void rasterizer_get_screen_and_frame_bounds(union rectangle2d* screen_bounds, union rectangle2d* frame_bounds);
 
 void rasterizer_get_z_planes(real32* z_near, real32* z_far);

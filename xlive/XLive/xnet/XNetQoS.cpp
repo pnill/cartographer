@@ -1,8 +1,10 @@
 #include "stdafx.h"
 #include "XNetQoS.h"
 
+#include <algorithm>
+#include <chrono>
+#include <numeric>
 #include <MSWSock.h>
-#include <WS2tcpip.h>
 #include "IpManagement/XnIp.h"
 
 static CXNetQoS XNetQoS;

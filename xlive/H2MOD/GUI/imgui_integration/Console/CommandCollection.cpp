@@ -717,7 +717,7 @@ static int CommandCollection::invite(const std::vector<std::string>& tokens, Con
 		csmemcpy(&x_session_info.sessionID, &session->m_session_id, sizeof(x_session_info.sessionID));
 		x_session_info.keyExchangeKey = session->m_session_key;
 		x_session_info.hostAddress = (session_host ? session->m_session_virtual_couch.xsession_info.hostAddress :
-			session->m_network_observer->m_observer_channels[session->get_session_peer(session->m_session_host_peer_index)->observer_channel_index].xnaddr);
+			session->m_network_observer->m_observer_channels[session->get_session_peer(session->m_session_host_peer_index)->observer_channel_index].xnaddr.addr);
 
 		uint8* session_bytes = (uint8*)&x_session_info;
 		char connect_string[sizeof(XSESSION_INFO) * 2 + 1];

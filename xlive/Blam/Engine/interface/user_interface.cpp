@@ -506,7 +506,7 @@ void __cdecl user_interface_return_to_mainmenu(bool a1)
 void __cdecl user_interface_update(real32 dt)
 {
 	static real32 user_interface_precise_accumulator_msec = 0.f;
-	user_interface_precise_accumulator_msec += (dt * 1000.f) - floor(dt * 1000.f);
+	user_interface_precise_accumulator_msec += (dt * 1000.f) - (real32)floor(dt * 1000.f);
 	if (user_interface_precise_accumulator_msec >= 1.f)
 	{
 		*Memory::GetAddress<int32*>(0x971900) += (int32)user_interface_precise_accumulator_msec;

@@ -1,6 +1,5 @@
 #pragma once
 #include "game/game_allegiance.h"
-#include "interface/user_interface_widget_window.h"
 #include "interface/user_interface_widget_text.h"
 #include "interface/user_interface_widget_button.h"
 #include "interface/user_interface_widget_text_entry.h"

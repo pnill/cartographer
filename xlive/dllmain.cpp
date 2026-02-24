@@ -12,35 +12,38 @@
 #include "H2MOD/Modules/Shell/H2MODShell.h"
 #endif
 
+#include <time.h>
 
-/* constants */
+/* externs */
 
-#define k_discord_dll_filename L"discord_game_sdk.dll"
+extern void DeinitCustomLanguage();
+
+extern void h2log_dispose(void);
+
+/* prototypes */
+
+static void initialize_instance(void);
+
+static void discord_dispose(void);
+
+static void heap_debug_initialize(void);
+
+static void exit_instance(void);
 
 /* globals */
 
 HMODULE hThis = NULL;
 
-/* externs */
+/* public code */
 
-/* prototypes */
-
-void discord_initialize(void);
-void discord_dispose(void);
-void heap_debug_initialize(void);
-void initialize_instance(void);
-void exit_instance(void);
-
-/* entry point */
-
-BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
 {
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
 		hThis = hModule;
 		srand((unsigned int)time(NULL));
-		InitH2Startup();
+		initialize_instance();
 		break;
 
 	case DLL_THREAD_ATTACH:
@@ -54,25 +57,17 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpRese
 	return TRUE;
 }
 
-/* private code */
-
-void discord_initialize(void)
+static void initialize_instance(void)
 {
-	HMODULE module = LoadLibraryW(k_discord_dll_filename);
-	if (module && !shell_is_dedicated_server()
-		&& H2Config_discord_enable
-#ifdef TEST_DISCORD_INSTANCE
-		&& g_instance_number == 1
-#endif
-		)
-	{
-		discord_game_status_create(module);
-	}
-
+	heap_debug_initialize();
+	InitH2Startup();
 	return;
 }
 
-void discord_dispose(void)
+
+/* private code */
+
+static void discord_dispose(void)
 {
 	if (!shell_is_dedicated_server()
 		&& H2Config_discord_enable
@@ -86,7 +81,7 @@ void discord_dispose(void)
 	return;
 }
 
-void heap_debug_initialize(void)
+static void heap_debug_initialize(void)
 {
 #if CARTOGRAPHER_HEAP_DEBUG
 	int CurrentFlags;
@@ -99,27 +94,12 @@ void heap_debug_initialize(void)
 	return;
 }
 
-void initialize_instance(void)
-{
-	static bool init = false;
-
-	if (!init)
-	{
-		init = true;
-
-		heap_debug_initialize();
-		discord_initialize();
-	}
-	return;
-}
-
-void exit_instance(void)
+static void exit_instance(void)
 {
 	discord_dispose();
 	tag_injection_deinitialize();
 	new_hud_draw_deinitialize();
 
-	extern void DeinitCustomLanguage();
 	DeinitCustomLanguage();
 	DeinitH2Config();
 

@@ -12,11 +12,16 @@
 #include "interface/user_interface_guide.h"
 #include "interface/user_interface_utilities.h"
 #include "main/game_preferences.h"
-#include "Networking/online/online_account_xbox.h"
-#include "Networking/transport/transport.h"
-#include "Networking/panorama/panorama_friends.h"
-
+#include "networking/online/online_account_xbox.h"
+#include "networking/transport/transport.h"
+#include "networking/panorama/panorama_friends.h"
 #include "shell/shell.h"
+
+#include "H2MOD/Modules/Accounts/AccountLogin.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Utils/Utils.h"
+
+#include <XLive/xnet/xnet.h>
 
 /* enums */
 
@@ -50,8 +55,9 @@ enum e_main_menu_list_skin_texts
 
 /* constants */
 
-const char* k_main_menu_list_name = "main menu list";
-const wchar_t* k_online_button_text[k_language_count] =
+static const char* k_main_menu_list_name = "main menu list";
+
+static const wchar_t* k_online_button_text[k_language_count] =
 {
 	L"ONLINE",
 	L"オンライン",
@@ -67,11 +73,29 @@ const wchar_t* k_online_button_text[k_language_count] =
 /* prototypes */
 
 static bool __cdecl screen_show_campaign_options_without_achievement(e_controller_index controller_index);
+
 static bool __cdecl screen_show_screen_4way_signin_splitscreen_offline(e_controller_index controller_index);
+
 static bool __cdecl screen_show_screen_4way_signin_system_link_offline(e_controller_index controller_index);
+
 static bool __cdecl screen_show_screen_4way_signin_xbox_live_callback(void);
 
-/* public */
+static void online_account_transition_to_offline(void);
+
+static __declspec(naked) void jmp_c_main_menu_list()
+{
+	CLASS_HOOK_JMP(c_main_menu_list__c_main_menu_list_ctor, c_main_menu_list::c_main_menu_list_ctor);
+}
+
+/* public code */
+
+void c_main_menu_list::apply_instance_patches()
+{
+	if (shell_is_dedicated_server())
+		return;
+
+	PatchCall(Memory::GetAddress(0xB724), jmp_c_main_menu_list); //replace our c_main_menu_list inside c_screen_main_menu ctor
+}
 
 c_main_menu_list::c_main_menu_list(int16 user_flags) :
 	c_list_widget(user_flags),
@@ -106,11 +130,6 @@ CLASS_HOOK_DECLARE_LABEL(c_main_menu_list__c_main_menu_list_ctor, c_main_menu_li
 void c_main_menu_list::c_main_menu_list_ctor(int16 user_flags)
 {
 	new (this)c_main_menu_list(user_flags);
-}
-
-__declspec(naked) void jmp_c_main_menu_list()
-{
-	CLASS_HOOK_JMP(c_main_menu_list__c_main_menu_list_ctor, c_main_menu_list::c_main_menu_list_ctor);
 }
 
 c_list_item_widget* c_main_menu_list::get_list_items()
@@ -528,11 +547,14 @@ static bool __cdecl screen_show_screen_4way_signin_xbox_live_callback(void)
 	return true;
 }
 
-
-void c_main_menu_list::apply_instance_patches()
+static void online_account_transition_to_offline(void)
 {
-	if (shell_is_dedicated_server())
-		return;
+	BYTE abEnet[6];
+	BYTE abOnline[20];
+	XNetRandom(abEnet, sizeof(abEnet));
+	XNetRandom(abOnline, sizeof(abOnline));
+	ConfigureUserDetails("[Username]", "12345678901234567890123456789012", rand(), 0, H2Config_ip_lan, ByteToHexStr(abEnet, sizeof(abEnet)).c_str(), ByteToHexStr(abOnline, sizeof(abOnline)).c_str(), false);
 
-	PatchCall(Memory::GetAddress(0xB724), jmp_c_main_menu_list); //replace our c_main_menu_list inside c_screen_main_menu ctor
+	XUserSignInSetStatusChanged(0);
+	return;
 }

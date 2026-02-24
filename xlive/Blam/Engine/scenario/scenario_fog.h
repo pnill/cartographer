@@ -1,12 +1,14 @@
 #pragma once
 #include "math/color_math.h"
-#include "render/render_cameras.h"
 #include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"
 
-#define MAXIMUM_ATMOSPHERIC_FOG_PALETTE_ENTRIES_PER_SCENARIO 127
-#define k_maximum_mixers_per_scenario_atmospheric_fog_palette_entry 2
-#define MAXIMUM_PLANAR_FOG_PALETTE_ENTRIES_PER_SCENARIO 127
+enum
+{
+	MAXIMUM_ATMOSPHERIC_FOG_PALETTE_ENTRIES_PER_SCENARIO = 127,
+	k_maximum_mixers_per_scenario_atmospheric_fog_palette_entry = 2,
+	MAXIMUM_PLANAR_FOG_PALETTE_ENTRIES_PER_SCENARIO = 127
+};
 
 enum e_camera_immersion_flags : uint16
 {
@@ -165,6 +167,6 @@ ASSERT_STRUCT_SIZE(s_scenario_planar_fog_palette_entry, 16);
 
 // CLIENT ONLY
 // Renders the fog defined in the scenario
-bool __cdecl render_scenario_fog(int32 cluster_index, render_camera* camera_position, real_vector3d* camera_forward, bool a4, bool render_fog, s_scenario_fog_result* result);
+bool __cdecl render_scenario_fog(int32 cluster_index, struct render_camera* camera_position, real_vector3d* camera_forward, bool a4, bool render_fog, s_scenario_fog_result* result);
 
 void __cdecl scenario_fog_bloom_override_get_parameters(real32* bloom_override_amount, real32* bloom_override_gamma_power);

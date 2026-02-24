@@ -9,10 +9,6 @@
 #define SAFE_FREE(p)  { if(p) { free(p);     (p)=NULL; } }
 #define SAFE_RELEASE(p) { if(p) { (p)->Release(); (p)=NULL; } }
 #define ARRAYOF(x) (sizeof(x)/sizeof(*x))
-#define STRINGIFY(x) #x
-#define TOSTRING(x) STRINGIFY(x)
 #define BYTESOF(a, b) ((a) * sizeof(b))
-
-extern HMODULE hThis;
 
 #endif

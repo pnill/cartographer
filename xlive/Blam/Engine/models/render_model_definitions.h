@@ -2,8 +2,6 @@
 #include "errors/error_reports.h"
 #include "geometry/geometry_block.h"
 #include "geometry/geometry_definitions_new.h"
-#include "render/render_prt.h"
-#include "structures/structures.h"
 #include "tag_files/tag_import_definitions.h"
 
 enum e_render_model_definition_flags : int16
@@ -132,7 +130,7 @@ ASSERT_STRUCT_SIZE(render_model_marker_group, 12);
 // max count: MAXIMUM_SECTIONS_PER_RENDER_MODEL
 struct section_render_leaves
 {
-	tag_block<node_render_leaves> node_render_leaves;
+	s_tag_block node_render_leaves;	// struct: node_render_leaves
 };
 ASSERT_STRUCT_SIZE(section_render_leaves, 8);
 
@@ -165,7 +163,7 @@ struct render_model_definition
 	tag_block<error_report_category> errors;
 
 	real_angle dont_draw_over_camera_cosine_angle;  // dont draw fp model when camera > this angle cosine (-1,1) Sugg. -0.2. 0 disables.
-	tag_block<prt_info> prt_info;
-	tag_block<section_render_leaves> section_render_leaves;
+	s_tag_block prt_info;	// struct: prt_info
+	s_tag_block section_render_leaves;	// struct: section_render_leaves
 };
 ASSERT_STRUCT_SIZE(render_model_definition, 132);

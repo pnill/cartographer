@@ -22,11 +22,17 @@ union rectangle2d
 };
 ASSERT_STRUCT_SIZE(rectangle2d, sizeof(int16) * 4);
 
+/* prototypes */
+
+void rectangle2d_to_rect(const rectangle2d* rect2d, struct tagRECT* rect);
+
+/* public code */
 
 inline void point2d_scale(point2d* point, int16 scale)
 {
 	point->v[0] *= scale;
 	point->v[1] *= scale;
+	return;
 }
 
 inline int16 rectangle2d_width(const rectangle2d* rect)
@@ -64,19 +70,5 @@ inline void rectangle2d_scale(rectangle2d* rect, int16 scale)
 	rect->v[1] *= scale;
 	rect->v[2] *= scale;
 	rect->v[3] *= scale;
-	return;
-}
-
-inline void rectangle2d_to_rect(const rectangle2d* rect2d, RECT* rect)
-{
-	const int16 width = rectangle2d_width(rect2d);
-	const int16 height = rectangle2d_height(rect2d);
-	*rect =
-	{
-		rect2d->left,
-		rect2d->top,
-		rect2d->left + width,
-		rect2d->top + height
-	};
 	return;
 }

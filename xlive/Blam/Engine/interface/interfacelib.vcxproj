@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="debug_msvc|Win32">
+      <Configuration>debug_msvc</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release_min_msvc|Win32">
+      <Configuration>release_min_msvc</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release_msvc|Win32">
+      <Configuration>release_msvc</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>18.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{F59089C4-6D57-47EF-93A6-B6A49E168EF0}</ProjectGuid>
+    <RootNamespace>interfacelib</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">
+    <OutDir>$(SolutionDir)\objects\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)\objects\$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)$(Platform)$(Configuration)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">
+    <OutDir>$(SolutionDir)\objects\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)\objects\$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)$(Platform)$(Configuration)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">
+    <OutDir>$(SolutionDir)\objects\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)\objects\$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)$(Platform)$(Configuration)</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ASSERTS_ENABLED;EVENTS_ENABLED;ERRORS_ENABLED;DEBUG_MEMORY_ENABLED;RASTERIZER_PROFILE_ENABLED;VALIDATE_REAL_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;DEBUG_MENU_ENABLED;HS_COMPILER_ENABLED;_ALLOW_RTCc_IN_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeaderOutputFile>$(IntDir)interfacelib.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalIncludeDirectories>.\;..\;..\..\..\;..\..\..\3rdparty;..\..\..\XLive</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <DisableSpecificWarnings>4505;4100;4201</DisableSpecificWarnings>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <AdditionalOptions>/DPSAPI_VERSION=1 /utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
+      <SupportJustMyCode>false</SupportJustMyCode>
+      <TreatSpecificWarningsAsErrors>4700</TreatSpecificWarningsAsErrors>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ERRORS_ENABLED;EVENTS_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;HS_COMPILER_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeaderOutputFile>$(IntDir)interfacelib.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <AdditionalIncludeDirectories>.\;..\;..\..\..\;..\..\..\3rdparty;..\..\..\XLive</AdditionalIncludeDirectories>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DisableSpecificWarnings>4505;4100;4201</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <AdditionalOptions>/DPSAPI_VERSION=1 /utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
+      <TreatSpecificWarningsAsErrors>4700</TreatSpecificWarningsAsErrors>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;IMGUI_DISABLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeaderOutputFile>$(IntDir)interfacelib.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <AdditionalIncludeDirectories>.\;..\;..\..\..\;..\..\..\3rdparty;..\..\..\XLive</AdditionalIncludeDirectories>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DisableSpecificWarnings>4505;4100;4201</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <AdditionalOptions>/DPSAPI_VERSION=1 /utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
+      <TreatSpecificWarningsAsErrors>4700</TreatSpecificWarningsAsErrors>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="channel_with_history.h" />
+    <ClInclude Include="damaged_media.h" />
+    <ClInclude Include="dialog_channel.h" />
+    <ClInclude Include="first_person_weapons.h" />
+    <ClInclude Include="gameshell_background_channel.h" />
+    <ClInclude Include="gameshell_channel.h" />
+    <ClInclude Include="game_error_dialog_channel.h" />
+    <ClInclude Include="hardware_error_dialog_channel.h" />
+    <ClInclude Include="hud.h" />
+    <ClInclude Include="hud_definitions.h" />
+    <ClInclude Include="hud_draw.h" />
+    <ClInclude Include="hud_messaging.h" />
+    <ClInclude Include="hud_nav_points.h" />
+    <ClInclude Include="interface.h" />
+    <ClInclude Include="meter_definitions.h" />
+    <ClInclude Include="motion_sensor.h" />
+    <ClInclude Include="new_hud.h" />
+    <ClInclude Include="new_hud_definitions.h" />
+    <ClInclude Include="new_hud_draw.h" />
+    <ClInclude Include="online_menu_channel.h" />
+    <ClInclude Include="screens\screens_patches.h" />
+    <ClInclude Include="screens\screen_4way_signin.h" />
+    <ClInclude Include="screens\screen_about_dialog.h" />
+    <ClInclude Include="screens\screen_anti_aliasing.h" />
+    <ClInclude Include="screens\screen_audio_settings.h" />
+    <ClInclude Include="screens\screen_brightness_level.h" />
+    <ClInclude Include="screens\screen_brightness_menu.h" />
+    <ClInclude Include="screens\screen_bungie_news.h" />
+    <ClInclude Include="screens\screen_button_settings.h" />
+    <ClInclude Include="screens\screen_campaign_options_dialog.h" />
+    <ClInclude Include="screens\screen_cartographer_account_manager.h" />
+    <ClInclude Include="screens\screen_cartographer_account_manager_strings.h" />
+    <ClInclude Include="screens\screen_cartographer_errors.h" />
+    <ClInclude Include="screens\screen_cartographer_menus.h" />
+    <ClInclude Include="screens\screen_confirm_resolution.h" />
+    <ClInclude Include="screens\screen_controller_settings_menu.h" />
+    <ClInclude Include="screens\screen_display_mode.h" />
+    <ClInclude Include="screens\screen_error_dialog.h" />
+    <ClInclude Include="screens\screen_esrb_warning.h" />
+    <ClInclude Include="screens\screen_gamma_setting.h" />
+    <ClInclude Include="screens\screen_lod_setting.h" />
+    <ClInclude Include="screens\screen_main_menu.h" />
+    <ClInclude Include="screens\screen_multiplayer_pregame_lobby.h" />
+    <ClInclude Include="screens\screen_multiplayer_video_settings_menu.h" />
+    <ClInclude Include="screens\screen_network_adapter.h" />
+    <ClInclude Include="screens\screen_network_squad_browser.h" />
+    <ClInclude Include="screens\screen_press_start_introduction.h" />
+    <ClInclude Include="screens\screen_resolution.h" />
+    <ClInclude Include="screens\screen_restore_video_defaults.h" />
+    <ClInclude Include="screens\screen_safe_area_setting.h" />
+    <ClInclude Include="screens\screen_settings.h" />
+    <ClInclude Include="screens\screen_single_player_difficulty_select.h" />
+    <ClInclude Include="screens\screen_single_player_level_select.h" />
+    <ClInclude Include="screens\screen_single_player_profile_select.h" />
+    <ClInclude Include="screens\screen_splitscreen_setting.h" />
+    <ClInclude Include="screens\screen_squad_settings.h" />
+    <ClInclude Include="screens\screen_variant_game_engine_type.h" />
+    <ClInclude Include="screens\screen_video_settings.h" />
+    <ClInclude Include="screens\screen_virtual_keyboard.h" />
+    <ClInclude Include="screens\screen_vsync_setting.h" />
+    <ClInclude Include="screens\screen_xbox_live_task_progress_dialog.h" />
+    <ClInclude Include="signal_slot.h" />
+    <ClInclude Include="..\interfacelib\stdafx.h" />
+    <ClInclude Include="terminal.h" />
+    <ClInclude Include="user_interface.h" />
+    <ClInclude Include="user_interface_bitmap_block.h" />
+    <ClInclude Include="user_interface_channel.h" />
+    <ClInclude Include="user_interface_controller.h" />
+    <ClInclude Include="user_interface_group_widget.h" />
+    <ClInclude Include="user_interface_guide.h" />
+    <ClInclude Include="user_interface_hud_block.h" />
+    <ClInclude Include="user_interface_main_menu_music.h" />
+    <ClInclude Include="user_interface_memory.h" />
+    <ClInclude Include="user_interface_model_block.h" />
+    <ClInclude Include="user_interface_networking.h" />
+    <ClInclude Include="user_interface_network_search.h" />
+    <ClInclude Include="user_interface_player_widget.h" />
+    <ClInclude Include="user_interface_screen_widget_definition.h" />
+    <ClInclude Include="user_interface_shared_globals.h" />
+    <ClInclude Include="user_interface_text.h" />
+    <ClInclude Include="user_interface_text_block.h" />
+    <ClInclude Include="user_interface_text_chat.h" />
+    <ClInclude Include="user_interface_text_chat_receiver.h" />
+    <ClInclude Include="user_interface_text_chat_sender.h" />
+    <ClInclude Include="user_interface_utilities.h" />
+    <ClInclude Include="user_interface_widget.h" />
+    <ClInclude Include="user_interface_widget_button.h" />
+    <ClInclude Include="user_interface_widget_list.h" />
+    <ClInclude Include="user_interface_widget_list_item.h" />
+    <ClInclude Include="user_interface_widget_tab_view.h" />
+    <ClInclude Include="user_interface_widget_text.h" />
+    <ClInclude Include="user_interface_widget_text_entry.h" />
+    <ClInclude Include="user_interface_widget_window.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="damaged_media.cpp" />
+    <ClCompile Include="first_person_weapons.cpp" />
+    <ClCompile Include="hud.cpp" />
+    <ClCompile Include="hud_definitions.cpp" />
+    <ClCompile Include="hud_draw.cpp" />
+    <ClCompile Include="hud_messaging.cpp" />
+    <ClCompile Include="hud_nav_points.cpp" />
+    <ClCompile Include="interface.cpp" />
+    <ClCompile Include="motion_sensor.cpp" />
+    <ClCompile Include="new_hud.cpp" />
+    <ClCompile Include="new_hud_draw.cpp" />
+    <ClCompile Include="..\interfacelib\stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="screens\screens_patches.cpp" />
+    <ClCompile Include="screens\screen_4way_signin.cpp" />
+    <ClCompile Include="screens\screen_about_dialog.cpp" />
+    <ClCompile Include="screens\screen_anti_aliasing.cpp" />
+    <ClCompile Include="screens\screen_audio_settings.cpp" />
+    <ClCompile Include="screens\screen_brightness_level.cpp" />
+    <ClCompile Include="screens\screen_brightness_menu.cpp" />
+    <ClCompile Include="screens\screen_bungie_news.cpp" />
+    <ClCompile Include="screens\screen_button_settings.cpp" />
+    <ClCompile Include="screens\screen_campaign_options_dialog.cpp" />
+    <ClCompile Include="screens\screen_cartographer_account_manager.cpp" />
+    <ClCompile Include="screens\screen_cartographer_errors.cpp" />
+    <ClCompile Include="screens\screen_cartographer_menus.cpp" />
+    <ClCompile Include="screens\screen_confirm_resolution.cpp" />
+    <ClCompile Include="screens\screen_controller_settings_menu.cpp" />
+    <ClCompile Include="screens\screen_display_mode.cpp" />
+    <ClCompile Include="screens\screen_error_dialog.cpp" />
+    <ClCompile Include="screens\screen_esrb_warning.cpp" />
+    <ClCompile Include="screens\screen_gamma_setting.cpp" />
+    <ClCompile Include="screens\screen_lod_setting.cpp" />
+    <ClCompile Include="screens\screen_main_menu.cpp" />
+    <ClCompile Include="screens\screen_multiplayer_pregame_lobby.cpp" />
+    <ClCompile Include="screens\screen_multiplayer_video_settings_menu.cpp" />
+    <ClCompile Include="screens\screen_network_adapter.cpp" />
+    <ClCompile Include="screens\screen_network_squad_browser.cpp" />
+    <ClCompile Include="screens\screen_press_start_introduction.cpp" />
+    <ClCompile Include="screens\screen_resolution.cpp" />
+    <ClCompile Include="screens\screen_restore_video_defaults.cpp" />
+    <ClCompile Include="screens\screen_safe_area_setting.cpp" />
+    <ClCompile Include="screens\screen_settings.cpp" />
+    <ClCompile Include="screens\screen_single_player_difficulty_select.cpp" />
+    <ClCompile Include="screens\screen_single_player_level_select.cpp" />
+    <ClCompile Include="screens\screen_single_player_profile_select.cpp" />
+    <ClCompile Include="screens\screen_splitscreen_setting.cpp" />
+    <ClCompile Include="screens\screen_squad_settings.cpp" />
+    <ClCompile Include="screens\screen_variant_game_engine_type.cpp" />
+    <ClCompile Include="screens\screen_video_settings.cpp" />
+    <ClCompile Include="screens\screen_virtual_keyboard.cpp" />
+    <ClCompile Include="screens\screen_vsync_setting.cpp" />
+    <ClCompile Include="screens\screen_xbox_live_task_progress_dialog.cpp" />
+    <ClCompile Include="terminal.cpp" />
+    <ClCompile Include="user_interface.cpp" />
+    <ClCompile Include="user_interface_bitmap_block.cpp" />
+    <ClCompile Include="user_interface_channel.cpp" />
+    <ClCompile Include="user_interface_controller.cpp" />
+    <ClCompile Include="user_interface_group_widget.cpp" />
+    <ClCompile Include="user_interface_guide.cpp" />
+    <ClCompile Include="user_interface_hud_block.cpp" />
+    <ClCompile Include="user_interface_memory.cpp" />
+    <ClCompile Include="user_interface_model_block.cpp" />
+    <ClCompile Include="user_interface_networking.cpp" />
+    <ClCompile Include="user_interface_network_search.cpp" />
+    <ClCompile Include="user_interface_player_widget.cpp" />
+    <ClCompile Include="user_interface_shared_globals.cpp" />
+    <ClCompile Include="user_interface_text.cpp" />
+    <ClCompile Include="user_interface_text_block.cpp" />
+    <ClCompile Include="user_interface_utilities.cpp" />
+    <ClCompile Include="user_interface_widget.cpp" />
+    <ClCompile Include="user_interface_widget_button.cpp" />
+    <ClCompile Include="user_interface_widget_list.cpp" />
+    <ClCompile Include="user_interface_widget_list_item.cpp" />
+    <ClCompile Include="user_interface_widget_tab_view.cpp" />
+    <ClCompile Include="user_interface_widget_text.cpp" />
+    <ClCompile Include="user_interface_widget_text_entry.cpp" />
+    <ClCompile Include="user_interface_widget_window.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

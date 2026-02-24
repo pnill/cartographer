@@ -11,8 +11,6 @@
 #include "game/game_time.h"
 #include "main/console.h"
 #include "main/main.h"
-#include "rasterizer/dx9/rasterizer_dx9_errors.h"
-#include "rasterizer/dx9/rasterizer_dx9_main.h"
 #include "rasterizer/rasterizer_main.h"
 #include "render/render.h"
 #include "shell/shell.h"
@@ -135,31 +133,17 @@ bool __cdecl screenshot_render(window_bound* window)
 	if (screenshot_globals->take_screenshot || movie_globals->in_progress)
 	{
 		s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
-		s_rasterizer_dx9_main_globals* rasterizer_dx9_globals = rasterizer_dx9_main_globals_get();
-		IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
 
 		int16 screen_width = rectangle2d_width(&rasterizer_globals->screen_bounds);
 		int16 screen_height = rectangle2d_height(&rasterizer_globals->screen_bounds);
 
-		HRESULT hr;
-		rasterizer_dx9_log_hr(
-			hr,
-			global_d3d_device->CreateRenderTarget(
-				screen_width, 
-				screen_height,
-				D3DFMT_A8R8G8B8,
-				D3DMULTISAMPLE_NONE,
-				0,
-				true,
-				&rasterizer_dx9_globals->global_d3d_surface_screenshot,
-				NULL
-			)
-		);
-		if (FAILED(hr))
+
+		result = rasterizer_initialize_screenshot_render_target(screen_width, screen_height);
+		if (!result)
 		{
-			result = false;
 			return result;
 		}
+
 
 		// Continue if we meet the movie checks
 		if (!movie_globals->in_progress || movie_should_continue())
@@ -544,12 +528,7 @@ bool __cdecl screenshot_render(window_bound* window)
 		screenshot_globals->cubemap_screenshot = false;
 
 		// Cleanup rasterizer target
-
-		if (rasterizer_dx9_globals->global_d3d_surface_screenshot)
-		{
-			rasterizer_dx9_globals->global_d3d_surface_screenshot->Release();
-			rasterizer_dx9_globals->global_d3d_surface_screenshot = NULL;
-		}
+		rasterizer_cleanup_screenshot_render_target();
 	}
 
 	return result;

@@ -6,8 +6,6 @@
 #include "networking/logic/network_logic.h"
 #include "networking/transport/transport_security.h"
 
-#include <XLive/ServerList/ServerList.h>
-
 /* typedefs */
 
 typedef c_screen_network_squad_browser* (__cdecl* load_network_browser_t)(s_screen_parameters*);

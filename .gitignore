@@ -1,6 +1,3 @@
-Project_Cartographer.VC.db
-Project_Cartographer.VC.VC.opendb
-Project_Cartographer.vcxproj.user
 *.exp
 *.obj
 *.tlog
@@ -15,22 +12,16 @@ Project_Cartographer.vcxproj.user
 *.opendb
 *.db
 xlive.ilk
-xliveless.aps
-xliveless.opensdf
-xliveless.v12.suo
 **/.vs
 **/.vscode
 /Directx SDK/include
 /Halo2
 /Halo2Server
-/xlive/objects
-*.opensdf
+/objects
 *.user
 *.ipch
 *.pso
 version_git.h
-
-JSON/
 
 xlive/version_git.h
 xlive/3rdparty/imgui/lib

@@ -614,7 +614,7 @@ bool __cdecl rasterizer_dx9_primary_targets_initialize(void)
 	const int16 screen_bounds_height = rectangle2d_height(&rasterizer_globals->screen_bounds);
 
 	bool success = false;
-	const D3DFORMAT backbuffer_fmt = rasterizer_globals->display_parameters.backbuffer_format;
+	const D3DFORMAT backbuffer_fmt = (D3DFORMAT)rasterizer_globals->display_parameters.backbuffer_format;
 
 	HRESULT hr;
 	rasterizer_dx9_log_hr(
@@ -633,10 +633,10 @@ bool __cdecl rasterizer_dx9_primary_targets_initialize(void)
 	success = SUCCEEDED(hr);
 	if (success)
 	{
-		const D3DMULTISAMPLE_TYPE type = rasterizer_globals->d3d9_sm3_supported ? D3DMULTISAMPLE_NONE : dx9_globals->global_d3d_primary_multisampletype;
+		const D3DMULTISAMPLE_TYPE type = (D3DMULTISAMPLE_TYPE)(rasterizer_globals->d3d9_sm3_supported ? D3DMULTISAMPLE_NONE : dx9_globals->global_d3d_primary_multisampletype);
 		const uint32 quality = rasterizer_globals->d3d9_sm3_supported ? 0 : dx9_globals->global_d3d_primary_multisamplequality;
 
-		const D3DFORMAT depthstencil_fmt = rasterizer_globals->display_parameters.depthstencil_format;
+		const D3DFORMAT depthstencil_fmt = (D3DFORMAT)rasterizer_globals->display_parameters.depthstencil_format;
 
 		// Get the surface of the previously created render resolved texture
 		rasterizer_dx9_log_hr(
@@ -781,7 +781,7 @@ bool __cdecl rasterizer_dx9_secondary_targets_initialize(void)
 			screen_bounds_height,
 			1,
 			D3DUSAGE_RENDERTARGET,
-			rasterizer_globals->display_parameters.backbuffer_format,
+			(D3DFORMAT)rasterizer_globals->display_parameters.backbuffer_format,
 			D3DPOOL_DEFAULT,
 			&dx9_globals->global_d3d_texture_backbuffer,
 			NULL
@@ -803,7 +803,7 @@ bool __cdecl rasterizer_dx9_secondary_targets_initialize(void)
 		{
 			const bool sm3_supported = rasterizer_globals->d3d9_sm3_supported;
 
-			const D3DFORMAT format = (sm3_supported ? rasterizer_globals->display_parameters.backbuffer_format : rasterizer_globals->display_parameters.depthstencil_format);
+			const D3DFORMAT format = (D3DFORMAT)(sm3_supported ? rasterizer_globals->display_parameters.backbuffer_format : rasterizer_globals->display_parameters.depthstencil_format);
 			const D3DMULTISAMPLE_TYPE type = D3DMULTISAMPLE_NONE;
 			const uint32 quality = 0;
 
@@ -818,7 +818,7 @@ bool __cdecl rasterizer_dx9_secondary_targets_initialize(void)
 						screen_bounds_height,
 						1,
 						D3DUSAGE_RENDERTARGET,
-						rasterizer_globals->display_parameters.backbuffer_format,
+						(D3DFORMAT)rasterizer_globals->display_parameters.backbuffer_format,
 						D3DPOOL_DEFAULT,
 						&g_d3d_texture_render_z_as_target_z,
 						NULL

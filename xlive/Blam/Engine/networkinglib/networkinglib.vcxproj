@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="debug_msvc|Win32">
+      <Configuration>debug_msvc</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release_min_msvc|Win32">
+      <Configuration>release_min_msvc</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release_msvc|Win32">
+      <Configuration>release_msvc</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>18.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{97fcedec-adf6-4ad9-8600-d28ad461bb3c}</ProjectGuid>
+    <RootNamespace>networkinglib</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">
+    <OutDir>$(SolutionDir)\objects\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)\objects\$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)$(Platform)$(Configuration)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">
+    <OutDir>$(SolutionDir)\objects\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)\objects\$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)$(Platform)$(Configuration)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">
+    <OutDir>$(SolutionDir)\objects\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)\objects\$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)$(Platform)$(Configuration)</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ASSERTS_ENABLED;EVENTS_ENABLED;ERRORS_ENABLED;DEBUG_MEMORY_ENABLED;RASTERIZER_PROFILE_ENABLED;VALIDATE_REAL_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;DEBUG_MENU_ENABLED;HS_COMPILER_ENABLED;_ALLOW_RTCc_IN_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeaderOutputFile>$(IntDir)networkinglib.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..\..\..\3rdparty;.\;..\;..\..\..\;..\..\..\XLive</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <DisableSpecificWarnings>4505;4100;4201</DisableSpecificWarnings>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <AdditionalOptions>/DPSAPI_VERSION=1 /utf-8</AdditionalOptions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
+      <SupportJustMyCode>false</SupportJustMyCode>
+      <TreatSpecificWarningsAsErrors>4700</TreatSpecificWarningsAsErrors>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ERRORS_ENABLED;EVENTS_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;HS_COMPILER_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeaderOutputFile>$(IntDir)networkinglib.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <AdditionalIncludeDirectories>..\..\..\3rdparty;.\;..\;..\..\..\;..\..\..\XLive</AdditionalIncludeDirectories>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DisableSpecificWarnings>4505;4100;4201</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <AdditionalOptions>/DPSAPI_VERSION=1 /utf-8</AdditionalOptions>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
+      <TreatSpecificWarningsAsErrors>4700</TreatSpecificWarningsAsErrors>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeaderOutputFile>$(IntDir)networkinglib.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <AdditionalIncludeDirectories>..\..\..\3rdparty;.\;..\;..\..\..\;..\..\..\XLive</AdditionalIncludeDirectories>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DisableSpecificWarnings>4505;4100;4201</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <AdditionalOptions>/DPSAPI_VERSION=1 /utf-8</AdditionalOptions>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
+      <TreatSpecificWarningsAsErrors>4700</TreatSpecificWarningsAsErrors>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\networking\couch\xsession_manager.h" />
+    <ClInclude Include="..\networking\delivery\network_channel.h" />
+    <ClInclude Include="..\networking\delivery\network_link.h" />
+    <ClInclude Include="..\networking\locator\network_locator.h" />
+    <ClInclude Include="..\networking\logic\life_cycle_manager.h" />
+    <ClInclude Include="..\networking\logic\network_bandwidth.h" />
+    <ClInclude Include="..\networking\logic\network_broadcast_search.h" />
+    <ClInclude Include="..\networking\logic\network_life_cycle.h" />
+    <ClInclude Include="..\networking\logic\network_logic.h" />
+    <ClInclude Include="..\networking\logic\network_search.h" />
+    <ClInclude Include="..\networking\logic\network_session_interface.h" />
+    <ClInclude Include="..\networking\logic\storage\network_storage.h" />
+    <ClInclude Include="..\networking\messages\network_messages_cartographer.h" />
+    <ClInclude Include="..\networking\messages\network_messages_connect.h" />
+    <ClInclude Include="..\networking\messages\network_messages_out_of_band.h" />
+    <ClInclude Include="..\networking\messages\network_messages_session_membership.h" />
+    <ClInclude Include="..\networking\messages\network_messages_session_parameters.h" />
+    <ClInclude Include="..\networking\messages\network_messages_session_protocol.h" />
+    <ClInclude Include="..\networking\messages\network_messages_simulation.h" />
+    <ClInclude Include="..\networking\messages\network_messages_simulation_distributed.h" />
+    <ClInclude Include="..\networking\messages\network_messages_simulation_synchronous.h" />
+    <ClInclude Include="..\networking\messages\network_messages_test.h" />
+    <ClInclude Include="..\networking\messages\network_messages_text_chat.h" />
+    <ClInclude Include="..\networking\messages\network_message_gateway.h" />
+    <ClInclude Include="..\networking\messages\network_message_handler.h" />
+    <ClInclude Include="..\networking\messages\network_message_type_collection.h" />
+    <ClInclude Include="..\networking\network_configuration.h" />
+    <ClInclude Include="..\networking\network_constants.h" />
+    <ClInclude Include="..\networking\network_event.h" />
+    <ClInclude Include="..\networking\network_game_definitions.h" />
+    <ClInclude Include="..\networking\network_globals.h" />
+    <ClInclude Include="..\networking\network_loading.h" />
+    <ClInclude Include="..\networking\network_memory.h" />
+    <ClInclude Include="..\networking\network_statistics.h" />
+    <ClInclude Include="..\networking\network_time.h" />
+    <ClInclude Include="..\networking\network_utilities.h" />
+    <ClInclude Include="..\networking\online\online_account_xbox.h" />
+    <ClInclude Include="..\networking\online\online_cheater.h" />
+    <ClInclude Include="..\networking\online\online_strings.h" />
+    <ClInclude Include="..\networking\online\online_task_xbox.h" />
+    <ClInclude Include="..\networking\online\voice_engine.h" />
+    <ClInclude Include="..\networking\panorama\panorama_achievements.h" />
+    <ClInclude Include="..\networking\panorama\panorama_favorites.h" />
+    <ClInclude Include="..\networking\panorama\panorama_friends.h" />
+    <ClInclude Include="..\networking\panorama\panorama_presence.h" />
+    <ClInclude Include="..\networking\panorama\panorama_user_history.h" />
+    <ClInclude Include="..\networking\player_motion.h" />
+    <ClInclude Include="..\networking\player_prediction.h" />
+    <ClInclude Include="..\networking\replication\replication_control_view.h" />
+    <ClInclude Include="..\networking\replication\replication_entity.h" />
+    <ClInclude Include="..\networking\replication\replication_entity_manager.h" />
+    <ClInclude Include="..\networking\replication\replication_entity_manager_view.h" />
+    <ClInclude Include="..\networking\replication\replication_event_manager.h" />
+    <ClInclude Include="..\networking\Session\network_observer.h" />
+    <ClInclude Include="..\networking\Session\network_session.h" />
+    <ClInclude Include="..\networking\Session\network_session_manager.h" />
+    <ClInclude Include="..\networking\Session\network_text_chat_manager.h" />
+    <ClInclude Include="..\networking\transport\transport.h" />
+    <ClInclude Include="..\networking\transport\transport_address.h" />
+    <ClInclude Include="..\networking\transport\transport_qos.h" />
+    <ClInclude Include="..\networking\transport\transport_security.h" />
+    <ClInclude Include="..\simulation\game_interface\simulation_game_action.h" />
+    <ClInclude Include="..\simulation\game_interface\simulation_game_damage.h" />
+    <ClInclude Include="..\simulation\game_interface\simulation_game_device_machines.h" />
+    <ClInclude Include="..\simulation\game_interface\simulation_game_engine_player.h" />
+    <ClInclude Include="..\simulation\game_interface\simulation_game_entities.h" />
+    <ClInclude Include="..\simulation\game_interface\simulation_game_events.h" />
+    <ClInclude Include="..\simulation\game_interface\simulation_game_generics.h" />
+    <ClInclude Include="..\simulation\game_interface\simulation_game_interface.h" />
+    <ClInclude Include="..\simulation\game_interface\simulation_game_internal.h" />
+    <ClInclude Include="..\simulation\game_interface\simulation_game_items.h" />
+    <ClInclude Include="..\simulation\game_interface\simulation_game_objects.h" />
+    <ClInclude Include="..\simulation\game_interface\simulation_game_projectiles.h" />
+    <ClInclude Include="..\simulation\game_interface\simulation_game_turrets.h" />
+    <ClInclude Include="..\simulation\game_interface\simulation_game_units.h" />
+    <ClInclude Include="..\simulation\game_interface\simulation_game_vehicles.h" />
+    <ClInclude Include="..\simulation\game_interface\simulation_game_weapons.h" />
+    <ClInclude Include="..\simulation\machine_id.h" />
+    <ClInclude Include="..\simulation\simulation.h" />
+    <ClInclude Include="..\simulation\simulation_actors.h" />
+    <ClInclude Include="..\simulation\simulation_encoding.h" />
+    <ClInclude Include="..\simulation\simulation_entity_database.h" />
+    <ClInclude Include="..\simulation\simulation_event_handler.h" />
+    <ClInclude Include="..\simulation\simulation_gamestate_entities.h" />
+    <ClInclude Include="..\simulation\simulation_players.h" />
+    <ClInclude Include="..\simulation\simulation_queue.h" />
+    <ClInclude Include="..\simulation\simulation_queue_entities.h" />
+    <ClInclude Include="..\simulation\simulation_queue_events.h" />
+    <ClInclude Include="..\simulation\simulation_queue_global_events.h" />
+    <ClInclude Include="..\simulation\simulation_type_collection.h" />
+    <ClInclude Include="..\simulation\simulation_view.h" />
+    <ClInclude Include="..\simulation\simulation_watcher.h" />
+    <ClInclude Include="..\simulation\simulation_world.h" />
+    <ClInclude Include="stdafx.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\networking\couch\xsession_manager.cpp" />
+    <ClCompile Include="..\networking\delivery\network_channel.cpp" />
+    <ClCompile Include="..\networking\delivery\network_link.cpp" />
+    <ClCompile Include="..\networking\locator\network_locator.cpp" />
+    <ClCompile Include="..\networking\logic\life_cycle_manager.cpp" />
+    <ClCompile Include="..\networking\logic\network_bandwidth.cpp" />
+    <ClCompile Include="..\networking\logic\network_broadcast_search.cpp" />
+    <ClCompile Include="..\networking\logic\network_life_cycle.cpp" />
+    <ClCompile Include="..\networking\logic\network_search.cpp" />
+    <ClCompile Include="..\networking\logic\network_session_interface.cpp" />
+    <ClCompile Include="..\networking\logic\storage\network_storage.cpp" />
+    <ClCompile Include="..\networking\messages\network_messages_cartographer.cpp" />
+    <ClCompile Include="..\networking\messages\network_messages_connect.cpp" />
+    <ClCompile Include="..\networking\messages\network_messages_out_of_band.cpp" />
+    <ClCompile Include="..\networking\messages\network_messages_session_membership.cpp" />
+    <ClCompile Include="..\networking\messages\network_messages_session_parameters.cpp" />
+    <ClCompile Include="..\networking\messages\network_messages_session_protocol.cpp" />
+    <ClCompile Include="..\networking\messages\network_messages_simulation.cpp" />
+    <ClCompile Include="..\networking\messages\network_messages_simulation_distributed.cpp" />
+    <ClCompile Include="..\networking\messages\network_messages_simulation_synchronous.cpp" />
+    <ClCompile Include="..\networking\messages\network_messages_test.cpp" />
+    <ClCompile Include="..\networking\messages\network_messages_text_chat.cpp" />
+    <ClCompile Include="..\networking\messages\network_message_gateway.cpp" />
+    <ClCompile Include="..\networking\messages\network_message_handler.cpp" />
+    <ClCompile Include="..\networking\messages\network_message_type_collection.cpp" />
+    <ClCompile Include="..\networking\network_configuration.cpp" />
+    <ClCompile Include="..\networking\network_event.cpp" />
+    <ClCompile Include="..\networking\network_globals.cpp" />
+    <ClCompile Include="..\networking\network_loading.cpp" />
+    <ClCompile Include="..\networking\network_memory.cpp" />
+    <ClCompile Include="..\networking\network_statistics.cpp" />
+    <ClCompile Include="..\networking\network_time.cpp" />
+    <ClCompile Include="..\networking\network_utilities.cpp" />
+    <ClCompile Include="..\networking\online\online_account_xbox.cpp" />
+    <ClCompile Include="..\networking\online\online_cheater.cpp" />
+    <ClCompile Include="..\networking\online\online_strings.cpp" />
+    <ClCompile Include="..\networking\online\online_task_xbox.cpp" />
+    <ClCompile Include="..\networking\online\voice_engine.cpp" />
+    <ClCompile Include="..\networking\panorama\panorama_achievements.cpp" />
+    <ClCompile Include="..\networking\panorama\panorama_favorites.cpp" />
+    <ClCompile Include="..\networking\panorama\panorama_friends.cpp" />
+    <ClCompile Include="..\networking\panorama\panorama_presence.cpp" />
+    <ClCompile Include="..\networking\panorama\panorama_user_history.cpp" />
+    <ClCompile Include="..\networking\replication\replication_entity.cpp" />
+    <ClCompile Include="..\networking\replication\replication_entity_manager.cpp" />
+    <ClCompile Include="..\networking\replication\replication_entity_manager_view.cpp" />
+    <ClCompile Include="..\networking\replication\replication_event_manager.cpp" />
+    <ClCompile Include="..\networking\Session\network_observer.cpp" />
+    <ClCompile Include="..\networking\Session\network_session.cpp" />
+    <ClCompile Include="..\networking\Session\network_session_manager.cpp" />
+    <ClCompile Include="..\networking\Session\network_text_chat_manager.cpp" />
+    <ClCompile Include="..\networking\transport\transport.cpp" />
+    <ClCompile Include="..\networking\transport\transport_address.cpp" />
+    <ClCompile Include="..\networking\transport\transport_qos.cpp" />
+    <ClCompile Include="..\networking\transport\transport_security.cpp" />
+    <ClCompile Include="..\simulation\game_interface\simulation_game_action.cpp" />
+    <ClCompile Include="..\simulation\game_interface\simulation_game_entities.cpp" />
+    <ClCompile Include="..\simulation\game_interface\simulation_game_events.cpp" />
+    <ClCompile Include="..\simulation\game_interface\simulation_game_interface.cpp" />
+    <ClCompile Include="..\simulation\game_interface\simulation_game_internal.cpp" />
+    <ClCompile Include="..\simulation\game_interface\simulation_game_objects.cpp" />
+    <ClCompile Include="..\simulation\game_interface\simulation_game_units.cpp" />
+    <ClCompile Include="..\simulation\game_interface\simulation_game_vehicles.cpp" />
+    <ClCompile Include="..\simulation\simulation.cpp" />
+    <ClCompile Include="..\simulation\simulation_actors.cpp" />
+    <ClCompile Include="..\simulation\simulation_encoding.cpp" />
+    <ClCompile Include="..\simulation\simulation_entity_database.cpp" />
+    <ClCompile Include="..\simulation\simulation_event_handler.cpp" />
+    <ClCompile Include="..\simulation\simulation_gamestate_entities.cpp" />
+    <ClCompile Include="..\simulation\simulation_players.cpp" />
+    <ClCompile Include="..\simulation\simulation_queue.cpp" />
+    <ClCompile Include="..\simulation\simulation_queue_entities.cpp" />
+    <ClCompile Include="..\simulation\simulation_queue_events.cpp" />
+    <ClCompile Include="..\simulation\simulation_queue_global_events.cpp" />
+    <ClCompile Include="..\simulation\simulation_type_collection.cpp" />
+    <ClCompile Include="..\simulation\simulation_world.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

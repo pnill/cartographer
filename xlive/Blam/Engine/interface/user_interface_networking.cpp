@@ -11,6 +11,7 @@
 #include "networking/logic/life_cycle_manager.h"
 #include "networking/online/online_account_xbox.h"
 #include "networking/session/network_session.h"
+#include "networking/transport/transport.h"
 
 /* globals */
 

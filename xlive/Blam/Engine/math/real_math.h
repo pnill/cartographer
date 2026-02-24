@@ -22,7 +22,7 @@ typedef real32 real_angle;
 union real_euler_angles2d
 {
 	real32 n[2];
-	struct { real_angle yaw, pitch; };
+	struct { real32 yaw, pitch; };
 };
 ASSERT_STRUCT_SIZE(real_euler_angles2d, sizeof(real_angle) * 2);
 
@@ -287,7 +287,7 @@ inline bool valid_real(real32 value)
 inline bool valid_realcmp(real32 a, real32 b)
 {
 	real32 result = a - b;
-	return valid_real(result) && ::abs(result) < 0.01f;
+	return valid_real(result) && ::fabs(result) < 0.01f;
 }
 
 inline bool valid_real_normal3d(const real_vector3d* normal)
@@ -402,7 +402,7 @@ inline real_point3d* point_from_line3d(const real_point3d* p, const real_vector3
 inline real32 normalize3d(real_vector3d* v1)
 {
 	real32 length = magnitude3d(v1);
-	if (::abs(length) >= k_real_epsilon)
+	if (::fabs(length) >= k_real_epsilon)
 	{
 		scale_vector3d(v1, 1.0f / length, v1);
 	}

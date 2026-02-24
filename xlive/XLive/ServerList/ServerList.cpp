@@ -11,11 +11,11 @@
 #include "H2MOD/Modules/Accounts/Accounts.h"
 #include "H2MOD/Utils/Utils.h"
 
+#include <chrono>
 #include <rapidjson/document.h>
 #include <rapidjson/writer.h>
 
 using namespace rapidjson;
-
 
 /* constants */
 
@@ -317,7 +317,7 @@ bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData,
 
 			ZeroMemory(*stringBuffer, X_PROPERTY_UNICODE_BUFFER_SIZE);
 
-			ustrncpy(*stringBuffer, str.c_str(), str.length() + 1);
+			wcsncpy_s(*stringBuffer, str.length() + 1, str.c_str(), _TRUNCATE);
 
 			userProperty.value.string.cbData = (wcsnlen(*stringBuffer, 64) + 1) * sizeof(WCHAR);
 			userProperty.value.string.pwszData = *stringBuffer;
@@ -788,7 +788,8 @@ void CServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, 
 
 		XUSER_SIGNIN_INFO* signedInUser = XUserGetSignInInfo(dwUserIndex);
 
-		const char* server_name = strnlen_s(H2Config_dedi_server_name, XUSER_MAX_NAME_LENGTH) > 0 ? H2Config_dedi_server_name : signedInUser->szUserName;
+		const char* dedi_server_name = h2config_get_dedi_server_name();
+		const char* server_name = strnlen_s(dedi_server_name, XUSER_MAX_NAME_LENGTH) > 0 ? dedi_server_name : signedInUser->szUserName;
 
 		Value token(kStringType);
 		if (H2CurrentAccountLoginToken)

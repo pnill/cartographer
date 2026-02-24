@@ -4,8 +4,6 @@
 #include "input/controllers.h"
 #include "networking/network_constants.h"
 #include "networking/network_game_definitions.h"
-#include "networking/transport/transport.h"
-#include "networking/transport/transport_security.h"
 #include "saved_games/game_variant.h"
 
 /* enums */
@@ -108,7 +106,6 @@ namespace NetworkSession
 	/* Use this to verify if a player is currently active in the network session */
 	/* Otherwise you will wonder why you don't get the right data/player index etc. */
 	bool PlayerIsActive(datum player_index);
-	std::vector<int32> GetActivePlayerIndicesList();
 
 	int32 GetPlayerCount();
 	const wchar_t* GetPlayerName(datum player_index);
@@ -254,7 +251,7 @@ struct s_network_session_player
 	s_player_identifier identifier; // -0xA
 	int32 peer_index; // -0x8
 	int32 peer_user_index; // -0x4
-	WORD player_flags; // 0x0
+	uint16 player_flags; // 0x0
 	bool properties_valid;
 	char pad[1];
 	int32 controller_index;

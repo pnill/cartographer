@@ -25,6 +25,7 @@
 #include "cseries/debug_memory.h"
 #include "game/game.h"
 #include "main/main.h"
+#include "main/main_screenshot.h"
 #include "networking/network_configuration.h"
 #include "networking/network_event.h"
 #include "rasterizer/rasterizer_cinematics.h"
@@ -47,8 +48,9 @@
 #include "shell/shell.h"
 #include "shell/shell_windows.h"
 
-#include "H2MOD/GUI/XLiveRendering.h"
 #include "H2MOD/Modules/Shell/Config.h"
+
+#include <XLive/XAM/xam.h>
 
 #if WINVER > 0x0600 && WINVER < 0x0602
 #include <dwmapi.h>
@@ -190,8 +192,6 @@ static const D3DVERTEXELEMENT9 global_d3d_vd_source[] =
 static rasterizer_dx9_set_texture_stage_t p_rasterizer_dx9_set_texture_stage;
 static rasterizer_dx9_initialize_t p_rasterizer_dx9_initialize;
 
-static datum g_last_bitmap_tag_index = 0;
-
 static s_rasterizer_parameters g_rasterizer_parameters = {};
 
 static D3DCAPS9 global_d3d_caps;
@@ -259,7 +259,7 @@ void rasterizer_dx9_main_apply_patches(void)
 	PatchCall(Memory::GetAddress(0x26375D), rasterizer_dx9_device_initialize);
 
 	// Redirect dx9 initialization function so we can use d3d9on12 and do other cool stuff
-	DETOUR_ATTACH(p_rasterizer_dx9_initialize, Memory::GetAddress<rasterizer_dx9_initialize_t>(0x263359, 0x0), rasterizer_initialize);
+	DETOUR_ATTACH(p_rasterizer_dx9_initialize, Memory::GetAddress<rasterizer_dx9_initialize_t>(0x263359, 0x0), rasterizer_dx9_initialize);
 
 	// Replace calls to rasterizer_frame_begin with our own
 	PatchCall(Memory::GetAddress(0x190EC3), rasterizer_frame_begin);
@@ -284,14 +284,15 @@ IDirect3DDevice9Ex* rasterizer_dx9_device_get_interface(void)
 	return rasterizer_dx9_main_globals_get()->global_d3d_device;
 }
 
-datum last_bitmap_tag_index_get(void)
-{
-	return g_last_bitmap_tag_index;
-}
-
 int32* hardware_vertex_processing_get(void)
 {
 	return Memory::GetAddress<int32*>(0x9DA8B0);
+}
+
+bool rasterizer_dx9_device_is_lost(void)
+{
+	IDirect3DDevice9* d3d_device = rasterizer_dx9_device_get_interface();
+	return d3d_device && FAILED(d3d_device->TestCooperativeLevel());
 }
 
 bool __cdecl rasterizer_dx9_reset(bool create_window)
@@ -374,7 +375,6 @@ void rasterizer_dx9_present(bitmap_data* screenshot_bitmap, bool a2)
 
 void __cdecl rasterizer_dx9_set_texture_direct(int16 stage, datum bitmap_tag_index, int16 bitmap_data_index, real32 a4)
 {
-	g_last_bitmap_tag_index = bitmap_tag_index;
 	p_rasterizer_dx9_set_texture_stage(stage, bitmap_tag_index, bitmap_data_index, a4);
 	return;
 }
@@ -490,9 +490,9 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
 
 	D3DPRESENT_PARAMETERS d3d_present_parameters = {};
 	d3d_present_parameters.hDeviceWindow = window_globals->hWnd;
-	d3d_present_parameters.BackBufferFormat = rasterizer_globals->display_parameters.backbuffer_format;
+	d3d_present_parameters.BackBufferFormat = (D3DFORMAT)rasterizer_globals->display_parameters.backbuffer_format;
 	d3d_present_parameters.Windowed = !is_fullscreen;
-	d3d_present_parameters.AutoDepthStencilFormat = rasterizer_globals->display_parameters.depthstencil_format;
+	d3d_present_parameters.AutoDepthStencilFormat = (D3DFORMAT)rasterizer_globals->display_parameters.depthstencil_format;
 	d3d_present_parameters.BackBufferWidth = rectangle2d_width(&rasterizer_globals->screen_bounds);
 	d3d_present_parameters.Flags = 0;
 	d3d_present_parameters.EnableAutoDepthStencil = false;
@@ -540,7 +540,7 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
 				fs_disp_mode.Width = d3d_present_parameters.BackBufferWidth;
 				fs_disp_mode.Height = d3d_present_parameters.BackBufferHeight;
 				fs_disp_mode.RefreshRate = d3d_present_parameters.FullScreen_RefreshRateInHz;
-				fs_disp_mode.Format = rasterizer_globals->display_parameters.backbuffer_format;
+				fs_disp_mode.Format = (D3DFORMAT)rasterizer_globals->display_parameters.backbuffer_format;
 				fs_disp_mode.ScanLineOrdering = D3DSCANLINEORDERING_PROGRESSIVE;
 				rasterizer_dx9_log_hr(
 					hr,
@@ -586,7 +586,7 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
 			fs_disp_mode.Width = d3d_present_parameters.BackBufferWidth;
 			fs_disp_mode.Height = d3d_present_parameters.BackBufferHeight;
 			fs_disp_mode.RefreshRate = d3d_present_parameters.FullScreen_RefreshRateInHz;
-			fs_disp_mode.Format = rasterizer_globals->display_parameters.backbuffer_format;
+			fs_disp_mode.Format = (D3DFORMAT)rasterizer_globals->display_parameters.backbuffer_format;
 			fs_disp_mode.ScanLineOrdering = D3DSCANLINEORDERING_PROGRESSIVE;
 			D3DDISPLAYMODEEX* p_fs_disp_mode = is_fullscreen ? &fs_disp_mode : NULL;
 			
@@ -718,7 +718,7 @@ void __cdecl rasterizer_dx9_initialize_camera_projection(
 	return;
 }
 
-bool __cdecl rasterizer_initialize(void)
+bool __cdecl rasterizer_dx9_initialize(void)
 {
 	bool result = true;
 
@@ -1017,6 +1017,69 @@ void __cdecl rasterizer_dx9_clear_render_target(uint32 flags, pixel32 color, rea
 void __cdecl rasterizer_dx9_window_change_display_settings(DWORD flags)
 {
 	INVOKE(0x25F431, 0x0, rasterizer_dx9_window_change_display_settings, flags);
+	return;
+}
+
+void rasterizer_dx9_main_render_pregame(void)
+{
+	s_rasterizer_dx9_main_globals* rasterizer_dx9_globals = rasterizer_dx9_main_globals_get();
+	IDirect3DSurface9* backbuffer;
+	if (screenshot_in_progress())
+	{
+		backbuffer = rasterizer_dx9_globals->global_d3d_surface_screenshot;
+		rasterizer_dx9_globals->global_d3d_surface_screenshot->AddRef();
+	}
+	else
+	{
+		rasterizer_dx9_globals->global_d3d_device->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backbuffer);
+	}
+
+	rasterizer_dx9_log(
+		rasterizer_dx9_globals->global_d3d_device->StretchRect(
+			rasterizer_dx9_globals->global_d3d_surface_render_primary,
+			NULL,
+			backbuffer,
+			NULL,
+			D3DTEXF_NONE
+		)
+	);
+	if (backbuffer)
+	{
+		backbuffer->Release();
+	}
+	return;
+}
+
+bool rasterizer_dx9_initialize_screenshot_render_target(uint32 screen_width, uint32 screen_height)
+{
+	s_rasterizer_dx9_main_globals* rasterizer_dx9_globals = rasterizer_dx9_main_globals_get();
+	IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
+	
+	HRESULT hr;
+	rasterizer_dx9_log_hr(
+		hr,
+		global_d3d_device->CreateRenderTarget(
+			screen_width,
+			screen_height,
+			D3DFMT_A8R8G8B8,
+			D3DMULTISAMPLE_NONE,
+			0,
+			true,
+			&rasterizer_dx9_globals->global_d3d_surface_screenshot,
+			NULL
+		)
+	);
+	return SUCCEEDED(hr);
+}
+
+void rasterizer_dx9_cleanup_screenshot_render_target(void)
+{
+	s_rasterizer_dx9_main_globals* rasterizer_dx9_globals = rasterizer_dx9_main_globals_get();
+	if (rasterizer_dx9_globals->global_d3d_surface_screenshot)
+	{
+		rasterizer_dx9_globals->global_d3d_surface_screenshot->Release();
+		rasterizer_dx9_globals->global_d3d_surface_screenshot = NULL;
+	}
 	return;
 }
 
@@ -1403,7 +1466,7 @@ static bool rasterizer_dx9_create_device_interface(void)
 	}
 	else if (rasterizer_globals->use_d3d9_ex)
 	{
-		hr = rasterizer_globals->d3d9_create_ex_proc(D3D_SDK_VERSION, &dx9_globals->global_d3d_interface);
+		hr = ((decltype(Direct3DCreate9Ex)*)(rasterizer_globals->d3d9_create_ex_proc))(D3D_SDK_VERSION, &dx9_globals->global_d3d_interface);
 		if (FAILED(hr))
 		{
 			error(_error_delayed, "### ERROR failed to create D3D object with the Ex version of D3D");

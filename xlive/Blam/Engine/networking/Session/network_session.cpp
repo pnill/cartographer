@@ -41,21 +41,6 @@ bool NetworkSession::PlayerIsActive(datum player_index)
 	return GetActiveNetworkSession()->is_session_player_active(player_index);
 }
 
-std::vector<int32> NetworkSession::GetActivePlayerIndicesList()
-{
-	std::vector<int32> activePlayersIndices;
-	if (GetPlayerCount() > 0)
-	{
-		for (int32 playerIndex = 0; playerIndex < k_maximum_players; playerIndex++)
-		{
-			if (PlayerIsActive(playerIndex))
-				activePlayersIndices.emplace_back(playerIndex);
-		}
-	}
-
-	return activePlayersIndices;
-}
-
 c_network_session* NetworkSession::GetNetworkSessions()
 {
 	return *Memory::GetAddress<c_network_session**>(0x51C474, 0x520B94);

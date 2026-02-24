@@ -10,7 +10,8 @@
 #include "networking/network_event.h"
 #include "saved_games/game_state_procs.h"
 
-#include "H2MOD/GUI/imgui_integration/Console/ImGui_ConsoleImpl.h"
+//#include "H2MOD/GUI/imgui_integration/Console/ImGui_ConsoleImpl.h"
+#define SIM_EVENT_QUEUE_DBG(...)
 
 // TODO verify if these buffers get saturated quickly
 // if that's the case, increse the buffer size

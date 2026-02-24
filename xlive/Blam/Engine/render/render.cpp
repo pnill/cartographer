@@ -214,12 +214,12 @@ bool frame_parameters_type_is_above_or_equal_to_7(void)
 	return global_frame_parameters_get()->frame_type - 5 <= 2;
 }
 
-void render_scene_geometry(e_collection_type collection_type, e_render_layer render_layer)
+void render_scene_geometry(e_collection_type collection_type, uint32 render_layer)
 {
 	ASSERT(VALID_INDEX(collection_type, k_number_collection_types));
 	ASSERT(VALID_INDEX(render_layer, k_number_of_render_layers));
 
-	if (render_layer != _render_layer_debug_view && render_layer_begin(render_layer))
+	if (render_layer != _render_layer_debug_view && render_layer_begin((e_render_layer)render_layer))
 	{
 		render_layer_draw();
 		render_layer_end();

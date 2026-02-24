@@ -1,0 +1,273 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="objectslib">
+      <UniqueIdentifier>{2fcb53b1-5599-47d4-b4e6-b6e23c14b9a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="objects">
+      <UniqueIdentifier>{7c094cbf-90ce-4166-ba3f-5f43fdf642e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="objects\widgets">
+      <UniqueIdentifier>{1eaa32b1-b1f5-4df7-9ecf-af7f3b8e6225}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="units">
+      <UniqueIdentifier>{b6c651e1-384f-472b-beea-30176428c6aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="items">
+      <UniqueIdentifier>{d6d6c655-2d10-466a-bff7-f1da2295d173}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="devices">
+      <UniqueIdentifier>{3fefe3d1-64ad-4b15-8b61-8c9710091792}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="creatures">
+      <UniqueIdentifier>{78b2b26f-fba2-46cd-b262-f56fd29ce2f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="widgets">
+      <UniqueIdentifier>{f8a08e05-1b2f-48d1-b875-6aa95eedc885}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>objectslib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\objects\widgets\antenna_definitions.h">
+      <Filter>objects\widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\objects\widgets\widgets.h">
+      <Filter>objects\widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\objects\crate_scenario_definitions.h">
+      <Filter>objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\objects\crates.h">
+      <Filter>objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\objects\damage_reporting.h">
+      <Filter>objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\objects\damage.h">
+      <Filter>objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\objects\damage_effects.h">
+      <Filter>objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\objects\emblems.h">
+      <Filter>objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\objects\light_definitions.h">
+      <Filter>objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\objects\lights.h">
+      <Filter>objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\objects\lights_scenario_definitions.h">
+      <Filter>objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\objects\object_constants.h">
+      <Filter>objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\objects\object_definition.h">
+      <Filter>objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\objects\object_early_movers.h">
+      <Filter>objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\objects\object_globals.h">
+      <Filter>objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\objects\object_identifier.h">
+      <Filter>objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\objects\object_location.h">
+      <Filter>objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\objects\object_placement.h">
+      <Filter>objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\objects\object_scenario_definitions.h">
+      <Filter>objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\objects\object_types.h">
+      <Filter>objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\objects\objects.h">
+      <Filter>objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\objects\scenery.h">
+      <Filter>objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\units\biped_definitions.h">
+      <Filter>units</Filter>
+    </ClInclude>
+    <ClInclude Include="..\units\biped_scenario_definitions.h">
+      <Filter>units</Filter>
+    </ClInclude>
+    <ClInclude Include="..\units\bipeds.h">
+      <Filter>units</Filter>
+    </ClInclude>
+    <ClInclude Include="..\units\dialogue_definitions.h">
+      <Filter>units</Filter>
+    </ClInclude>
+    <ClInclude Include="..\units\unit_action_system.h">
+      <Filter>units</Filter>
+    </ClInclude>
+    <ClInclude Include="..\units\unit_definitions.h">
+      <Filter>units</Filter>
+    </ClInclude>
+    <ClInclude Include="..\units\unit_dialogue.h">
+      <Filter>units</Filter>
+    </ClInclude>
+    <ClInclude Include="..\units\unit_scenario_definitions.h">
+      <Filter>units</Filter>
+    </ClInclude>
+    <ClInclude Include="..\units\units.h">
+      <Filter>units</Filter>
+    </ClInclude>
+    <ClInclude Include="..\units\vehicle_definitions.h">
+      <Filter>units</Filter>
+    </ClInclude>
+    <ClInclude Include="..\units\vehicle_scenario_definitions.h">
+      <Filter>units</Filter>
+    </ClInclude>
+    <ClInclude Include="..\units\vehicles.h">
+      <Filter>units</Filter>
+    </ClInclude>
+    <ClInclude Include="..\items\equipment.h">
+      <Filter>items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\items\equipment_scenario_definitions.h">
+      <Filter>items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\items\garbage.h">
+      <Filter>items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\items\item_collection_definition.h">
+      <Filter>items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\items\item_definitions.h">
+      <Filter>items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\items\items.h">
+      <Filter>items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\items\projectile_definition.h">
+      <Filter>items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\items\projectiles.h">
+      <Filter>items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\items\vehicle_collection_definitions.h">
+      <Filter>items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\items\weapon_definitions.h">
+      <Filter>items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\items\weapon_scenario_definitions.h">
+      <Filter>items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\items\weapons.h">
+      <Filter>items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\units\unit_control.h">
+      <Filter>units</Filter>
+    </ClInclude>
+    <ClInclude Include="..\creatures\creature_definitions.h">
+      <Filter>creatures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\creatures\creature_scenario_definitions.h">
+      <Filter>creatures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\devices\devices.h">
+      <Filter>devices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\devices\device_controls.h">
+      <Filter>devices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\devices\device_light_fixture.h">
+      <Filter>devices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\devices\device_machines.h">
+      <Filter>devices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\devices\device_scenario_definitions.h">
+      <Filter>devices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\widgets\cloth.h">
+      <Filter>widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\widgets\liquid.h">
+      <Filter>widgets</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>objectslib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\objects\widgets\widgets.cpp">
+      <Filter>objects\widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\objects\damage.cpp">
+      <Filter>objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\objects\damage_effects.cpp">
+      <Filter>objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\objects\lights.cpp">
+      <Filter>objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\objects\object_early_movers.cpp">
+      <Filter>objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\objects\object_globals.cpp">
+      <Filter>objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\objects\object_identifier.cpp">
+      <Filter>objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\objects\object_types.cpp">
+      <Filter>objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\objects\objects.cpp">
+      <Filter>objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\units\biped_definitions.cpp">
+      <Filter>units</Filter>
+    </ClCompile>
+    <ClCompile Include="..\units\bipeds.cpp">
+      <Filter>units</Filter>
+    </ClCompile>
+    <ClCompile Include="..\units\units.cpp">
+      <Filter>units</Filter>
+    </ClCompile>
+    <ClCompile Include="..\units\vehicle_definitions.cpp">
+      <Filter>units</Filter>
+    </ClCompile>
+    <ClCompile Include="..\units\vehicles.cpp">
+      <Filter>units</Filter>
+    </ClCompile>
+    <ClCompile Include="..\items\item_definitions.cpp">
+      <Filter>items</Filter>
+    </ClCompile>
+    <ClCompile Include="..\items\projectiles.cpp">
+      <Filter>items</Filter>
+    </ClCompile>
+    <ClCompile Include="..\items\weapon_definitions.cpp">
+      <Filter>items</Filter>
+    </ClCompile>
+    <ClCompile Include="..\items\weapons.cpp">
+      <Filter>items</Filter>
+    </ClCompile>
+    <ClCompile Include="..\creatures\creature_definitions.cpp">
+      <Filter>creatures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\devices\devices.cpp">
+      <Filter>devices</Filter>
+    </ClCompile>
+    <ClCompile Include="..\widgets\cloth.cpp">
+      <Filter>widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\widgets\liquid.cpp">
+      <Filter>widgets</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -1,21 +1,10 @@
 #pragma once
-#include <XLive/xbox/xbox.h>
 
 /* macros */
 
 // #define TEST_DISCORD_INSTANCE
 
 /* enums */
-
-enum e_context_id
-{
-	_context_id_variant = 2,
-	_context_id_difficulty = 3,
-	_context_id_map = 5,
-	_context_id_presence = X_CONTEXT_PRESENCE,
-	_context_id_game_type = X_CONTEXT_GAME_TYPE,
-	_context_id_game_mode = X_CONTEXT_GAME_MODE
-};
 
 enum e_context_variant
 {
@@ -80,4 +69,4 @@ void discord_interface_set_player_counts(void);
 
 void discord_interface_update_map_info_campaign(int32 map_id, const utf8* scenario_name);
 
-void discord_interface_set_context(e_context_id context_id, uint32 contex_value);
+void discord_interface_set_context(uint32 context_id, uint32 contex_value);

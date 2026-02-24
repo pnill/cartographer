@@ -6,8 +6,28 @@
 static DWORD achievementCount = 0;
 static DWORD achievementEnumeratorFlags = 0;
 static DWORD achievementEnumeratorIndex = 0;
+static std::unordered_map<std::string, bool> AchievementMap;
 
 HANDLE g_dwFakeAchievementContent = INVALID_HANDLE_VALUE;
+
+bool achievement_has_entry(void)
+{
+	return !AchievementMap.empty();
+}
+
+const char* achievement_get_first(void)
+{
+	auto it = AchievementMap.begin();
+	const char* string = it->first.c_str();
+	it->second = true;
+	return string;
+}
+
+void achievement_pop_first(void)
+{
+	AchievementMap.erase(AchievementMap.begin());
+	return;
+}
 
 
 // #5278: XUserWriteAchievements
@@ -200,7 +220,6 @@ DWORD WINAPI XUserWriteAchievements(DWORD dwNumAchievements, PXUSER_ACHIEVEMENT 
 
 				default:
 					AchievementData.append("Unknown|We're honestly not sure wtf? :");
-					AchievementData.append(std::to_string(achievementID));
 					break;
 				}
 

@@ -1,8 +1,6 @@
 #pragma once 
 
 #include "../xnet.h"
-#include "../Sockets/XSocket.h"
-
 #include "../net_utils.h"
 
 
@@ -47,26 +45,6 @@ enum eXnIp_ConnectionRequestBitFlags
 	XnIp_HasPortMappingsUpdated = 0,
 };
 
-#pragma region NAT handling
-
-// TODO: currently we use multiple system sockets
-// to send data to the corresponding virtual socket
-// when in practice we could just use one
-struct PortMapping
-{
-	enum class PortMapState : int
-	{
-		XNIP_NET_ADDRESS_MAPPINGS_UNAVAILABLE,
-		XNIP_NET_ADDRESS_MAP_AVAILABLE,
-	};
-
-	PortMapState state;
-	sockaddr_in address;
-	WORD virtualPort;
-};
-
-#pragma endregion
-
 struct XNetPacketHeader
 {
 	DWORD signature;
@@ -75,14 +53,7 @@ struct XNetPacketHeader
 
 struct XBroadcastPacket
 {
-	XBroadcastPacket()
-	{
-		pckHeader.signature = EXNIP_PACKET_SIGNATURE_XNET_BROADCAST;
-		strncpy_s(pckHeader.signatureString, XNIP_BROADCAST_HEADER_STR, XNIP_MAX_PCK_STR_HDR_LEN);
-		ZeroMemory(&data, sizeof(data));
-		data.titleId = (DWORD)-1;
-		data.name.sin_addr.s_addr = htonl(INADDR_BROADCAST);
-	};
+	XBroadcastPacket();
 
 	XNetPacketHeader pckHeader;
 	struct
@@ -148,72 +119,11 @@ struct XnIpPckTransportStats
 
 	ULONGLONG	 lastPacketReceivedTime;
 
-	void PckDataSampleUpdate()
-	{
-		if (!initialized)
-		{
-			initialized = true;
-			pckSent = 0;
-			pckRecvd = 0;
-			pckBytesSent = 0;
-			pckBytesRecvd = 0;
+	void PckDataSampleUpdate();
 
-			pckSentPerSecIdx = 0;
-			pckRecvdPerSecIdx = 0;
-			pckCurrentSendPerSecIdx = -1;
-			pckCurrentRecvdPerSecIdx = -1;
+	void PckSendStatsUpdate(unsigned int _pckXmit, unsigned int _pckXmitBytes);
 
-			memset(pckSentPerSec, 0, sizeof(pckSentPerSec));
-			memset(pckRecvdPerSec, 0, sizeof(pckRecvdPerSec));
-
-			lastTimeUpdate = timeGetTime();
-		}
-		else
-		{
-			const ULONGLONG sample_end_time = 1ull * 1000ull;
-
-			if (timeGetTime() - lastTimeUpdate >= sample_end_time)
-			{
-				pckSentPerSecIdx = (pckSentPerSecIdx + 1) % XNIP_MAX_NET_STATS_SAMPLES;
-				pckRecvdPerSecIdx = (pckRecvdPerSecIdx + 1) % XNIP_MAX_NET_STATS_SAMPLES;
-
-				pckSentPerSec[pckSentPerSecIdx] = 0;
-				pckBytesSentPerSec[pckSentPerSecIdx] = 0;
-
-				pckRecvdPerSec[pckRecvdPerSecIdx] = 0;
-				pckBytesRecvdPerSec[pckRecvdPerSecIdx] = 0;
-
-				pckCurrentSendPerSecIdx = (pckCurrentSendPerSecIdx + 1) % XNIP_MAX_NET_STATS_SAMPLES;
-				pckCurrentRecvdPerSecIdx = (pckCurrentRecvdPerSecIdx + 1) % XNIP_MAX_NET_STATS_SAMPLES;
-
-				lastTimeUpdate = timeGetTime();
-			}
-		}
-	}
-
-	void PckSendStatsUpdate(unsigned int _pckXmit, unsigned int _pckXmitBytes)
-	{
-		PckDataSampleUpdate();
-
-		pckSent += _pckXmit;
-		pckBytesSent += _pckXmitBytes;
-
-		pckSentPerSec[pckSentPerSecIdx] += _pckXmit;
-		pckBytesSentPerSec[pckSentPerSecIdx] += _pckXmitBytes;
-	}
-
-	void PckRecvdStatsUpdate(unsigned int _pckRecvd, unsigned int _pckRecvdBytes)
-	{
-		PckDataSampleUpdate();
-
-		pckRecvd += _pckRecvd;
-		pckBytesRecvd += _pckRecvdBytes;
-
-		pckRecvdPerSec[pckRecvdPerSecIdx] += _pckRecvd;
-		pckBytesRecvdPerSec[pckRecvdPerSecIdx] += _pckRecvdBytes;
-
-		lastPacketReceivedTime = timeGetTime();
-	}
+	void PckRecvdStatsUpdate(unsigned int _pckRecvd, unsigned int _pckRecvdBytes);
 
 private:
 	ULONGLONG lastTimeUpdate;
@@ -291,25 +201,6 @@ public:
 		return m_xnaddr.ina;
 	}
 
-	bool IsValid(IN_ADDR identifier) const
-	{
-		bool valid = m_valid
-			&& identifier.s_addr == GetConnectionId().s_addr;
-
-		if (!valid)
-		{
-			LOG_CRITICAL_NETWORK("{} - m_valid: {} or {:X} != {:X}", __FUNCTION__, m_valid, identifier.s_addr, GetConnectionId().s_addr);
-			return false;
-		}
-
-		return valid;
-	}
-
-	void UpdateInteractionTimeHappened()
-	{
-		m_lastConnectionInteractionTime = timeGetTime();
-	}
-
 	IN_ADDR GetConnectionId() const
 	{
 		return m_connectionId;
@@ -350,108 +241,34 @@ public:
 		return GetConnectStatus() == XNET_CONNECT_STATUS_LOST;
 	}
 
-	bool ConnectionTimedOut() const 
-	{
-		return timeGetTime() - m_lastConnectionInteractionTime >= XnIp_ConnectionTimeOut;
-	}
-
 	static int GetConnectionIndex(IN_ADDR connectionId);
 
-	void SavePortMapping(XVirtualSocket* xsocket, WORD virtualPort, const sockaddr_in* addr) const;
-	void HandleConnectionPacket(XVirtualSocket* xsocket, const XNetRequestPacket* reqPacket, const sockaddr_in* recvAddr, LPDWORD lpBytesRecvdCount);
-	void HandleDisconnectPacket(XVirtualSocket* xsocket, const XNetRequestPacket* disconnectReqPck, const sockaddr_in* recvAddr) const; // TODO:
+	bool IsValid(IN_ADDR identifier) const;
+
+	void UpdateInteractionTimeHappened();
+
+	bool ConnectionTimedOut() const;
+
+	void SavePortMapping(struct XVirtualSocket* xsocket, WORD virtualPort, const struct sockaddr_in* addr) const;
+	void HandleConnectionPacket(struct XVirtualSocket* xsocket, const XNetRequestPacket* reqPacket, const struct sockaddr_in* recvAddr, LPDWORD lpBytesRecvdCount);
+	void HandleDisconnectPacket(struct XVirtualSocket* xsocket, const XNetRequestPacket* disconnectReqPck, const struct sockaddr_in* recvAddr) const; // TODO:
 	void UpdateNonceKeyFromPacket(const XNetRequestPacket* reqPacket);
 
 	/* sends a request over the socket to the other socket end, with the same identifier */
-	void SendXNetRequest(XVirtualSocket* xsocket, eXnip_ConnectRequestType reqType);
+	void SendXNetRequest(struct XVirtualSocket* xsocket, eXnip_ConnectRequestType reqType);
 
 	/* sends a request to all open sockets */
 	void SendXNetRequestAllSockets(eXnip_ConnectRequestType reqType);
 
-	void InsertPortMapping(PortMapping* mapping)
-	{
-		PortMapping* pMap = (PortMapping*)malloc(sizeof(*mapping));
-		memcpy(pMap, mapping, sizeof(*pMap));
-		m_netAddrMappings.insert(pMap);
-	}
+	void InsertPortMapping(struct PortMapping* mapping);
 
-	const sockaddr_in* GetPortMapping(WORD virtualPort) const
-	{
-		NetElement* elem = m_netAddrMappings.first();
-		while (elem)
-		{
-			PortMapping* mapping = (PortMapping*)elem->data;
-			if (mapping->virtualPort == virtualPort)
-			{
-				return &mapping->address;
-			}
+	const struct sockaddr_in* GetPortMapping(WORD virtualPort) const;
 
-			elem = elem->next;
-		}
+	void UpdatePortMapping(WORD virtualPort, const struct sockaddr_in* addr) const;
 
-		return NULL;
-	}
+	bool PortMappingAvailable(WORD virtualPort) const;
 
-	void UpdatePortMapping(WORD virtualPort, const sockaddr_in* addr) const
-	{
-		NetElement* elem = m_netAddrMappings.first();
-		while (elem)
-		{
-			PortMapping* mapping = (PortMapping*)elem->data;
-			if (mapping->virtualPort == virtualPort)
-			{
-				mapping->state = PortMapping::PortMapState::XNIP_NET_ADDRESS_MAP_AVAILABLE;
-				memcpy(&mapping->address, addr, sizeof(mapping->address));
-				break;
-			}
-
-			elem = elem->next;
-		}
-	}
-
-	bool PortMappingAvailable(WORD virtualPort) const
-	{
-		NetElement* elem = m_netAddrMappings.first();
-
-		bool result = false;
-		while (elem)
-		{
-			PortMapping* mapping = (PortMapping*)elem->data;
-			if (mapping->virtualPort == virtualPort
-				&& mapping->state == PortMapping::PortMapState::XNIP_NET_ADDRESS_MAP_AVAILABLE)
-			{
-				return true;
-			}
-
-			elem = elem->next;
-		}
-
-		return result;
-	}
-
-	bool PortMappingsAvailable() const
-	{
-		NetElement* elem = m_netAddrMappings.first();
-
-		bool result = true;
-		if (!elem)
-		{
-			return false;
-		}
-
-		while (elem)
-		{
-			PortMapping* mapping = (PortMapping*)elem->data;
-			if (mapping->state != PortMapping::PortMapState::XNIP_NET_ADDRESS_MAP_AVAILABLE)
-			{
-				return false;
-			}
-
-			elem = elem->next;
-		}
-
-		return result;
-	}
+	bool PortMappingsAvailable() const;
 
 	void DiscardPortMappings()
 	{
@@ -480,14 +297,14 @@ public:
 
 	// Connection data getters 
 	XnIp* GetConnection(const IN_ADDR ina) const;
-	int GetEstablishedConnectionIdentifierByRecvAddr(XVirtualSocket* xsocket, const sockaddr_in* addr, IN_ADDR* outConnectionIdentifier) const;
+	int GetEstablishedConnectionIdentifierByRecvAddr(struct XVirtualSocket* xsocket, const struct sockaddr_in* addr, IN_ADDR* outConnectionIdentifier) const;
 
 	// Miscellaneous
 	void ClearLostConnections();
 
 	// local network address
 	static XnIp* GetLocalUserXn();
-	static u_short GetQoSPort();
+	static unsigned short GetQoSPort();
 
 	static void UnregisterLocalConnectionInfo();
 	static void SetupLocalConnectionInfo(unsigned long xnaddr, unsigned long lanaddr, unsigned short baseport, const char* machineUID, const char* abOnline);
@@ -496,9 +313,9 @@ public:
 	void UpdatePacketReceivedCounters(IN_ADDR ipIdentifier, unsigned int bytesRecvdCount) const;
 
 	// Packet handlers
-	int HandleRecvdPacket(XVirtualSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, DWORD dwBufferCount, LPDWORD bytesRecvdCount);
-	void HandleXNetRequestPacket(XVirtualSocket* xsocket, const XNetRequestPacket* reqPaket, const sockaddr_in* recvAddr, LPDWORD lpBytesRecvdCount);
-	void HandleDisconnectPacket(XVirtualSocket* xsocket, const XNetRequestPacket* disconnectReqPck, const sockaddr_in* recvAddr) const;
+	int HandleRecvdPacket(struct XVirtualSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, DWORD dwBufferCount, LPDWORD bytesRecvdCount);
+	void HandleXNetRequestPacket(struct XVirtualSocket* xsocket, const XNetRequestPacket* reqPaket, const struct sockaddr_in* recvAddr, LPDWORD lpBytesRecvdCount);
+	void HandleDisconnectPacket(struct XVirtualSocket* xsocket, const XNetRequestPacket* disconnectReqPck, const struct sockaddr_in* recvAddr) const;
 
 	// XnIp handling function
 	XnIp* XnIpLookup(const XNADDR* pxna, const XNKID* xnkid) const;
@@ -521,8 +338,8 @@ public:
 	int GetMaxXnConnections()				const { return m_startupParams.cfgSecRegMax; }
 	int GetReqQoSBufferSize()				const { return m_startupParams.cfgQosDataLimitDiv4 * 4; }
 	int GetMaxXnKeyPairs()					const { return m_startupParams.cfgKeyRegMax; }
-	int GetMinSockRecvBufferSizeInBytes()	const { return m_startupParams.cfgSockDefaultRecvBufsizeInK * SOCK_K_UNIT; }
-	int GetMinSockSendBufferSizeInBytes()	const { return m_startupParams.cfgSockDefaultSendBufsizeInK * SOCK_K_UNIT; }
+	int GetMinSockRecvBufferSizeInBytes()	const;
+	int GetMinSockSendBufferSizeInBytes()	const;
 
 	int GetRegisteredKeyCount() const
 	{

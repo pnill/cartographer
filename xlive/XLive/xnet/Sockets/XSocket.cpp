@@ -921,6 +921,16 @@ int XVirtualSocket::SetBufferSize(int optname, INT bufSize)
 	return 0;
 }
 
+bool XVirtualSocket::SockAddrInEqual(const sockaddr_in* a1, const sockaddr_in* a2)
+{
+	return (a1->sin_addr.s_addr == a2->sin_addr.s_addr && a1->sin_port == a2->sin_port);
+}
+
+bool XVirtualSocket::SockAddrInInvalid(const sockaddr_in* a1)
+{
+	return a1->sin_addr.s_addr == 0 || a1->sin_port == 0;
+}
+
 int XVirtualSocket::UdpSend(const char* buf, int len, int flags, sockaddr* to, int tolen)
 {
 	return XSocketSendTo((SOCKET)this, buf, len, flags, to, tolen);
@@ -936,6 +946,30 @@ void XSocketManager::SocketsDisposeAll()
 
 	SystemLinkDispose();
 	MainLinkDispose();
+}
+
+void XSocketManager::XInternalSocket::Dispose()
+{
+	if (m_systemSockHandle != INVALID_SOCKET)
+	{
+		if (m_multicast)
+		{
+			ip_mreq mreq;
+
+			// localhost only
+			mreq.imr_interface.s_addr = htonl(INADDR_LOOPBACK);
+			mreq.imr_multiaddr.s_addr = htonl(XSOCK_MUTICAST_ADDR);
+
+			setsockopt(
+				m_systemSockHandle, IPPROTO_IP, IP_DROP_MEMBERSHIP, (char*)&mreq, sizeof(mreq)
+			);
+		}
+
+		closesocket(m_systemSockHandle);
+
+	}
+	m_systemSockHandle = INVALID_SOCKET;
+	m_port = 0;
 }
 
 void XSocketManager::Initialize()
@@ -1083,4 +1117,9 @@ bool XSocketManager::MainLinkSocketReset(WORD port)
 void XSocketManager::MainLinkDispose() 
 {
 	m_mainUdpSocket.Dispose();
+}
+
+SOCKET XSocketManager::GetMainUdpSocketSystemHandle() const
+{
+	return m_mainUdpSocket.m_systemSockHandle;
 }

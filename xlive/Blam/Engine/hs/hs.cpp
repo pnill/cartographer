@@ -31,6 +31,7 @@
 #include "interface/terminal.h"
 #include "main/console.h"
 #include "math/random_math.h"
+#include "memory/data.h"
 
 #ifdef HS_COMPILER_ENABLED
 #include "models/model_definitions.h"

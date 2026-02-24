@@ -1,12 +1,16 @@
 #include "stdafx.h"
+#include "OnscreenDebug.h"
 
-#include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "H2MOD/GUI/ImGui_Integration/Console/ImGui_ConsoleImpl.h"
 
-bool initialisedDebugText = false;
+static bool initialisedDebugText = false;
 
 // we change global variables, async debug text could result in hazzard
+#ifdef TERMINAL_ENABLED
 std::recursive_mutex addTextMutex;
+#endif
+
+extern void h2log_onscreen_log(const char* text);
 
 /*
 //
@@ -26,14 +30,14 @@ void addDebugTextInternal(char* text) {
 		lenInput = endChar - text;
 	}
 
+#ifdef TERMINAL_ENABLED
 	std::lock_guard lg(addTextMutex);
 
-#ifdef TERMINAL_ENABLED
 	CircularStringBuffer* output = GetMainConsoleInstance()->GetTabOutput(_console_tab_logs);
 	output->AddString(StringFlag_None, text, lenInput);
 #endif
 #ifndef SPDLOG_DISABLED
-	g_onscreendebug_log->debug(text);
+	h2log_onscreen_log(text);
 #endif
 	if (endChar) {
 		return addDebugTextInternal(endChar + 1);
@@ -50,7 +54,6 @@ void addDebugText(const wchar_t* format, ...)
 
 	if (stringLength == -1)
 	{
-		LOG_TRACE_GAME("{} - error trying to get string length size", __FUNCTION__);
 		return;
 	}
 
@@ -77,7 +80,6 @@ void addDebugText(const char* format, ...)
 
 	if (stringLength == -1)
 	{
-		LOG_TRACE_GAME("{} - error trying to get string length size", __FUNCTION__);
 		return;
 	}
 
@@ -93,10 +95,6 @@ void addDebugText(const char* format, ...)
 void InitOnScreenDebugText() {
 #ifndef SPDLOG_DISABLED
 	initialisedDebugText = true;
-
-	c_static_wchar_string<MAX_PATH> path;
-	log_file_name_prepare(L"h2onscreendebug", &path);
-	g_onscreendebug_log = h2log::create("OnScreenDebug", path.get_string(), 0); // we always create onscreendebuglog, which logs everything (log level 0)
 	addDebugText("Initialized onscreendebug log");
 #endif
 }

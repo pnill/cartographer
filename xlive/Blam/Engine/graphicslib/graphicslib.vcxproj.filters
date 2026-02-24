@@ -1,0 +1,600 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="render">
+      <UniqueIdentifier>{0119b867-cafb-4ef3-8646-48668c1979c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="graphicslib">
+      <UniqueIdentifier>{6765c90c-ac48-49a4-b664-ef17adb23f70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rasterizer">
+      <UniqueIdentifier>{2c1802bb-cbab-4c3e-9417-c8b286e6317a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rasterizer\dx12">
+      <UniqueIdentifier>{b11b4ff1-08fe-4c6e-b79e-4b8f39debaf1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rasterizer\dx9">
+      <UniqueIdentifier>{f734b33b-7204-498b-b1b3-49d7fea5c604}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rasterizer\dx9\shaders">
+      <UniqueIdentifier>{6f95fadb-9c9e-416d-b0aa-299eeded988f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rasterizer\dx9\shaders\compiled">
+      <UniqueIdentifier>{c2cedc96-00ea-41d5-99af-cf65683620e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="effects">
+      <UniqueIdentifier>{5dc874dd-871a-4af1-bf41-33bbdc7ee37d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="decorators">
+      <UniqueIdentifier>{fb731e34-53fc-44e7-bc78-9f0f900304de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{d29ec8a1-d044-48a2-b333-726a9ab487f4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\render\render.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\render\render_cameras.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\render\render_cartographer_ingame_ui.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\render\render_contrails.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\render\render_debug.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\render\render_first_person.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\render\render_layers.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\render\render_lights.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\render\render_lod_new.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\render\render_objects.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\render\render_patchy_fog.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\render\render_primitive.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\render\render_section_visibility.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\render\render_sky.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\render\render_submit.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\render\render_visibility.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\render\render_visibility_collection.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\render\render_visible_geometry.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\render\render_water.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\render\render_weather.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>graphicslib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\rasterizer_profile.cpp">
+      <Filter>rasterizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\rasterizer_screen_effects.cpp">
+      <Filter>rasterizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\rasterizer_settings.cpp">
+      <Filter>rasterizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\rasterizer_stipple.cpp">
+      <Filter>rasterizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\rasterizer_text.cpp">
+      <Filter>rasterizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\rasterizer_transparent_geometry.cpp">
+      <Filter>rasterizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\rasterizer_vertex_shader_definitions.cpp">
+      <Filter>rasterizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\rasterizer_cinematics.cpp">
+      <Filter>rasterizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\rasterizer_dynamic_reflect.cpp">
+      <Filter>rasterizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\rasterizer_fog.cpp">
+      <Filter>rasterizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\rasterizer_globals.cpp">
+      <Filter>rasterizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\rasterizer_lens_flares.cpp">
+      <Filter>rasterizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\rasterizer_lights.cpp">
+      <Filter>rasterizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\rasterizer_loading.cpp">
+      <Filter>rasterizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\rasterizer_main.cpp">
+      <Filter>rasterizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\rasterizer_memory.cpp">
+      <Filter>rasterizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\rasterizer_occlusion.cpp">
+      <Filter>rasterizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\dx12\rasterizer_dx12_main.cpp">
+      <Filter>rasterizer\dx12</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_dynamic_geometry.cpp">
+      <Filter>rasterizer\dx9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_dynavobgeom.cpp">
+      <Filter>rasterizer\dx9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_errors.cpp">
+      <Filter>rasterizer\dx9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_fog.cpp">
+      <Filter>rasterizer\dx9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_fullscreen_passes.cpp">
+      <Filter>rasterizer\dx9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_lens_flares.cpp">
+      <Filter>rasterizer\dx9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_main.cpp">
+      <Filter>rasterizer\dx9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_motion_sensor.cpp">
+      <Filter>rasterizer\dx9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_screen_effect.cpp">
+      <Filter>rasterizer\dx9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_shader_submit.cpp">
+      <Filter>rasterizer\dx9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_shader_submit_new.cpp">
+      <Filter>rasterizer\dx9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_submit.cpp">
+      <Filter>rasterizer\dx9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_targets.cpp">
+      <Filter>rasterizer\dx9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_text.cpp">
+      <Filter>rasterizer\dx9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_vertex_buffers.cpp">
+      <Filter>rasterizer\dx9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_vertex_shaders.cpp">
+      <Filter>rasterizer\dx9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_water.cpp">
+      <Filter>rasterizer\dx9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_weather.cpp">
+      <Filter>rasterizer\dx9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_widgets.cpp">
+      <Filter>rasterizer\dx9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9.cpp">
+      <Filter>rasterizer\dx9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_9on12.cpp">
+      <Filter>rasterizer\dx9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_bitmaps.cpp">
+      <Filter>rasterizer\dx9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_debug.cpp">
+      <Filter>rasterizer\dx9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_decals.cpp">
+      <Filter>rasterizer\dx9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_dof.cpp">
+      <Filter>rasterizer\dx9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\effects\beam.cpp">
+      <Filter>effects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\effects\contrails.cpp">
+      <Filter>effects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\effects\effects.cpp">
+      <Filter>effects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\effects\particle.cpp">
+      <Filter>effects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\effects\particle_definition_interface.cpp">
+      <Filter>effects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\effects\particle_draw.cpp">
+      <Filter>effects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\effects\particle_emitter.cpp">
+      <Filter>effects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\effects\particle_location.cpp">
+      <Filter>effects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\effects\particle_model_definition.cpp">
+      <Filter>effects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\effects\particle_property.cpp">
+      <Filter>effects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\effects\particle_state.cpp">
+      <Filter>effects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\effects\particle_system.cpp">
+      <Filter>effects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\effects\particle_system_definition.cpp">
+      <Filter>effects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\effects\particle_update.cpp">
+      <Filter>effects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\effects\player_effects.cpp">
+      <Filter>effects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\decorators\decorator_definitions.cpp">
+      <Filter>decorators</Filter>
+    </ClCompile>
+    <ClCompile Include="..\render\render_prt.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\render\render.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\render\render_cameras.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\render\render_cartographer_ingame_ui.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\render\render_contrails.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\render\render_debug.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\render\render_debug_structure.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\render\render_first_person.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\render\render_layers.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\render\render_lights.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\render\render_lod_new.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\render\render_objects.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\render\render_patchy_fog.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\render\render_primitive.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\render\render_prt.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\render\render_section_visibility.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\render\render_sky.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\render\render_sky_definitions.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\render\render_submit.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\render\render_visibility.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\render\render_visibility_collection.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\render\render_visible_geometry.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\render\render_water.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\render\render_weather.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\render\weather_definitions.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>graphicslib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\rasterizer_occlusion.h">
+      <Filter>rasterizer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\rasterizer_profile.h">
+      <Filter>rasterizer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\rasterizer_screen_effects.h">
+      <Filter>rasterizer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\rasterizer_settings.h">
+      <Filter>rasterizer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\rasterizer_stipple.h">
+      <Filter>rasterizer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\rasterizer_text.h">
+      <Filter>rasterizer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\rasterizer_transparent_geometry.h">
+      <Filter>rasterizer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\rasterizer_vertex_buffers.h">
+      <Filter>rasterizer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\rasterizer_vertex_shader_definitions.h">
+      <Filter>rasterizer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\rasterizer_cinematics.h">
+      <Filter>rasterizer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\rasterizer_dynamic_reflect.h">
+      <Filter>rasterizer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\rasterizer_fog.h">
+      <Filter>rasterizer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\rasterizer_globals.h">
+      <Filter>rasterizer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\rasterizer_lens_flares.h">
+      <Filter>rasterizer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\rasterizer_lights.h">
+      <Filter>rasterizer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\rasterizer_loading.h">
+      <Filter>rasterizer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\rasterizer_main.h">
+      <Filter>rasterizer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\rasterizer_memory.h">
+      <Filter>rasterizer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx12\rasterizer_dx12_main.h">
+      <Filter>rasterizer\dx12</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_dynamic_geometry.h">
+      <Filter>rasterizer\dx9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_dynavobgeom.h">
+      <Filter>rasterizer\dx9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_errors.h">
+      <Filter>rasterizer\dx9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_fog.h">
+      <Filter>rasterizer\dx9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_fullscreen_passes.h">
+      <Filter>rasterizer\dx9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_lens_flares.h">
+      <Filter>rasterizer\dx9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_main.h">
+      <Filter>rasterizer\dx9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_motion_sensor.h">
+      <Filter>rasterizer\dx9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_screen_effect.h">
+      <Filter>rasterizer\dx9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_shader_submit.h">
+      <Filter>rasterizer\dx9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_shader_submit_new.h">
+      <Filter>rasterizer\dx9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_submit.h">
+      <Filter>rasterizer\dx9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_targets.h">
+      <Filter>rasterizer\dx9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_text.h">
+      <Filter>rasterizer\dx9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_vertex_buffers.h">
+      <Filter>rasterizer\dx9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_vertex_shaders.h">
+      <Filter>rasterizer\dx9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_water.h">
+      <Filter>rasterizer\dx9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_weather.h">
+      <Filter>rasterizer\dx9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_widgets.h">
+      <Filter>rasterizer\dx9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9.h">
+      <Filter>rasterizer\dx9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_9on12.h">
+      <Filter>rasterizer\dx9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_bitmaps.h">
+      <Filter>rasterizer\dx9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_debug.h">
+      <Filter>rasterizer\dx9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_decals.h">
+      <Filter>rasterizer\dx9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_dof.h">
+      <Filter>rasterizer\dx9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\shaders\compiled\motion_sensor_sweep.h">
+      <Filter>rasterizer\dx9\shaders\compiled</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\shaders\compiled\sun_glow_convolve.h">
+      <Filter>rasterizer\dx9\shaders\compiled</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\shaders\compiled\weather_particle_generic.h">
+      <Filter>rasterizer\dx9\shaders\compiled</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\shaders\compiled\weather_particle_rain.h">
+      <Filter>rasterizer\dx9\shaders\compiled</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\shaders\compiled\weather_plate.h">
+      <Filter>rasterizer\dx9\shaders\compiled</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\shaders\compiled\zprime.h">
+      <Filter>rasterizer\dx9\shaders\compiled</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\shaders\compiled\bloom_simple.h">
+      <Filter>rasterizer\dx9\shaders\compiled</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rasterizer\dx9\shaders\compiled\fog_atmospheric_apply.h">
+      <Filter>rasterizer\dx9\shaders\compiled</Filter>
+    </ClInclude>
+    <ClInclude Include="..\effects\beam.h">
+      <Filter>effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\effects\contrails.h">
+      <Filter>effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\effects\decals.h">
+      <Filter>effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\effects\effects.h">
+      <Filter>effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\effects\effects_creation.h">
+      <Filter>effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\effects\effects_definitions.h">
+      <Filter>effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\effects\effect_location_definition.h">
+      <Filter>effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\effects\lens_flares.h">
+      <Filter>effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\effects\particle.h">
+      <Filter>effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\effects\particle_definition_interface.h">
+      <Filter>effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\effects\particle_draw.h">
+      <Filter>effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\effects\particle_emitter.h">
+      <Filter>effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\effects\particle_location.h">
+      <Filter>effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\effects\particle_model_definitions.h">
+      <Filter>effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\effects\particle_movement_definition.h">
+      <Filter>effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\effects\particle_property.h">
+      <Filter>effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\effects\particle_state.h">
+      <Filter>effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\effects\particle_system.h">
+      <Filter>effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\effects\particle_system_definition.h">
+      <Filter>effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\effects\particle_update.h">
+      <Filter>effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\effects\player_effects.h">
+      <Filter>effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decorators\decorator_definitions.h">
+      <Filter>decorators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decorators\decorator_projected_decals.h">
+      <Filter>decorators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shaders\pixel_shader.h">
+      <Filter>shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shaders\shader_definitions.h">
+      <Filter>shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shaders\shader_passes.h">
+      <Filter>shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shaders\shader_postprocess_definitions.h">
+      <Filter>shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shaders\shader_templates.h">
+      <Filter>shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shaders\vertex_shader.h">
+      <Filter>shaders</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

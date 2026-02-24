@@ -95,6 +95,7 @@ const char* tag_names[]
 datum trigger_projectile_datum_index = NONE;
 
 #pragma region H3 collision data research
+#if	ENABLE_H3_COLLISION_DATA_SOURCE
 __declspec(naked) void update_projectile_collision_data()
 {
 	__asm
@@ -144,6 +145,8 @@ void __cdecl matrix4x3_transform_point(void* matrix, real_vector3d* v1, real_vec
 
 	p_matrix4x3_transform_point(matrix, v1, out);
 }
+#endif
+
 #pragma endregion
 
 void ProjectileFix::ApplyProjectileVelocity()

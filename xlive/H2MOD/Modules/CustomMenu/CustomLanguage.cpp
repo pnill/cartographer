@@ -3,6 +3,7 @@
 
 #include "main/game_preferences.h"
 #include "game/game.h"
+#include "game/game_options.h"
 #include "shell/shell.h"
 #include "text/unicode.h"
 #include "text/font_group.h"
@@ -507,9 +508,10 @@ void setCustomLanguage(int main, int variant) {
 	
 	setGameLanguage();
 
-	game_globals_storage* game_globals = get_main_game_globals();
-	if (game_globals) {
-		game_globals->options.game_mode = _game_mode_campaign;
+	const bool initialized = map_initialized();
+	if (initialized) {
+		s_game_options* options = game_options_get();
+		options->game_mode = _game_mode_campaign;
 		BYTE& QuitLevel = *(BYTE*)((char*)Memory::GetAddress() + 0x482251);
 		QuitLevel = 1;
 	}
@@ -525,11 +527,12 @@ void setCustomLanguage(int main, int variant) {
 
 	addDebugText("language_code = %dx%d", current_language_main, current_language_sub);
 
-	if (game_globals) {
+	if (initialized) {
 		BYTE* LoadedFonts = (BYTE*)((char*)Memory::GetAddress() + 0x47e7c0);
 		*LoadedFonts = 0;
 		font_initialize();
 	}
+
 	if (current_language_isGarbage) {
 		delete_custom_language(old_language);
 		current_language_isGarbage = false;

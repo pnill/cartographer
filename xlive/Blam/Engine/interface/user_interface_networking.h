@@ -21,7 +21,7 @@ struct s_game_auto_join_globals
 	XSESSION_INFO auto_join_session;
 };
 
-/* public methods */
+/* prototypes */
 
 bool session_protocol_has_coop(e_session_protocol protocol);
 bool __cdecl user_interface_create_new_squad(bool a1, bool online);

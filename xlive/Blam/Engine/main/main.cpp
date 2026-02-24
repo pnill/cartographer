@@ -19,9 +19,10 @@
 #include "cseries/async.h"
 #include "cseries/cseries_windows_debug.h"
 #include "cseries/debug_memory.h"
+#ifdef PROFILE_ENABLED
 #include "cseries/profile.h"
+#endif
 #include "cseries/stack_walk_windows.h"
-#include "cutscene/cinematics.h"
 #ifdef DEBUG_MENU_ENABLED
 #include "debug/menu/debug_menu_main.h"
 #endif
@@ -34,9 +35,11 @@
 #include "networking/logic/life_cycle_manager.h"
 #include "networking/logic/network_search.h"
 #include "networking/network_globals.h"
+#ifdef PROFILE_ENABLED
 #include "physics/collision_usage.h"
+#endif
 #include "rasterizer/rasterizer_globals.h"
-#include "rasterizer/dx9/rasterizer_dx9_main.h"
+#include "rasterizer/rasterizer_main.h"
 #include "saved_games/game_state.h"
 #include "saved_games/saved_game_files.h"
 #include "shell/shell.h"
@@ -45,9 +48,10 @@
 #include "sound/sound_manager.h"
 #include "text/font_group.h"
 
-#include "H2MOD.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/MapManager/MapManager.h"
+
+#include <WinSock2.h>	// Needed for gXnIpMgr
 #include "XLive/xnet/IpManagement/XnIp.h"
 
 /* structures */
@@ -214,6 +218,8 @@ void main_save_core_name(const char* name)
 void main_loop_body(void)
 {
 	EventHandler::GameLoopEventExecute(EventExecutionType::execute_before);
+	
+	// TODO: figure out a better place to put this
 	if (!shell_is_dedicated_server())
 	{
 		mapManager->MapDownloadUpdateTick();
@@ -544,8 +550,7 @@ static void main_save_map_private(void)
 	// Patch added for tabbing in and out?
 	if (!shell_is_dedicated_server())
 	{
-		IDirect3DDevice9* d3d_device = rasterizer_dx9_device_get_interface();
-		if (d3d_device && FAILED(d3d_device->TestCooperativeLevel()))
+		if (rasterizer_device_is_lost())
 		{
 			rasterizer_globals_get()->reset_screen = true;
 		}

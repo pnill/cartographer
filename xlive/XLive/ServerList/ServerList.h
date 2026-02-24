@@ -58,10 +58,6 @@
 
 #define XLOCATOR_SERVER_PAGE_REPORT_ITEM_COUNT_MIN 24
 
-#define XLOCATOR_SERVER_PAGE_MIN_ITEMS		50
-#define XLOCATOR_SERVER_PAGE_MAX_ITEMS_OLD	200
-#define XLOCATOR_SERVER_PAGE_MAX_ITEMS		2000	// Increased because we hit the limit
-
 /* structs */
 
 typedef struct _XLOCATOR_SEARCHRESULT {

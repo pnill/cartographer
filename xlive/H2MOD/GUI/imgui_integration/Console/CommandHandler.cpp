@@ -3,6 +3,7 @@
 
 #ifdef TERMINAL_ENABLED
 
+#include "ComVar.h"
 #include "CommandCollection.h"
 
 const char command_error_invalid_parameter_count[] = "# %s command error: invalid parameter count";
@@ -101,6 +102,14 @@ bool ConsoleCommand::HandleCommandLine(const char* commandLine, size_t commandLi
 	}
 
 	return result;
+}
+
+void ConsoleCommand::VarAsStr(char* outVar, size_t outSize) const
+{
+	if (SetsVariable())
+	{
+		csstrncpy(outVar, m_var_ptr->AsString().c_str(), outSize - 1);
+	}
 }
 
 #endif

@@ -44,7 +44,7 @@ protected:
 
 public:
 	static void* load_by_error_id(e_cartographer_error_id error_id);
-	static void* load(s_screen_parameters* a1);
+	static void* load(struct s_screen_parameters* a1);
 
 	c_cartographer_error_menu(e_user_interface_channel_type _ui_channel, e_user_interface_render_window _window_index, uint16 _flags);
 
@@ -53,8 +53,8 @@ public:
 
 	virtual ~c_cartographer_error_menu() = default;
 	virtual void pre_destroy() override;
-	virtual bool handle_event(s_event_record* event) override;
-	virtual void initialize(s_screen_parameters* screen_parameters) override;
+	virtual bool handle_event(struct s_event_record* event) override;
+	virtual void initialize(struct s_screen_parameters* screen_parameters) override;
 	virtual const void* load_proc(void) const override;
 
 private:

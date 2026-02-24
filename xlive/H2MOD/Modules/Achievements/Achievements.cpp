@@ -17,9 +17,6 @@ bool g_achievement_list[42];
 
 using namespace rapidjson;
 
-
-std::unordered_map<std::string, bool> AchievementMap;
-
 static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
 	((std::string*)userp)->append((char*)contents, size * nmemb);

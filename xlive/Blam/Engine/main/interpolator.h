@@ -2,7 +2,7 @@
 #include "game/player_constants.h"
 #include "interface/first_person_weapons.h"
 #include "models/render_models.h"
-#include "objects/objects.h"
+#include "objects/object_constants.h"
 
 /* constants */
 

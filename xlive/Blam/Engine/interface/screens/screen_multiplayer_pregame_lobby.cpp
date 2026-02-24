@@ -3,7 +3,6 @@
 
 #include "cache/cache_files.h"
 #include "interface/user_interface_screen_widget_definition.h"
-#include "interface/user_interface_widget_window.h"
 #include "interface/user_interface_networking.h"
 #include "tag_files/tag_loader/tag_injection.h"
 

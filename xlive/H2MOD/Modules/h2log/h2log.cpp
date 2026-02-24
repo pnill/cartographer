@@ -131,6 +131,24 @@ void h2log_initialize()
 	return;
 }
 
+void h2log_onscreen_initialize(void)
+{
+#ifndef SPDLOG_DISABLED
+	c_static_wchar_string<MAX_PATH> path;
+	log_file_name_prepare(L"h2onscreendebug", &path);
+	g_onscreendebug_log = h2log::create("OnScreenDebug", path.get_string(), 0); // we always create onscreendebuglog, which logs everything (log level 0)
+#endif
+	return;
+}
+
+void h2log_onscreen_log(const char* text)
+{
+#ifndef SPDLOG_DISABLED
+	g_onscreendebug_log->debug(text);
+#endif
+	return;
+}
+
 void h2log_dispose()
 {
 #ifndef SPDLOG_DISABLED

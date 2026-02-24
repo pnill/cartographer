@@ -8,18 +8,21 @@
 #include "rasterizer/rasterizer_globals.h"
 #include "rasterizer/rasterizer_text.h"
 #include "rasterizer/dx9/rasterizer_dx9.h"
-#include "shell/shell_windows.h"
 #include "networking/logic/life_cycle_manager.h"
 #include "networking/session/network_observer.h"
 #include "networking/session/network_session.h"
+#include "shell/shell_windows.h"
 #include "text/draw_string.h"
 #include "text/font_cache.h"
 #include "text/unicode.h"
 
+#ifndef IMGUI_DISABLE
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
+#endif
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
-#include "H2MOD/Modules/Achievements/Achievements.h"
 #include "H2MOD/Modules/Updater/Updater.h"
+
+#include "XLive/achievements/XAchievements.h"
 #include "version_git.h"
 
 /* defines */
@@ -77,13 +80,13 @@ void render_cartographer_ingame_ui(void)
 	rasterizer_dx9_perf_event_begin("render cartographer ingame ui", NULL);
 	render_cartographer_status_bar(g_cartographer_build_text);
 	render_cartographer_update_message(g_auto_update_text, sizeOfDownload, sizeOfDownloaded);
-	if (!AchievementMap.empty())
+	
+	if (achievement_has_entry())
 	{
-		auto it = AchievementMap.begin();
-		it->second = true;
-		if (!render_cartographer_achievement_message(it->first.c_str()))
+		const char* string = achievement_get_first();
+		if (!render_cartographer_achievement_message(string))
 		{
-			AchievementMap.erase(it);
+			achievement_pop_first();
 		}
 	}
 	render_cartographer_git_build_info();
@@ -159,11 +162,11 @@ void render_cartographer_git_build_info(void)
 
 	wchar_t result_text_buffer[1024];
 
-	swprintf(result_text_buffer, NUMBEROF(result_text_buffer), L"%S %S", __DATE__, __TIME__);
+	usnprintf(result_text_buffer, NUMBEROF(result_text_buffer), L"%S %S", __DATE__, __TIME__);
 	rasterizer_draw_unicode_string(&bounds, result_text_buffer);
 	bounds.top += line_height;
 	bounds.bottom = bounds.top + line_height;
-	swprintf(result_text_buffer, NUMBEROF(result_text_buffer), L"%S %S branch: %S", GEN_GIT_VER_VERSION_STRING, GET_GIT_VER_USERNAME, GET_GIT_VER_BRANCH);
+	usnprintf(result_text_buffer, NUMBEROF(result_text_buffer), L"%S %S branch: %S", GEN_GIT_VER_VERSION_STRING, GET_GIT_VER_USERNAME, GET_GIT_VER_BRANCH);
 	rasterizer_draw_unicode_string(&bounds, result_text_buffer);
 #endif
 }
@@ -258,7 +261,7 @@ void render_cartographer_update_message(const char* update_text, int64 update_si
 	{
 		wchar_t update_message_buffer[256];
 		real32 percent_complete = 100.f * ((real32)update_downloaded_bytes / update_size_bytes);
-		swprintf_s(update_message_buffer, NUMBEROF(update_message_buffer), L"(progress: %.2f%%)", percent_complete);
+		usnprintf(update_message_buffer, NUMBEROF(update_message_buffer), L"(progress: %.2f%%)", percent_complete);
 		rasterizer_draw_unicode_string(&bounds, update_message_buffer);
 	}
 
@@ -274,7 +277,7 @@ void render_main_game_time_debug(void)
 	rectangle2d bounds;
 	wchar_t main_game_time_debug_text[512];
 
-	swprintf_s(main_game_time_debug_text, ARRAYSIZE(main_game_time_debug_text),
+	usnprintf(main_game_time_debug_text, ARRAYSIZE(main_game_time_debug_text),
 		L"dt default: %.6f dt performance counter: %.6f",
 		g_main_game_time_debug.dt_default,
 		g_main_game_time_debug.dt_performance_counter
@@ -359,7 +362,9 @@ void render_netdebug_text(void)
 			real_argb_color text_color_console = *global_real_argb_white;
 			text_color_console.alpha *= (65.f / 100.f);
 
-			swprintf_s(netdebug_text, ARRAYSIZE(netdebug_text),
+			usnprintf(
+				netdebug_text,
+				ARRAYSIZE(netdebug_text),
 				L"[up^ rtt: %3d msec, pck rate: %.1f, throughput: %.3f bps, loss: %3d %%]",
 				netdebug_data->client_rtt_msec,
 				(real32)netdebug_data->client_packet_rate / 10.f,

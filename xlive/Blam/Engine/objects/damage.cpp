@@ -2,6 +2,7 @@
 #include "damage.h"
 
 #include "game/game.h"
+#include "game/game_options.h"
 #include "networking/network_event.h"
 #include "units/units.h"
 
@@ -63,4 +64,5 @@ void __cdecl object_apply_damage_aftermath(datum object_index, s_damage_aftermat
 {
 	SET_BIT(aftermath_data->flags, _damage_aftermath_has_explosion_physics, currentVariantSettings.explosionPhysics);
 	INVOKE(0x17A25D, 0x0, object_apply_damage_aftermath, object_index, aftermath_data);
+	return;
 }

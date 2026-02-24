@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "XStorage.h"
 
+#include <ShlObj_core.h>
+
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 
 // #5344: XStorageBuildServerPath

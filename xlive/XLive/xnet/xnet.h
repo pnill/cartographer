@@ -5,13 +5,13 @@ typedef struct
 	//
 	// Must be set to sizeof(XNetStartupParams).  There is no default.
 	//
-	BYTE        cfgSizeOfStruct;
+	BYTE    cfgSizeOfStruct;
 
 	//
 	// One or more of the XNET_STARTUP_xxx flags OR'd together.
 	//
 	// The default is 0 (no flags specified).
-	BYTE        cfgFlags;
+	BYTE    cfgFlags;
 
 	//
 	// The maximum number of SOCK_DGRAM (UDP or VDP) sockets that can be
@@ -19,7 +19,7 @@ typedef struct
 	//
 	// The default is 8 sockets.
 	//
-	BYTE        cfgSockMaxDgramSockets;
+	BYTE    cfgSockMaxDgramSockets;
 
 	//
 	// The maximum number of SOCK_STREAM (TCP) sockets that can be opened at
@@ -30,21 +30,21 @@ typedef struct
 	//
 	// The default is 32 sockets.
 	//
-	BYTE        cfgSockMaxStreamSockets;
+	BYTE    cfgSockMaxStreamSockets;
 
 	//
 	// The default receive buffer size for a socket, in units of K (1024 bytes).
 	//
 	// The default is 16 units (16K).
 	//
-	BYTE        cfgSockDefaultRecvBufsizeInK;
+	BYTE    cfgSockDefaultRecvBufsizeInK;
 
 	//
 	// The default send buffer size for a socket, in units of K (1024 bytes).
 	//
 	// The default is 16 units (16K).
 	//
-	BYTE        cfgSockDefaultSendBufsizeInK;
+	BYTE    cfgSockDefaultSendBufsizeInK;
 
 	//
 	// The maximum number of XNKID / XNKEY pairs that can be registered at the
@@ -52,7 +52,7 @@ typedef struct
 	//
 	// The default is 8 key pair registrations.
 	//
-	BYTE        cfgKeyRegMax;
+	BYTE    cfgKeyRegMax;
 
 	//
 	// The maximum number of security associations that can be registered at
@@ -66,7 +66,7 @@ typedef struct
 	//
 	// The default is 32 security associations.
 	//
-	BYTE        cfgSecRegMax;
+	BYTE    cfgSecRegMax;
 
 	//
 	// The maximum amount of QoS data, in units of DWORD (4 bytes), that can be
@@ -75,7 +75,7 @@ typedef struct
 	//
 	// The default is 64 (256 bytes).
 	//
-	BYTE        cfgQosDataLimitDiv4;
+	BYTE    cfgQosDataLimitDiv4;
 
 	//
 	// The amount of time to wait for a response after sending a QoS packet
@@ -85,7 +85,7 @@ typedef struct
 	//
 	// The default is 2 seconds.
 	//
-	BYTE        cfgQosProbeTimeoutInSeconds;
+	BYTE    cfgQosProbeTimeoutInSeconds;
 
 	//
 	// The maximum number of times to retry a given QoS packet when no response
@@ -94,7 +94,7 @@ typedef struct
 	//
 	// The default is 3 retries.
 	//
-	BYTE        cfgQosProbeRetries;
+	BYTE    cfgQosProbeRetries;
 
 	//
 	// The maximum number of simultaneous QoS lookup responses that a QoS
@@ -104,7 +104,7 @@ typedef struct
 	//
 	// The default is 8 responses.
 	//
-	BYTE        cfgQosSrvMaxSimultaneousResponses;
+	BYTE    cfgQosSrvMaxSimultaneousResponses;
 
 	//
 	// The maximum amount of time for QoS listeners to wait for the second
@@ -112,7 +112,31 @@ typedef struct
 	//
 	// The default is 2 seconds.
 	//
-	BYTE        cfgQosPairWaitTimeInSeconds;
+	BYTE    cfgQosPairWaitTimeInSeconds;
 
 } XNetStartupParams;
 
+INT WINAPI XNetCleanup();
+
+INT WINAPI XNetConnect(const IN_ADDR ina);
+INT WINAPI XNetGetConnectStatus(const IN_ADDR ina);
+
+INT WINAPI XNetRandom(BYTE* pb, UINT cb);
+
+INT WINAPI XNetCreateKey(XNKID* pxnkid, XNKEY* pxnkey);
+INT WINAPI XNetRegisterKey(const XNKID* pxnkid, const XNKEY* pxnkey);
+INT WINAPI XNetUnregisterKey(const XNKID* pxnkid);
+INT WINAPI XNetReplaceKey(const XNKID* pxnkidUnregister, const XNKID* pxnkidReplace);
+
+INT WINAPI XNetXnAddrToInAddr(const XNADDR* pxna, const XNKID* pxnkid, IN_ADDR* pina);
+INT WINAPI XNetServerToInAddr(const IN_ADDR ina, DWORD dwServiceId, IN_ADDR* pina);
+INT WINAPI XNetTsAddrToInAddr(const TSADDR* ptsa, DWORD dwServiceId, const XNKID* pxnkid, IN_ADDR* pina);
+INT WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR* pxna, XNKID* pxnkid);
+INT WINAPI XNetInAddrToServer(const IN_ADDR ina, IN_ADDR* pina);
+INT WINAPI XNetInAddrToString(const IN_ADDR ina, char* pchBuf, INT cchBuf);
+INT WINAPI XNetUnregisterInAddr(const IN_ADDR ina);
+INT WINAPI XNetXnAddrToMachineId(const XNADDR* pxnaddr, ULONGLONG* pqwMachineId);
+
+INT WINAPI XNetDnsLookup(const char* pszHost, WSAEVENT hEvent, XNDNS** ppxndns);
+
+INT WINAPI XNetDnsRelease(XNDNS* pxndns);

@@ -5,7 +5,6 @@
 #include "interface/user_interface.h"
 #include "interface/user_interface_widget_list.h"
 #include "interface/user_interface_widget_list_item.h"
-#include "interface/user_interface_widget_window.h"
 
 /* macro defines */
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "render_cameras.h"
-#include "render_layers.h"
 #include "render_visibility_collection.h"
 
 #include "input/controllers.h"
@@ -13,15 +12,15 @@
 enum e_display_split_type : uint32
 {
 	_display_split_type_none = 0,
-	_display_split_type_horizontal = 1,
-	_display_split_type_vertical = 2
+	_display_split_type_horizontal,
+	_display_split_type_vertical
 };
 
 enum e_screen_split_type : uint8
 {
 	_screen_split_type_full = 0,
-	_screen_split_type_half = 1,
-	_screen_split_type_quarter = 2,
+	_screen_split_type_half,
+	_screen_split_type_quarter,
 	k_split_screen_type_count
 };
 
@@ -164,7 +163,7 @@ bool frame_parameters_type_is_above_or_equal_to_7(void);
 
 void rasterizer_render_scene(bool is_texture_camera);
 
-void render_scene_geometry(e_collection_type collection_type, e_render_layer render_layer);
+void render_scene_geometry(e_collection_type collection_type, uint32 render_layer);
 
 // CLIENT ONLY
 // Get cluster index and leaf index from render position provided

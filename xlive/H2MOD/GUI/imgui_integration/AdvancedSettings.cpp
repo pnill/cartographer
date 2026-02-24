@@ -18,6 +18,7 @@
 #include "networking/logic/life_cycle_manager.h"
 #include "networking/session/network_session.h"
 #include "rasterizer/rasterizer_globals.h"
+#include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
 
 #include "H2MOD.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"

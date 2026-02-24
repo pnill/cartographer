@@ -1,33 +1,11 @@
 #pragma once
+#include "game.h"
 #include "game/player_constants.h"
 #include "main/map_manager.h"
 #include "networking/network_constants.h"
 #include "networking/network_game_definitions.h"
 #include "saved_games/game_variant.h"
 #include "simulation/machine_id.h"
-
-/* enums */
-
-enum e_game_simulation : int8
-{
-	_game_simulation_none = 0,
-	_game_simulation_local,
-	_game_simulation_synchronous_client,
-	_game_simulation_synchronous_server,
-	_game_simulation_distributed_client,
-	_game_simulation_distributed_server,
-	k_game_simulation_count,
-};
-
-enum e_game_mode : int32
-{
-	_game_mode_none = 0,
-	_game_mode_campaign,
-	_game_mode_multiplayer,
-	_game_mode_ui_shell,
-	_game_mode_tool,
-	k_game_mode_count
-};
 
 /* structures */
 

@@ -57,6 +57,6 @@
     <LocalDebuggerCommandArgumentsHistory>-nointro -windowed -novsync|</LocalDebuggerCommandArgumentsHistory>
   </PropertyGroup>
   <PropertyGroup>
-    <ShowAllFiles>true</ShowAllFiles>
+    <ShowAllFiles>false</ShowAllFiles>
   </PropertyGroup>
 </Project>

@@ -1,8 +1,14 @@
 #include "stdafx.h"
 #include "cseries_windows_modules.h"
 
-s_loaded_module_info g_module_info[k_recorded_module_count];
+#include <Psapi.h>
+#include <tlhelp32.h>
 
+/* globals */
+
+static s_loaded_module_info g_module_info[k_recorded_module_count];
+
+/* public code */
 
 s_loaded_module_info* get_loaded_module_info()
 {

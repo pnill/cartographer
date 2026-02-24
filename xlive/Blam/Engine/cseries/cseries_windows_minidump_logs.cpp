@@ -6,11 +6,10 @@
 
 #include "game/game.h"
 #include "game/game_options.h"
-#include "rasterizer/dx9/rasterizer_dx9_main.h"
 
 /* constants */
 
-static const wchar_t k_crash_message_header_break[] = L"=============================================\n";
+const wchar_t k_crash_message_header_break[] = L"=============================================\n";
 const wchar_t k_reports_path[] = L"reports\\";
 const wchar_t *const k_report_text_file_names[k_report_text_file_type_count] = { L"exception_info.txt", L"cpu_info.txt", L"game_options.txt", L"game_globals.txt", L"rasterizer.txt"};
 
@@ -353,56 +352,9 @@ static void setup_game_global_text(const wchar_t* reports_path)
 
 	FILE* file;
 	errno_t error = _wfopen_s(&file, report_info_path_game_globals->get_string(), L"w+");
-	const game_globals_storage* game_globals = get_main_game_globals();
-	if (!error && file != NULL && game_globals != NULL)
+	if (!error)
 	{
-
-		fwprintf(file, L"GAME GLOBALS\n");
-		fwprintf(file, L"%ls", k_crash_message_header_break);
-
-		fwprintf(file, L"Initializing: ");
-		print_bool_to_file(file, game_globals->initializing);
-
-		fwprintf(file, L"Map Active: ");
-		print_bool_to_file(file, game_globals->map_active);
-
-		fwprintf(file, L"Active Structure BSP Index: ");
-		print_bool_to_file(file, game_globals->active_structure_bsp_index);
-
-		fwprintf(file, L"Game In Progress: ");
-		print_bool_to_file(file, game_globals->game_in_progress);
-
-		fwprintf(file, L"Game Is Lost: ");
-		print_bool_to_file(file, game_globals->game_is_lost);
-
-		fwprintf(file, L"Ticks To Reset Game: %d\n", game_globals->ticks_to_reset_game);
-
-		fwprintf(file, L"Game Is Finished: ");
-		print_bool_to_file(file, game_globals->game_is_finished);
-
-		fwprintf(file, L"Game Sounds Disabled: ");
-		print_bool_to_file(file, game_globals->game_sounds_disabled);
-
-		fwprintf(file, L"Ticks Till End: %u\n", game_globals->ticks_till_end);
-
-		fwprintf(file, L"Game Ragdoll Count: %d\n", game_globals->game_ragdoll_count);
-
-		fwprintf(file, L"Cluster PVS: ");
-		print_array_to_file(file, game_globals->cluster_pvs.cluster_bitvector, NUMBEROF(game_globals->cluster_pvs.cluster_bitvector));
-
-		fwprintf(file, L"Cluster PVS Local: ");
-		print_array_to_file(file, game_globals->cluster_pvs_local.cluster_bitvector, NUMBEROF(game_globals->cluster_pvs_local.cluster_bitvector));
-
-		fwprintf(file, L"Cluster Activation: ");
-		print_array_to_file(file, game_globals->cluster_activation.cluster_bitvector, NUMBEROF(game_globals->cluster_activation.cluster_bitvector));
-
-		fwprintf(file, L"Enable Scripted Camera PVS: ");
-		print_bool_to_file(file, game_globals->enable_scripted_camera_pvs);
-
-		fwprintf(file, L"PVS Object Is Set: %hu\n", game_globals->pvs_activation_mode);
-
-		fwprintf(file, L"PVS Object Datum: %d\n", game_globals->pvs_object_datum);
-
+		cartographer_dump_game_globals_info(file);
 		fclose(file);
 	}
 
@@ -423,10 +375,6 @@ static void setup_rasterizer_text(const wchar_t* reports_path)
 	{
 		fwprintf(file, L"RASTERIZER\n");
 		fwprintf(file, L"%ls", k_crash_message_header_break);
-
-		fwprintf(file, L"Last Bitmap Tag Datum: ");
-		print_hex_value_to_file(file, (uint32)last_bitmap_tag_index_get());
-
 		fclose(file);
 	}
 

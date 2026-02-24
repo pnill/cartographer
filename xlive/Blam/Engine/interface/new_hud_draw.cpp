@@ -11,8 +11,6 @@
 #include "camera/camera.h"
 
 #include "game/players.h"
-#include "rasterizer/dx9/rasterizer_dx9.h"
-#include "rasterizer/dx9/rasterizer_dx9_main.h"
 #include "rasterizer/dx9/rasterizer_dx9_shader_submit_new.h"
 #include "rasterizer/rasterizer_text.h"
 #include "render/render.h"
@@ -68,8 +66,6 @@ datum* g_draw_hud_crosshair_bitmap_cache;
 uint8 g_draw_hud_user_draw_player_indicators_mask;
 
 /* prototypes */
-
-static void rasterizer_setup_2d_vertex_shader_user_interface_constants(void);
 
 static void __cdecl render_ingame_user_interface_hud_indicators_element_hook(int32* a1, datum tag_index, datum bitmap_index, int32* a4, datum shader_index);
 
@@ -849,62 +845,14 @@ void __cdecl render_ingame_user_interface_hud_element(
 	real_rectangle2d* bounds,
 	datum shader_tag_index)
 {
-	rasterizer_setup_2d_vertex_shader_user_interface_constants();
+	rasterizer_dx9_setup_2d_vertex_shader_user_interface_constants();
 	p_draw_ingame_user_interface_hud_element(left, top, x, y, scale, rotation_rad, bitmap_tag_index, bitmap, bounds, shader_tag_index);
-	return;
-}
-
-static void rasterizer_setup_2d_vertex_shader_user_interface_constants(void)
-{
-	IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
-
-	real_vector4d vc[5];
-	int16 width, height;
-
-	s_render* render = render_get();
-
-	rectangle2d screen_bounds = render->camera.viewport_bounds;
-	width = rectangle2d_width(&screen_bounds);
-	height = rectangle2d_height(&screen_bounds);
-
-	// vertex shaders use normalized device coordinates system (NDC)
-	vc[0].i = 2.0f / (real32)width; // x
-	vc[0].j = 0.0f;
-	vc[0].k = 0.0f;
-	vc[0].l = -(1.0f / (real32)width + 1.0f) - ((real32)screen_bounds.left * 2.0f / width); // offset from x
-
-	vc[1].i = 0.0f;
-	vc[1].j = -(2.0f / (real32)height); // y
-	vc[1].k = 0.0f;
-	vc[1].l = (1.0f / (real32)height + 1.0f) + ((real32)screen_bounds.top * 2.0f / height); // offset from y
-
-	vc[2].i = 0.0f;
-	vc[2].j = 0.0f;
-	vc[2].k = 0.0f; // z
-	vc[2].l = 0.5f; // acts as an offset, facing (<=1.0f is towards the viewport, above 1.0f facing from the viewport)
-
-	vc[3].i = 0.0f;
-	vc[3].j = 0.0f;
-	vc[3].k = 0.0f;
-	vc[3].l = 1.0f; // w scaling component
-
-	// the c181 register seems unused?
-	vc[4].i = 0.0f;
-	vc[4].j = 0.0f;
-	vc[4].k = 0.0f;
-	vc[4].l = 0.0f;
-
-	// avoid unnecessary API calls by testing the user mode memory cache
-	if (rasterizer_get_main_vertex_shader_cache()->test_cache(177, vc, NUMBEROF(vc)))
-	{
-		global_d3d_device->SetVertexShaderConstantF(177, (const real32*)vc, NUMBEROF(vc));
-	}
 	return;
 }
 
 static void __cdecl render_ingame_user_interface_hud_indicators_element_hook(int32* a1, datum tag_index, datum bitmap_index, int32* a4, datum shader_index)
 {
-	rasterizer_setup_2d_vertex_shader_user_interface_constants();
+	rasterizer_dx9_setup_2d_vertex_shader_user_interface_constants();
 	p_render_ingame_user_interface_hud_indicators_element(a1, tag_index, bitmap_index, a4, shader_index);
 	return;
 }

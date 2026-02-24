@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "MapManager.h"
 
-#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
 #include "cartographer/config/endpoints.h"
 #include "main/map_repository.h"
@@ -13,9 +12,13 @@
 #include "shell/shell.h"
 #include "text/unicode.h"
 
+#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+
+#include <chrono>
+
 std::unique_ptr<MapManager> mapManager(std::make_unique<MapManager>());
 
-const wchar_t* k_map_download_source_text[k_language_count] =
+static const wchar_t* k_map_download_source_text[k_language_count] =
 {
 	L"repository",
 };
@@ -375,7 +378,12 @@ bool MapDownloadQuery::DownloadFromRepo() {
 	if (curl) {
 		fp = ufopen(map_path.get_string(), L"wb");
 		if (fp == nullptr) {
-			LOG_TRACE_GAME(L"{} - unable to open map file at: {}", __FUNCTIONW__, map_path.get_string());
+			event(
+				_event_verbose,
+				"%s - unable to open map file at: %ws",
+				__FUNCTION__,
+				map_path.get_string()
+			);
 			curl_easy_cleanup(curl);
 			return false;
 		}

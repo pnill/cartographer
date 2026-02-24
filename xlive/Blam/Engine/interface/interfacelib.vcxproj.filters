@@ -1,0 +1,528 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="screens\screen_4way_signin.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_about_dialog.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_anti_aliasing.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_audio_settings.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_brightness_level.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_brightness_menu.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_bungie_news.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_button_settings.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_campaign_options_dialog.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_cartographer_account_manager.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_cartographer_errors.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_cartographer_menus.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_confirm_resolution.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_controller_settings_menu.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_display_mode.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_error_dialog.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_esrb_warning.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_gamma_setting.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_lod_setting.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_main_menu.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_multiplayer_pregame_lobby.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_multiplayer_video_settings_menu.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_network_adapter.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_network_squad_browser.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_press_start_introduction.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_resolution.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_restore_video_defaults.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_safe_area_setting.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_settings.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_single_player_difficulty_select.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_single_player_level_select.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_single_player_profile_select.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_splitscreen_setting.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_squad_settings.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_variant_game_engine_type.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_video_settings.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_virtual_keyboard.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_vsync_setting.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screen_xbox_live_task_progress_dialog.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="screens\screens_patches.cpp">
+      <Filter>interface\screens</Filter>
+    </ClCompile>
+    <ClCompile Include="damaged_media.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="first_person_weapons.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="hud.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="hud_definitions.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="hud_draw.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="hud_messaging.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="hud_nav_points.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="interface.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="motion_sensor.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="new_hud.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="new_hud_draw.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="terminal.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="user_interface.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="user_interface_bitmap_block.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="user_interface_channel.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="user_interface_controller.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="user_interface_group_widget.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="user_interface_guide.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="user_interface_hud_block.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="user_interface_memory.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="user_interface_model_block.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="user_interface_network_search.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="user_interface_networking.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="user_interface_player_widget.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="user_interface_shared_globals.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="user_interface_text.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="user_interface_text_block.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="user_interface_utilities.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="user_interface_widget.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="user_interface_widget_button.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="user_interface_widget_list.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="user_interface_widget_list_item.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="user_interface_widget_tab_view.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="user_interface_widget_text.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="user_interface_widget_text_entry.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="user_interface_widget_window.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\interfacelib\stdafx.cpp">
+      <Filter>interfacelib</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="screens\screen_4way_signin.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_about_dialog.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_anti_aliasing.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_audio_settings.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_brightness_level.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_brightness_menu.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_bungie_news.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_button_settings.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_campaign_options_dialog.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_cartographer_account_manager.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_cartographer_account_manager_strings.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_cartographer_errors.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_cartographer_menus.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_confirm_resolution.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_controller_settings_menu.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_display_mode.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_error_dialog.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_esrb_warning.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_gamma_setting.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_lod_setting.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_main_menu.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_multiplayer_pregame_lobby.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_multiplayer_video_settings_menu.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_network_adapter.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_network_squad_browser.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_press_start_introduction.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_resolution.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_restore_video_defaults.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_safe_area_setting.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_settings.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_single_player_difficulty_select.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_single_player_level_select.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_single_player_profile_select.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_splitscreen_setting.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_squad_settings.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_variant_game_engine_type.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_video_settings.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_virtual_keyboard.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_vsync_setting.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screen_xbox_live_task_progress_dialog.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="screens\screens_patches.h">
+      <Filter>interface\screens</Filter>
+    </ClInclude>
+    <ClInclude Include="channel_with_history.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="damaged_media.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="dialog_channel.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="first_person_weapons.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="game_error_dialog_channel.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="gameshell_background_channel.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="gameshell_channel.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="hardware_error_dialog_channel.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="hud.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="hud_definitions.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="hud_draw.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="hud_messaging.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="hud_nav_points.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="interface.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="meter_definitions.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="motion_sensor.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="new_hud.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="new_hud_definitions.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="new_hud_draw.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="online_menu_channel.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="signal_slot.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="terminal.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="user_interface.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="user_interface_bitmap_block.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="user_interface_channel.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="user_interface_controller.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="user_interface_group_widget.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="user_interface_guide.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="user_interface_hud_block.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="user_interface_main_menu_music.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="user_interface_memory.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="user_interface_model_block.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="user_interface_network_search.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="user_interface_networking.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="user_interface_player_widget.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="user_interface_screen_widget_definition.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="user_interface_shared_globals.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="user_interface_text.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="user_interface_text_block.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="user_interface_text_chat.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="user_interface_text_chat_receiver.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="user_interface_text_chat_sender.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="user_interface_utilities.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="user_interface_widget.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="user_interface_widget_button.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="user_interface_widget_list.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="user_interface_widget_list_item.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="user_interface_widget_tab_view.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="user_interface_widget_text.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="user_interface_widget_text_entry.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="user_interface_widget_window.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\interfacelib\stdafx.h">
+      <Filter>interfacelib</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="interface">
+      <UniqueIdentifier>{02446882-83a4-4576-a291-416d75bf0dbe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="interfacelib">
+      <UniqueIdentifier>{ce8da0e6-db54-40cc-82bb-f6a7a6bd8a06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="interface\screens">
+      <UniqueIdentifier>{553b88c6-c883-4f01-829b-c40f2215abac}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -6,6 +6,7 @@
 #include "interface/user_interface_memory.h"
 #include "memory/data.h"
 #include "multithreading/synchronization.h"
+#include "networking/network_event.h"
 #include "scenario/scenario_definitions.h"
 #include "shell/shell.h"
 #include "tag_files/files.h"
@@ -130,9 +131,11 @@ bool c_map_manager::read_custom_map_data_cache_from_file(const utf8* path,
 	{
 		if (!file_open(&cache_file, flags, &open_file_error_code))
 		{
-			LOG_TRACE_GAME("{} - failed to open custom map data cache file!",
-				__FUNCTION__);
-
+			event(
+				_event_verbose,
+				"h2mod:map_repository: %s - failed to open custom map data cache file!",
+				__FUNCTION__
+			);
 			break;
 		}
 
@@ -140,26 +143,32 @@ bool c_map_manager::read_custom_map_data_cache_from_file(const utf8* path,
 		if (!file_read(&cache_file, sizeof(s_custom_map_file_cache_header), true, custom_map_data_header))
 		{
 			invalid_file = true;
-			LOG_TRACE_GAME("{} - failed to read custom map data cache file header!",
-				__FUNCTION__);
-
+			event(
+				_event_verbose,
+				"h2mod:map_repository: %s - failed to read custom map data cache file header!",
+				__FUNCTION__
+			);
 			break;
 		}
 
 		if (custom_map_data_header->signature != custom_map_cache_signature)
 		{
-			LOG_TRACE_GAME("{} - invalid custom map data cache file signature! deleting file if possible, name is reserved!",
-				__FUNCTION__);
-
+			event(
+				_event_verbose,
+				"h2mod:map_repository: %s - invalid custom map data cache file signature! deleting file if possible, name is reserved!",
+				__FUNCTION__
+			);
 			invalid_file = true;
 			break;
 		}
 
 		if (custom_map_data_header->version != k_custom_map_data_cache_header_version)
 		{
-			LOG_TRACE_GAME("{} - custom map data cache file header version mismatch! deleting file if possible",
-				__FUNCTION__);
-
+			event(
+				_event_verbose,
+				"h2mod:map_repository: %s - custom map data cache file header version mismatch! deleting file if possible",
+				__FUNCTION__
+			);
 			invalid_file = true;
 			break;
 		}
@@ -167,11 +176,13 @@ bool c_map_manager::read_custom_map_data_cache_from_file(const utf8* path,
 		entry_count = custom_map_data_header->entry_count;
 		if (entry_count > k_maximum_number_of_custom_multiplayer_maps_new)
 		{
-			LOG_TRACE_GAME("{} - custom map data cache file exceeds new map limit size, {} > max: {}",
+			event(
+				_event_verbose,
+				"h2mod:map_repository: %s - custom map data cache file exceeds new map limit size, {} > max: {}",
 				__FUNCTION__,
 				entry_count,
-				k_maximum_number_of_custom_multiplayer_maps_new);
-
+				k_maximum_number_of_custom_multiplayer_maps_new
+			);
 			break;
 		}
 
@@ -180,9 +191,11 @@ bool c_map_manager::read_custom_map_data_cache_from_file(const utf8* path,
 
 		if (!file_read(&cache_file, file_custom_map_entries_size, true, entry_list))
 		{
-			LOG_TRACE_GAME("{} - failed reading custom map data cache file!",
-				__FUNCTION__);
-
+			event(
+				_event_error,
+				"h2mod:map_repository: %s - failed reading custom map data cache file!",
+				__FUNCTION__
+			);
 			break;
 		}
 
@@ -202,10 +215,14 @@ bool c_map_manager::read_custom_map_data_cache_from_file(const utf8* path,
 
 	if (success)
 	{
-		LOG_TRACE_GAME("loaded custom map paths: ");
+		event(_event_verbose, "h2mod:map_repository loaded custom map paths: ");
 		for (uint32 i = 0; i < entry_count; i++)
 		{
-			LOG_TRACE_GAME(L"	custom map path: {}", entry_list[i].file_path);
+			event(
+				_event_verbose,
+				"h2mod:map_repository:	custom map path: %ws",
+				entry_list[i].file_path
+			);
 		}
 	}
 
@@ -226,8 +243,12 @@ bool c_map_manager::write_custom_map_data_cache_to_file(const utf8* path, s_cust
 	{
 		if (!file_open(&cache_file, _permission_write_bit, &open_file_error_code))
 		{
-			LOG_ERROR_GAME("{} - failed to open custom map cache file, error code: {}", __FUNCTION__, (uint32)open_file_error_code);
-
+			event(
+				_event_error,
+				"h2mod:map_repository: %s - failed to open custom map cache file, error code: %u",
+				__FUNCTION__,
+				(uint32)open_file_error_code
+			);
 			break;
 		}
 
@@ -237,20 +258,29 @@ bool c_map_manager::write_custom_map_data_cache_to_file(const utf8* path, s_cust
 
 		if (!file_write(&cache_file, size_to_write, custom_map_data_cache))
 		{
-			LOG_ERROR_GAME("{} - failed to write custom map cache to file!",
-				__FUNCTION__);
-
+			event(
+				_event_error,
+				"h2mod:map_repository: %s - failed to write custom map cache to file!",
+				__FUNCTION__
+			);
 			break;
 		}
 
-		LOG_TRACE_GAME("{} - saved custom map data cache, map count: {}, write size: {}",
-			__FUNCTION__, custom_map_data_cache->entry_count, size_to_write);
+		event(
+			_event_verbose,
+			"h2mod:map_repository: %s - saved custom map data cache, map count: %u, write size: %u",
+			__FUNCTION__,
+			custom_map_data_cache->entry_count,
+			size_to_write
+		);
 
 		if (!file_set_eof(&cache_file, cache_file.api_result))
 		{
-			LOG_ERROR_GAME("{} - failed to set custom map cache file size!",
-				__FUNCTION__);
-
+			event(
+				_event_error,
+				"h2mod:map_repository: %s - failed to set custom map cache file size!",
+				__FUNCTION__
+			);
 			break;
 		}
 
@@ -265,7 +295,11 @@ bool c_map_manager::write_custom_map_data_cache_to_file(const utf8* path, s_cust
 	}
 	else if (!create_file_success && open_file_error_code == _file_open_error_not_found)
 	{
-		LOG_ERROR_GAME("{} - failed to create custom map data cache while file not present!", __FUNCTION__);
+		event(
+			_event_error,
+			"h2mod:map_repository: %s - failed to create custom map data cache while file not present!",
+			__FUNCTION__
+		);
 	}
 
 	return success;
@@ -296,7 +330,11 @@ void __thiscall c_map_manager::save_custom_map_data()
 		|| !WideCharToMultiByte(CP_UTF8, 0, path_wide, -1, path_multibyte, MAX_PATH, 0, 0)
 		|| !write_custom_map_data_cache_to_file(path_multibyte, custom_map_data_to_save))
 	{
-		LOG_ERROR_GAME("{} - failed to save custom map data cache!", __FUNCTION__);
+		event(
+			_event_error,
+			"h2mod:map_repository: %s - failed to save custom map data cache!",
+			__FUNCTION__
+		);
 	}
 }
 
@@ -339,8 +377,11 @@ void __thiscall c_map_manager::map_repository_load()
 		custom_map_cache_file_header->signature = custom_map_cache_signature;
 		custom_map_cache_file_header->version = k_custom_map_data_cache_header_version;
 
-		LOG_ERROR_GAME("{} - failed to read custom map data cache!", 
-			__FUNCTION__);
+		event(
+			_event_error,
+			"h2mod:map_repository: %s - failed to read custom map data cache!",
+			__FUNCTION__
+		);
 	}
 
 	//load_map_data_cache_from_file_cache(custom_map_cache_file_header);
@@ -927,22 +968,38 @@ static bool __cdecl validate_and_read_custom_map_data(s_custom_map_entry* custom
 		return false;
 	if (header.header_signature != 'head' || header.footer_signature != 'foot' || header.file_size <= 0 || header.version != 8)
 	{
-		LOG_TRACE_FUNCW(L"\"{}\" has invalid header", file_name);
+		event(
+			_event_error,
+			"h2mod:map_repository: \"%ws\" has invalid header",
+			file_name
+		);
 		return false;
 	}
 	if (header.type > 5 || header.type < 0)
 	{
-		LOG_TRACE_FUNCW(L"\"{}\" has bad scenario type", file_name);
+		event(
+			_event_error,
+			"h2mod:map_repository: \"%ws\" has bad scenario type",
+			file_name
+		);
 		return false;
 	}
 	if (strnlen_s(header.name, k_custom_map_name_length) >= 32 || strnlen_s(header.version_string, 32) >= 32)
 	{
-		LOG_TRACE_FUNCW(L"\"{}\" has invalid version or name string", file_name);
+		event(
+			_event_error,
+			"h2mod:map_repository: \"%ws\" has invalid version or name string",
+			file_name
+		);
 		return false;
 	}
 	if (header.type != _scenario_type_multiplayer && header.type != _scenario_type_solo)
 	{
-		LOG_TRACE_FUNCW(L"\"{}\" is not playable", file_name);
+		event(
+			_event_error,
+			"h2mod:map_repository: \"%ws\" is not playable",
+			file_name
+		);
 		return false;
 	}
 
@@ -955,7 +1012,11 @@ static bool __cdecl validate_and_read_custom_map_data(s_custom_map_entry* custom
 	auto validate_and_add_custom_map_internal = Memory::GetAddress<validate_and_add_custom_map_internal_t>(0x4F690, 0x56890);
 	if (!validate_and_add_custom_map_internal(custom_map_entry))
 	{
-		LOG_TRACE_FUNCW(L"warning \"{}\" has bad checksums or is blacklisted, map may not work correctly", file_name);
+		event(
+			_event_error,
+			"h2mod:map_repository: \"%ws\" has bad checksums or is blacklisted, map may not work correctly",
+			file_name
+		);
 		std::wstring fallback_name;
 		if (strnlen_s(header.name, sizeof(header.name)) > 0) {
 			wchar_t fallback_name_c[32];

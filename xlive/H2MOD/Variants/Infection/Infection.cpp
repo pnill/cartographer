@@ -5,6 +5,7 @@
 #include "game/game.h"
 #include "game/game_engine_util.h"
 #include "game/game_time.h"
+#include "game/game_options.h"
 #include "game/players.h"
 #include "interface/user_interface_controller.h"
 #include "items/item_collection_definition.h"
@@ -12,6 +13,7 @@
 #include "networking/session/network_session.h"
 #include "networking/network_event.h"
 #include "networking/network_game_definitions.h"
+#include "networking/session/network_session.h"
 #include "scenario/scenario.h"
 #include "scenario/scenario_definitions.h"
 #include "shell/shell.h"
@@ -70,25 +72,46 @@ static void set_zombie_player_status(uint64 identifier);
 
 int Infection::calculateZombiePlayerIndex()
 {
+	int32 result = NONE;
+
 	c_network_session* session = NULL;
 	network_life_cycle_in_squad_session(&session);
 
-	if (session->get_player_count() > 0)
+	uint32 player_in_game_count = 0;
+
+	// Get the number of players ingame
 	{
-		std::mt19937 mt_rand(rd());
-		std::vector<int32> activePlayersIndices = NetworkSession::GetActivePlayerIndicesList();
-		std::uniform_int_distribution<int> dist(0, session->get_player_count() - 1);
-	
-		if (activePlayersIndices.empty())
-			return NONE;
-
-		int32 infectedPlayerIndex = activePlayersIndices[dist(mt_rand)];
-		event(_event_verbose, "h2mod:infection: random infection player index: %d, with name: %ws", infectedPlayerIndex, session->get_player_name(infectedPlayerIndex));
-
-		return infectedPlayerIndex;
+		c_player_in_game_iterator player_it;
+		while (player_it.next())
+		{
+			++player_in_game_count;
+		}
 	}
 
-	return NONE;
+	if (player_in_game_count > 0)
+	{
+		std::mt19937 mt_rand(rd());
+		std::uniform_int_distribution<int> dist(0, player_in_game_count - 1);
+		const int32 active_index = dist(mt_rand);
+		
+		// Get the index in the actual array
+		{
+			c_player_in_game_iterator player_it;
+			for (int32 i = 0; player_it.next(); ++i)
+			{
+				if (i == active_index)
+				{
+					result = player_it.get_absolute_index();
+					break;
+				}
+			}
+		}
+		
+
+		event(_event_verbose, "h2mod:infection: random infection player index: %d, with name: %ws", result, session->get_player_name(result));
+	}
+
+	return result;
 }
 
 void Infection::sendTeamChange()

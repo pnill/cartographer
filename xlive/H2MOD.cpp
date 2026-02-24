@@ -20,6 +20,7 @@
 #include "game/cheats.h"
 #include "game/game.h"
 #include "game/game_globals.h"
+#include "game/game_options.h"
 #include "game/game_time.h"
 #include "game/multiplayer_globals.h"
 #include "game/player_control.h"
@@ -66,7 +67,6 @@
 #include "rasterizer/dx9/rasterizer_dx9_fog.h"
 #include "rasterizer/dx9/rasterizer_dx9_fullscreen_passes.h"
 #include "rasterizer/dx9/rasterizer_dx9_lens_flares.h"
-#include "rasterizer/dx9/rasterizer_dx9_main.h"
 #include "rasterizer/dx9/rasterizer_dx9_shader_submit_new.h"
 #include "rasterizer/dx9/rasterizer_dx9_screen_effect.h"
 #include "rasterizer/dx9/rasterizer_dx9_water.h"
@@ -112,6 +112,8 @@
 #include "H2MOD/Variants/VariantSystem.h"
 #include "H2MOD/Variants/H2X/H2X.h"
 #include "items/weapons.h"
+
+#include <chrono>
 
 /* typedefs */
 
@@ -273,7 +275,12 @@ void H2MOD::custom_sound_play(const wchar_t* soundName, int delay)
 		//std::unique_lock<std::mutex> lck(H2MOD::sound_mutex);
 		std::chrono::high_resolution_clock::time_point timePoint = std::chrono::high_resolution_clock::now() + std::chrono::milliseconds(delay);
 
-		LOG_TRACE_GAME(L"[H2MOD-SoundQueue] - attempting to play sound {0} - delaying {1} miliseconds first", soundName, delay);
+		event(
+			_event_verbose,
+			"[H2MOD-SoundQueue] - attempting to play sound %ws - delaying %d miliseconds first",
+			soundName,
+			delay
+		);
 
 		if (delay > 0)
 			std::this_thread::sleep_until(timePoint);
@@ -368,7 +375,7 @@ static void toggle_xbox_tickrate(s_game_options* options, bool toggle)
 {
 	options->game_tick_rate = toggle ? 30 : 60;
 	WriteValue<int32>(Memory::GetAddress(0x264ABB, 0x1DB8B) + 1, (int32)options->game_tick_rate);
-	LOG_TRACE_GAME("[h2mod] set game options tickrate to {}", options->game_tick_rate);
+	event(_event_verbose, "[h2mod] set game options tickrate to %hd", options->game_tick_rate);
 	return;
 }
 
@@ -456,7 +463,7 @@ static bool __cdecl OnMapLoad(s_game_options* options)
 	}
 	else
 	{
-		event(_event_status, "h2mod: engine type: {}", (int)options->game_mode);
+		event(_event_status, "h2mod: engine type: %d", (int32)options->game_mode);
 
 		if (!shell_is_dedicated_server())
 		{
@@ -725,7 +732,6 @@ static void h2mod_apply_hooks(void)
 		rasterizer_dx9_fog_apply_patches();
 		rasterizer_dx9_fullscreen_passes_apply_patches();
 		rasterizer_dx9_lens_flares_apply_patches();
-		rasterizer_dx9_main_apply_patches();
 		rasterizer_dx9_screen_effect_apply_patches();
 		rasterizer_dx9_shader_submit_new_apply_patches();
 		rasterizer_dx9_targets_apply_patches();
@@ -811,7 +817,7 @@ static int __cdecl showErrorScreen(int a1, int widget_type, int a3, __int16 a4, 
 {
 	if (widget_type == 0x117)
 	{
-		LOG_TRACE_FUNC("Ignoring need to reinstall maps");
+		//LOG_TRACE_FUNC("Ignoring need to reinstall maps");
 		return 0;
 	}
 	return p_show_error_screen(a1, widget_type, a3, a4, a5, a6);

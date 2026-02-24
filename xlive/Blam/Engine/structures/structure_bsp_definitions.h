@@ -1,20 +1,8 @@
 #pragma once
-#include "instanced_geometry_definitions.h"
-#include "leaf_map.h"
-#include "structure_audibility.h"
-#include "structure_lightmap_definitions.h"
-#include "structure_runtime_decals.h"
-
-#include "ai/path.h"
-#include "cache/predicted_resources.h"
-#include "decorators/decorator_definitions.h"
-#include "game/game_portals.h"
-#include "physics/collision_bsp_definition.h"
+#include "geometry/geometry_block.h"
+#include "geometry/geometry_definitions_new.h"
+#include "objects/object_types.h"
 #include "physics/structure_physics.h"
-#include "render/render_debug_structure.h"
-#include "render/render_water.h"
-#include "sound/sound_clusters.h"
-#include "tag_files/tag_import_definitions.h"
 
 /* constants */
 
@@ -94,7 +82,7 @@ struct cluster_portal
 	real32 bounding_radius;
 	e_cluster_portal_flags flags;
 	// max: MAXIMUM_VERTICES_PER_CLUSTER_PORTAL
-	tag_block<real_point3d> vertices;
+	s_tag_block vertices;	// struct: real_point3d
 };
 ASSERT_STRUCT_SIZE(cluster_portal, 36);
 
@@ -115,7 +103,7 @@ struct structure_weather_polyhedron
 	real_point3d bounding_sphere_center;
 	real32 bounding_sphere_radius;
 	// max: MAXIMUM_PLANES_PER_WEATHER_POLYHEDRON
-	tag_block<real_plane3d> planes;
+	s_tag_block planes;	// struct: real_plane3d
 };
 ASSERT_STRUCT_SIZE(structure_weather_polyhedron, 24);
 
@@ -124,12 +112,12 @@ struct structure_weather_palette_entry
 {
 	char name[k_tag_string_length];
 	tag_reference weather_system;   // weat
-	short pad[2];
-	int pad1[8];
+	int16 pad[2];
+	int32 pad1[8];
 	tag_reference wind;             // wind
 	real_vector3d wind_direction;
-	float wind_magnitude;
-	int pad2;
+	real32 wind_magnitude;
+	int32 pad2;
 	char wind_scale_function[k_tag_string_length];
 };
 ASSERT_STRUCT_SIZE(structure_weather_palette_entry, 136);
@@ -168,10 +156,10 @@ ASSERT_STRUCT_SIZE(detail_object_cell_definition, 32);
 // used to access dobc tag files
 struct structure_detail_object_data
 {
-	tag_block<detail_object_cell_definition> cells;
-	tag_block<detail_object> instances;
-	tag_block<detail_object_count> counts;
-	tag_block<real_vector4d> reference_z_vectors;
+	s_tag_block cells;					// struct: detail_object_cell_definition
+	s_tag_block instances;				// struct: detail_object
+	s_tag_block counts;					// struct: detail_object_count
+	s_tag_block reference_z_vectors;	// struct: real_vector4d
 	int32 pad_1;
 };
 ASSERT_STRUCT_SIZE(structure_detail_object_data, 36);
@@ -182,7 +170,7 @@ struct structure_cluster
 	geometry_section_info geometry_section_info;
 	geometry_block_info section_block_info;
 	// max: 1
-	tag_block<geometry_section> cluster_data;
+	s_tag_block cluster_data;	// struct: geometry_section
 
 	// Explaination("CLUSTER INFO", "EMPTY STRING")
 	real_rectangle3d bounds;
@@ -205,15 +193,15 @@ struct structure_cluster
 	e_structure_cluster_flags flags;
 	int16 pad_2;
 
-	tag_block<predicted_resource> predicted_resources;
+	s_tag_block predicted_resources;	//struct: predicted_resource
 	// max: MAXIMUM_CLUSTER_PORTALS_PER_CLUSTER
-	tag_block<uint16> portal_indices;
+	s_tag_block portal_indices;			// struct: uint16
 
 	int32 checksum_from_structure;
 	// max: k_maximum_instance_geometry_instances_per_cluster
-	tag_block<uint16> instanced_geometry_indices;
+	s_tag_block instanced_geometry_indices;	// struct: uint16
 	// max: MAXIMUM_STRIP_INDICES_PER_GEOMETRY_SECTION
-	tag_block<uint16> strip_indices;
+	s_tag_block strip_indices;				// struct: uint16
 	/****************************************
 	* definition_name: cluster_mopp_code_data
 	* flags: 0
@@ -287,46 +275,46 @@ ASSERT_STRUCT_SIZE(s_transparent_plane, 20);
 
 struct structure_bsp
 {
-	tag_block<tag_import_info> import_info;
+	s_tag_block import_info;			// struct: tag_import_info
 	int32 pad_1;
-	tag_block<structure_collision_material> collision_materials;
-	tag_block<collision_bsp> collision;
+	s_tag_block collision_materials;	// struct: structure_collision_material
+	s_tag_block collision;				// struct: collision_bsp
 
 	// bounds of the valid height in Z where vehicles can operate or get pushed by an unstoppable force.
 	real_bounds vehicle_z_limits;
 
-	tag_block<unused_structure_node> unused_nodes;
-	tag_block<structure_leaf> leaves;
+	s_tag_block unused_nodes;			// struct: unused_structure_node
+	s_tag_block leaves;	// struct: structure_leaf
 
 	real_rectangle3d world_bounds;
 
-	tag_block<structure_surface_reference> surface_references;
+	s_tag_block surface_references;	// struct: structure_surface_reference
 
 	data_reference cluster_data;
-	tag_block<cluster_portal> cluster_portals;
+	s_tag_block cluster_portals;		// struct: cluster_portal
 
-	tag_block<s_structure_fog_plane> fog_planes;
+	s_tag_block fog_planes;			// struct: s_structure_fog_plane
 
 	int8 pad_2[24];
 
 	s_tag_block weather_palette;	// struct: structure_weather_palette_entry
-	tag_block<structure_weather_polyhedron> weather_polyhedra;
-	tag_block<structure_detail_object_data> detail_objects;
+	s_tag_block weather_polyhedra;	// struct: structure_weather_polyhedron
+	s_tag_block detail_objects;		// struct: structure_detail_object_data
 	s_tag_block clusters;			// struct: structure_cluster
-	tag_block<geometry_material> materials;
+	s_tag_block materials;			// struct: geometry_material
 
 	// Max: MAXIMUM_SKIES_PER_SCENARIO
-	tag_block<uint16> sky_owner_cluster;
+	s_tag_block sky_owner_cluster;	// struct:uint16
 
-	tag_block<structure_conveyor_surface> conveyor_surfaces;
-	tag_block<structure_breakable_surface> breakable_surfaces;
-	tag_block<pathfinding_data> pathfinding_data;
+	s_tag_block conveyor_surfaces;	// struct: structure_conveyor_surface
+	s_tag_block breakable_surfaces;	// struct: structure_breakable_surface
+	s_tag_block pathfinding_data;	// struct: pathfinding_data
 
 	// max: MAXIMUM_EDGES_PER_COLLISION_BSP
-	tag_block<uint8> pathfinding_edges;
+	s_tag_block pathfinding_edges;	// struct: uint8
 
-	tag_block<structure_background_sound_palette_entry> background_sound_palette;
-	tag_block<structure_sound_environment_palette_entry> sound_environment_palette;
+	s_tag_block background_sound_palette;	// struct: structure_background_sound_palette_entry
+	s_tag_block sound_environment_palette;	// struct: structure_sound_environment_palette_entry
 
 	/****************************************
 	* definition_name: structure_bsp_cluster_encoded_sound_data
@@ -336,24 +324,24 @@ struct structure_bsp
 	// DataSize(131072)
 	data_reference sound_pas_data;
 
-	tag_block<structure_marker> markers;
-	tag_block<structure_runtime_decal> runtime_decals;
-	tag_block<structure_environment_object_palette_entry> environment_object_palette;
-	tag_block<structure_environment_object> environment_objects;
-	tag_block<structure_lightmap_data> lightmap_data;
+	s_tag_block markers;					// struct: structure_marker
+	s_tag_block runtime_decals;				// struct: structure_runtime_decal
+	s_tag_block environment_object_palette;	// struct: structure_environment_object_palette_entry
+	s_tag_block environment_objects;		// struct: structure_environment_object
+	s_tag_block lightmap_data;				// struct: structure_lightmap_data
 
 	uint32 pad_3;
 
-	tag_block<map_leaf> map_leaves;
-	tag_block<leaf_connection> leaf_connections;
-	tag_block<error_report_category> errors;
-	tag_block<structure_precomputed_lighting> precomputed_lighting;
-	tag_block<structure_instanced_geometry_definition> instanced_geometry_definitions;
-	tag_block< structure_instanced_geometry_instance> instanced_geometry_instances;
+	s_tag_block map_leaves;						// struct: map_leaf
+	s_tag_block leaf_connections;				// struct: leaf_connection
+	s_tag_block errors;							// struct: error_report_category
+	s_tag_block precomputed_lighting;			// struct: structure_precomputed_lighting
+	s_tag_block instanced_geometry_definitions;	// struct: structure_instanced_geometry_definition
+	s_tag_block instanced_geometry_instances;	// struct: structure_instanced_geometry_instance
 
-	tag_block<s_structure_sound_cluster> ambience_sound_clusters;
-	tag_block<s_structure_sound_cluster> reverb_sound_clusters;
-	tag_block<s_transparent_plane> transparent_planes;
+	s_tag_block ambience_sound_clusters;		// struct: s_structure_sound_cluster
+	s_tag_block reverb_sound_clusters;			// struct: s_structure_sound_cluster
+	s_tag_block transparent_planes;				// struct: s_transparent_plane
 
 	int8 pad_4[96];
 	/// Distances this far and longer from limit origin will pull you back in.
@@ -361,20 +349,20 @@ struct structure_bsp
 	/// Center of space in which vehicle can move.
 	real_point3d vehicle_spherical_limit_center;
 
-	tag_block<s_structure_debug_info> debug_info;
+	s_tag_block debug_info;	// struct: s_structure_debug_info
 
-	// TagReference("DECP")
-	tag_reference decorators;
+	tag_reference decorators;	// DECP
 
 	s_structure_physics structure_physics;
 
-	tag_block<s_water_definition> water_definitions;
-	tag_block<s_structure_portal_device_map> portal_device_map;
-	tag_block<s_structure_audibility> audibility;
-	tag_block<s_object_fake_lightprobe> fake_lightprobes;
-	tag_block<c_decorator_placement_definition> decorator_placement;
+	s_tag_block water_definitions;		// struct: s_water_definition
+	s_tag_block portal_device_map;		// struct: s_structure_portal_device_map
+	s_tag_block audibility;				// struct: s_structure_audibility
+	s_tag_block fake_lightprobes;		// struct: s_object_fake_lightprobe
+	s_tag_block decorator_placement;	// struct: c_decorator_placement_definition
 };
 ASSERT_STRUCT_SIZE(structure_bsp, 572);
 
 int16 get_global_structure_bsp_index(void);
+
 structure_bsp* get_global_structure_bsp(void);

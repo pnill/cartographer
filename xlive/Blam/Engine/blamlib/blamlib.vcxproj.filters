@@ -1,0 +1,1353 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\bitmaps\bitmaps.cpp">
+      <Filter>bitmaps</Filter>
+    </ClCompile>
+    <ClCompile Include="..\bitmaps\bitmap_group.cpp">
+      <Filter>bitmaps</Filter>
+    </ClCompile>
+    <ClCompile Include="..\bitmaps\bitmap_utilities.cpp">
+      <Filter>bitmaps</Filter>
+    </ClCompile>
+    <ClCompile Include="..\bitmaps\targa_file.cpp">
+      <Filter>bitmaps</Filter>
+    </ClCompile>
+    <ClCompile Include="..\bitmaps\tiff_file.cpp">
+      <Filter>bitmaps</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cache\cache_files.cpp">
+      <Filter>cache</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cache\cache_files_windows.cpp">
+      <Filter>cache</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cache\cache_file_verification.cpp">
+      <Filter>cache</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cache\pc_geometry_cache.cpp">
+      <Filter>cache</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cache\pc_texture_cache.cpp">
+      <Filter>cache</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cache\phyical_memory_map.cpp">
+      <Filter>cache</Filter>
+    </ClCompile>
+    <ClCompile Include="..\camera\camera.cpp">
+      <Filter>camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\camera\dead_camera.cpp">
+      <Filter>camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\camera\director.cpp">
+      <Filter>camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\camera\editor_camera.cpp">
+      <Filter>camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\camera\first_person_camera.cpp">
+      <Filter>camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\camera\following_camera.cpp">
+      <Filter>camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\camera\observer.cpp">
+      <Filter>camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cartographer\config\endpoints.cpp">
+      <Filter>cartographer\config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cartographer\discord\discord_interface.cpp">
+      <Filter>cartographer\discord</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cartographer\tag_fixes\tag_fixes.cpp">
+      <Filter>cartographer\tag_fixes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cartographer\twizzler\twizzler.cpp">
+      <Filter>cartographer\twizzler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cartographer\cartographer.cpp">
+      <Filter>cartographer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cseries\async.cpp">
+      <Filter>cseries</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cseries\async_helpers.cpp">
+      <Filter>cseries</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cseries\cseries.cpp">
+      <Filter>cseries</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cseries\cseries_errors.cpp">
+      <Filter>cseries</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cseries\cseries_system_memory.cpp">
+      <Filter>cseries</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cseries\cseries_windows.cpp">
+      <Filter>cseries</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cseries\cseries_windows_debug.cpp">
+      <Filter>cseries</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cseries\cseries_windows_debug_pc.cpp">
+      <Filter>cseries</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cseries\cseries_windows_minidump.cpp">
+      <Filter>cseries</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cseries\cseries_windows_minidump_logs.cpp">
+      <Filter>cseries</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cseries\cseries_windows_modules.cpp">
+      <Filter>cseries</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cseries\debug_memory.cpp">
+      <Filter>cseries</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cseries\profile.cpp">
+      <Filter>cseries</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cseries\runtime_state.cpp">
+      <Filter>cseries</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cseries\sort.cpp">
+      <Filter>cseries</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cseries\stack_walk_windows.cpp">
+      <Filter>cseries</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cseries\threads_windows.cpp">
+      <Filter>cseries</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cutscene\cinematics.cpp">
+      <Filter>cutscene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cutscene\recorded_animations.cpp">
+      <Filter>cutscene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\data_mining\data_mining.cpp">
+      <Filter>data_mining</Filter>
+    </ClCompile>
+    <ClCompile Include="..\debug\menu\debug_menu_main.cpp">
+      <Filter>debug\menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dialogs\edit_text.cpp">
+      <Filter>dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editor\editor_stubs.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\animations\animation_channel.cpp">
+      <Filter>animations</Filter>
+    </ClCompile>
+    <ClCompile Include="..\animations\animation_definitions.cpp">
+      <Filter>animations</Filter>
+    </ClCompile>
+    <ClCompile Include="..\animations\animation_id.cpp">
+      <Filter>animations</Filter>
+    </ClCompile>
+    <ClCompile Include="..\animations\animation_interpolation.cpp">
+      <Filter>animations</Filter>
+    </ClCompile>
+    <ClCompile Include="..\animations\animation_manager.cpp">
+      <Filter>animations</Filter>
+    </ClCompile>
+    <ClCompile Include="..\animations\ik_point_iterator.cpp">
+      <Filter>animations</Filter>
+    </ClCompile>
+    <ClCompile Include="..\bink\wmv_playback.cpp">
+      <Filter>bink</Filter>
+    </ClCompile>
+    <ClCompile Include="..\filesys\pc_file_system.cpp">
+      <Filter>filesys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\aim_assist.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\cheats.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\game.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\game_allegiance.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\game_engine.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\game_engine_simulation.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\game_engine_util.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\game_globals.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\game_grief.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\game_options.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\game_results.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\game_statborg.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\game_time.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\players.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\player_control.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\player_mapping.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\player_vibration.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\preferences.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hs\hs.cpp">
+      <Filter>hs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hs\hs_compile.cpp">
+      <Filter>hs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hs\hs_function.cpp">
+      <Filter>hs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hs\hs_globals_external.cpp">
+      <Filter>hs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hs\hs_runtime.cpp">
+      <Filter>hs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hs\object_lists.cpp">
+      <Filter>hs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\input\controllers.cpp">
+      <Filter>input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\input\input_abstraction.cpp">
+      <Filter>input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\input\input_process.cpp">
+      <Filter>input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\input\input_windows.cpp">
+      <Filter>input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\input\input_xinput.cpp">
+      <Filter>input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kablam\kablam.cpp">
+      <Filter>kablam</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kablam\kablamsvc_client.cpp">
+      <Filter>kablam</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kablam\kablam_config.cpp">
+      <Filter>kablam</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kablam\kablam_log.cpp">
+      <Filter>kablam</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\console.cpp">
+      <Filter>main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\debug_keys.cpp">
+      <Filter>main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\game_preferences.cpp">
+      <Filter>main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\interpolator.cpp">
+      <Filter>main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\levels.cpp">
+      <Filter>main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\licensing.cpp">
+      <Filter>main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\loading.cpp">
+      <Filter>main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\main.cpp">
+      <Filter>main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\main_game.cpp">
+      <Filter>main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\main_render.cpp">
+      <Filter>main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\main_screenshot.cpp">
+      <Filter>main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\main_time.cpp">
+      <Filter>main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\map_repository.cpp">
+      <Filter>main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\math\color_math.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\math\function_definitions.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\math\matrix_math.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\math\periodic_functions.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\math\random_direction_table.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\math\random_math.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\math\real_math.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\math\real_quantization.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\memory\bitstream.cpp">
+      <Filter>memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\memory\data.cpp">
+      <Filter>memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\memory\lruv_cache.cpp">
+      <Filter>memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\memory\memory_pool.cpp">
+      <Filter>memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\memory\rockall_heap_manager.cpp">
+      <Filter>memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\memory\static_arrays.cpp">
+      <Filter>memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\models\model_definitions.cpp">
+      <Filter>models</Filter>
+    </ClCompile>
+    <ClCompile Include="..\models\render_models.cpp">
+      <Filter>models</Filter>
+    </ClCompile>
+    <ClCompile Include="..\multithreading\synchronization.cpp">
+      <Filter>multithreading</Filter>
+    </ClCompile>
+    <ClCompile Include="..\physics\character_physics_mode_ground.cpp">
+      <Filter>physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\physics\character_physics_mode_melee.cpp">
+      <Filter>physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\physics\collisions.cpp">
+      <Filter>physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\physics\collision_bsp.cpp">
+      <Filter>physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\physics\collision_model_definitions.cpp">
+      <Filter>physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\physics\collision_usage.cpp">
+      <Filter>physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\physics\havok.cpp">
+      <Filter>physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\physics\havok_memory.cpp">
+      <Filter>physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\physics\impacts.cpp">
+      <Filter>physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\physics\physics_constants.cpp">
+      <Filter>physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\physics\physics_model_definitions.cpp">
+      <Filter>physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sapien\editor.cpp">
+      <Filter>sapien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sapien\patches_initialize.cpp">
+      <Filter>sapien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\scenario\scenario.cpp">
+      <Filter>scenario</Filter>
+    </ClCompile>
+    <ClCompile Include="..\scenario\scenario_fog.cpp">
+      <Filter>scenario</Filter>
+    </ClCompile>
+    <ClCompile Include="..\scenario\scenario_interpolators.cpp">
+      <Filter>scenario</Filter>
+    </ClCompile>
+    <ClCompile Include="..\scenario\scenario_kill_trigger_volumes.cpp">
+      <Filter>scenario</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sound\game_sound.cpp">
+      <Filter>sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sound\game_sound_deterministic.cpp">
+      <Filter>sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sound\sound_cache_file_definitions.cpp">
+      <Filter>sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sound\sound_manager.cpp">
+      <Filter>sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\structures\cluster_partitions.cpp">
+      <Filter>structures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\structures\structures.cpp">
+      <Filter>structures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\structures\structure_bsp_definitions.cpp">
+      <Filter>structures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tag_files\tag_loader\xml\xml_definition_loader.cpp">
+      <Filter>tag_files\tag_loader\xml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tag_files\tag_loader\xml\xml_agent.cpp">
+      <Filter>tag_files\tag_loader\xml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tag_files\tag_loader\xml\xml_definition_block.cpp">
+      <Filter>tag_files\tag_loader\xml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tag_files\tag_loader\tag_injection_table.cpp">
+      <Filter>tag_files\tag_loader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tag_files\tag_loader\tag_injection.cpp">
+      <Filter>tag_files\tag_loader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tag_files\tag_loader\tag_injection_manager.cpp">
+      <Filter>tag_files\tag_loader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tag_files\files.cpp">
+      <Filter>tag_files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tag_files\files_windows.cpp">
+      <Filter>tag_files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tag_files\tag_files.cpp">
+      <Filter>tag_files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tag_files\tag_group_dependencies.cpp">
+      <Filter>tag_files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tag_files\tag_groups.cpp">
+      <Filter>tag_files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\text\text_group.cpp">
+      <Filter>text</Filter>
+    </ClCompile>
+    <ClCompile Include="..\text\unicode.cpp">
+      <Filter>text</Filter>
+    </ClCompile>
+    <ClCompile Include="..\text\draw_string.cpp">
+      <Filter>text</Filter>
+    </ClCompile>
+    <ClCompile Include="..\text\font_cache.cpp">
+      <Filter>text</Filter>
+    </ClCompile>
+    <ClCompile Include="..\text\font_group.cpp">
+      <Filter>text</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tool\tool_patches_initialize.cpp">
+      <Filter>tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shell\windows\crash_report_window\crash_report_window.cpp">
+      <Filter>shell\windows\crash_report_window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shell\shell_windows.cpp">
+      <Filter>shell</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shell\shell_windows_internals.cpp">
+      <Filter>shell</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shell\shell_windows_pcc.cpp">
+      <Filter>shell</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shell\shell.cpp">
+      <Filter>shell</Filter>
+    </ClCompile>
+    <ClCompile Include="..\saved_games\saved_game_files_async_windows.cpp">
+      <Filter>saved_games</Filter>
+    </ClCompile>
+    <ClCompile Include="..\saved_games\game_state.cpp">
+      <Filter>saved_games</Filter>
+    </ClCompile>
+    <ClCompile Include="..\saved_games\game_state_procs.cpp">
+      <Filter>saved_games</Filter>
+    </ClCompile>
+    <ClCompile Include="..\saved_games\game_variant.cpp">
+      <Filter>saved_games</Filter>
+    </ClCompile>
+    <ClCompile Include="..\saved_games\player_profile.cpp">
+      <Filter>saved_games</Filter>
+    </ClCompile>
+    <ClCompile Include="..\saved_games\saved_game_files.cpp">
+      <Filter>saved_games</Filter>
+    </ClCompile>
+    <ClCompile Include="..\saved_games\cartographer_player_profile\cartographer_player_profile_weapon_offsets.cpp">
+      <Filter>saved_games\cartographer_player_profile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\saved_games\cartographer_player_profile\cartographer_player_profile.cpp">
+      <Filter>saved_games\cartographer_player_profile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\achievements\achievement_live_interface.cpp">
+      <Filter>achievements</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>blamlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\math\integer_math.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shell\shell_windows_ipc.cpp">
+      <Filter>shell</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\bitmaps\bitmaps.h">
+      <Filter>bitmaps</Filter>
+    </ClInclude>
+    <ClInclude Include="..\bitmaps\bitmap_group.h">
+      <Filter>bitmaps</Filter>
+    </ClInclude>
+    <ClInclude Include="..\bitmaps\bitmap_utilities.h">
+      <Filter>bitmaps</Filter>
+    </ClInclude>
+    <ClInclude Include="..\bitmaps\targa_file.h">
+      <Filter>bitmaps</Filter>
+    </ClInclude>
+    <ClInclude Include="..\bitmaps\tiff_file.h">
+      <Filter>bitmaps</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cache\cache_files.h">
+      <Filter>cache</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cache\cache_files_windows.h">
+      <Filter>cache</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cache\cache_file_verification.h">
+      <Filter>cache</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cache\pc_geometry_cache.h">
+      <Filter>cache</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cache\pc_texture_cache.h">
+      <Filter>cache</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cache\physical_memory_map.h">
+      <Filter>cache</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cache\predicted_resources.h">
+      <Filter>cache</Filter>
+    </ClInclude>
+    <ClInclude Include="..\camera\camera.h">
+      <Filter>camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\camera\camera_track_definition.h">
+      <Filter>camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\camera\dead_camera.h">
+      <Filter>camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\camera\director.h">
+      <Filter>camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\camera\editor_camera.h">
+      <Filter>camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\camera\first_person_camera.h">
+      <Filter>camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\camera\following_camera.h">
+      <Filter>camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\camera\observer.h">
+      <Filter>camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cartographer\config\endpoints.h">
+      <Filter>cartographer\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cartographer\discord\discord_interface.h">
+      <Filter>cartographer\discord</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cartographer\tag_fixes\tag_fixes.h">
+      <Filter>cartographer\tag_fixes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cartographer\twizzler\twizzler.h">
+      <Filter>cartographer\twizzler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cartographer\cartographer.h">
+      <Filter>cartographer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cseries\async.h">
+      <Filter>cseries</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cseries\async_helpers.h">
+      <Filter>cseries</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cseries\cseries.h">
+      <Filter>cseries</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cseries\cseries_errors.h">
+      <Filter>cseries</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cseries\cseries_system_memory.h">
+      <Filter>cseries</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cseries\cseries_windows.h">
+      <Filter>cseries</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cseries\cseries_windows_debug.h">
+      <Filter>cseries</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cseries\cseries_windows_debug_pc.h">
+      <Filter>cseries</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cseries\cseries_windows_minidump.h">
+      <Filter>cseries</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cseries\cseries_windows_minidump_logs.h">
+      <Filter>cseries</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cseries\cseries_windows_modules.h">
+      <Filter>cseries</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cseries\debug_memory.h">
+      <Filter>cseries</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cseries\profile.h">
+      <Filter>cseries</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cseries\runtime_state.h">
+      <Filter>cseries</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cseries\sort.h">
+      <Filter>cseries</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cseries\stack_walk_windows.h">
+      <Filter>cseries</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cseries\threads_windows.h">
+      <Filter>cseries</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cutscene\cinematics.h">
+      <Filter>cutscene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cutscene\cinematics_definitions.h">
+      <Filter>cutscene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cutscene\recorded_animations.h">
+      <Filter>cutscene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cutscene\recorded_animation_definitions.h">
+      <Filter>cutscene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\data_mining\data_mining.h">
+      <Filter>data_mining</Filter>
+    </ClInclude>
+    <ClInclude Include="..\debug\menu\debug_menu_main.h">
+      <Filter>debug\menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dialogs\edit_text.h">
+      <Filter>dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editor\editor_flags.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editor\editor_stubs.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\animations\animation_channel.h">
+      <Filter>animations</Filter>
+    </ClInclude>
+    <ClInclude Include="..\animations\animation_definitions.h">
+      <Filter>animations</Filter>
+    </ClInclude>
+    <ClInclude Include="..\animations\animation_id.h">
+      <Filter>animations</Filter>
+    </ClInclude>
+    <ClInclude Include="..\animations\animation_interpolation.h">
+      <Filter>animations</Filter>
+    </ClInclude>
+    <ClInclude Include="..\animations\animation_manager.h">
+      <Filter>animations</Filter>
+    </ClInclude>
+    <ClInclude Include="..\animations\ik_point_iterator.h">
+      <Filter>animations</Filter>
+    </ClInclude>
+    <ClInclude Include="..\bink\wmv_playback.h">
+      <Filter>bink</Filter>
+    </ClInclude>
+    <ClInclude Include="..\errors\error_reports.h">
+      <Filter>errors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filesys\pc_file_system.h">
+      <Filter>filesys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\filesys\pc_saved_game.h">
+      <Filter>filesys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\aim_assist.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\cheats.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\game.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\game_allegiance.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\game_engine.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\game_engine_simulation.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\game_engine_spawning.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\game_engine_territories.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\game_engine_util.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\game_globals.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\game_grief.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\game_options.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\game_portals.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\game_results.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\game_statborg.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\game_time.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\materials.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\multiplayer_globals.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\players.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\player_constants.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\player_control.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\player_mapping.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\player_vibration.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\preferences.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\geometry_block.h">
+      <Filter>geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\geometry_definitions_new.h">
+      <Filter>geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hs\hs.h">
+      <Filter>hs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hs\hs_compile.h">
+      <Filter>hs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hs\hs_function.h">
+      <Filter>hs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hs\hs_globals_external.h">
+      <Filter>hs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hs\hs_library_internal_compile.h">
+      <Filter>hs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hs\hs_library_internal_runtime.h">
+      <Filter>hs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hs\hs_runtime.h">
+      <Filter>hs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hs\hs_unit_seats.h">
+      <Filter>hs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hs\object_lists.h">
+      <Filter>hs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\input\controllers.h">
+      <Filter>input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\input\input_abstraction.h">
+      <Filter>input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\input\input_constants.h">
+      <Filter>input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\input\input_process.h">
+      <Filter>input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\input\input_windows.h">
+      <Filter>input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\input\input_xinput.h">
+      <Filter>input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kablam\kablam.h">
+      <Filter>kablam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kablam\kablamsvc_client.h">
+      <Filter>kablam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kablam\kablam_config.h">
+      <Filter>kablam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kablam\kablam_log.h">
+      <Filter>kablam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\console.h">
+      <Filter>main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\debug_keys.h">
+      <Filter>main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\game_preferences.h">
+      <Filter>main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\interpolator.h">
+      <Filter>main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\levels.h">
+      <Filter>main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\level_definitions.h">
+      <Filter>main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\licensing.h">
+      <Filter>main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\loading.h">
+      <Filter>main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\main.h">
+      <Filter>main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\main_game.h">
+      <Filter>main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\main_render.h">
+      <Filter>main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\main_screenshot.h">
+      <Filter>main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\main_time.h">
+      <Filter>main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\map_manager.h">
+      <Filter>main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\map_repository.h">
+      <Filter>main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\math\color_math.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\math\crypto_windows.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\math\function_definitions.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\math\integer_math.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\math\matrix_math.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\math\periodic_functions.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\math\random_direction_table.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\math\random_math.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\math\real_math.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\math\real_quantization.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\memory\bitstream.h">
+      <Filter>memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\memory\data.h">
+      <Filter>memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\memory\hashtable.h">
+      <Filter>memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\memory\lruv_cache.h">
+      <Filter>memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\memory\memory_pool.h">
+      <Filter>memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\memory\rockall_heap_manager.h">
+      <Filter>memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\memory\static_arrays.h">
+      <Filter>memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\models\models.h">
+      <Filter>models</Filter>
+    </ClInclude>
+    <ClInclude Include="..\models\model_definitions.h">
+      <Filter>models</Filter>
+    </ClInclude>
+    <ClInclude Include="..\models\render_models.h">
+      <Filter>models</Filter>
+    </ClInclude>
+    <ClInclude Include="..\models\render_model_definitions.h">
+      <Filter>models</Filter>
+    </ClInclude>
+    <ClInclude Include="..\multithreading\synchronization.h">
+      <Filter>multithreading</Filter>
+    </ClInclude>
+    <ClInclude Include="..\physics\breakable_surface_definitions.h">
+      <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\physics\character_physics_definitions.h">
+      <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\physics\character_physics_mode_ground.h">
+      <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\physics\character_physics_mode_melee.h">
+      <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\physics\collisions.h">
+      <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\physics\collision_bsp.h">
+      <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\physics\collision_bsp_definition.h">
+      <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\physics\collision_models.h">
+      <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\physics\collision_model_definitions.h">
+      <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\physics\collision_usage.h">
+      <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\physics\havok.h">
+      <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\physics\havok_component.h">
+      <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\physics\havok_memory.h">
+      <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\physics\impacts.h">
+      <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\physics\physics_constants.h">
+      <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\physics\physics_models.h">
+      <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\physics\physics_model_definitions.h">
+      <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\physics\structure_physics.h">
+      <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sapien\editor.h">
+      <Filter>sapien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sapien\patches_initialize.h">
+      <Filter>sapien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scenario\scenario.h">
+      <Filter>scenario</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scenario\scenario_definitions.h">
+      <Filter>scenario</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scenario\scenario_fog.h">
+      <Filter>scenario</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scenario\scenario_interpolators.h">
+      <Filter>scenario</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scenario\scenario_kill_trigger_volumes.h">
+      <Filter>scenario</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scenario\scenario_lights.h">
+      <Filter>scenario</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sound\game_sound.h">
+      <Filter>sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sound\game_sound_deterministic.h">
+      <Filter>sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sound\sound_cache_file_definitions.h">
+      <Filter>sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sound\sound_classes.h">
+      <Filter>sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sound\sound_clusters.h">
+      <Filter>sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sound\sound_definitions.h">
+      <Filter>sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sound\sound_manager.h">
+      <Filter>sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sound\sound_scenery.h">
+      <Filter>sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\structures\cluster_partitions.h">
+      <Filter>structures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\structures\instanced_geometry_definitions.h">
+      <Filter>structures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\structures\leaf_map.h">
+      <Filter>structures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\structures\structures.h">
+      <Filter>structures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\structures\structure_audibility.h">
+      <Filter>structures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\structures\structure_bsp_definitions.h">
+      <Filter>structures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\structures\structure_lightmap.h">
+      <Filter>structures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\structures\structure_lightmap_definitions.h">
+      <Filter>structures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\structures\structure_runtime_decals.h">
+      <Filter>structures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tag_files\tag_loader\xml\xml_definition_block.h">
+      <Filter>tag_files\tag_loader\xml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tag_files\tag_loader\xml\xml_definition_loader.h">
+      <Filter>tag_files\tag_loader\xml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tag_files\tag_loader\xml\xml_agent.h">
+      <Filter>tag_files\tag_loader\xml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tag_files\tag_loader\tag_injection_table.h">
+      <Filter>tag_files\tag_loader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tag_files\tag_loader\tag_injection.h">
+      <Filter>tag_files\tag_loader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tag_files\tag_loader\tag_injection_define.h">
+      <Filter>tag_files\tag_loader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tag_files\tag_loader\tag_injection_manager.h">
+      <Filter>tag_files\tag_loader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tag_files\tag_groups.h">
+      <Filter>tag_files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tag_files\tag_import_definitions.h">
+      <Filter>tag_files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tag_files\tag_reference.h">
+      <Filter>tag_files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tag_files\data_reference.h">
+      <Filter>tag_files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tag_files\files.h">
+      <Filter>tag_files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tag_files\files_windows.h">
+      <Filter>tag_files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tag_files\tag_block.h">
+      <Filter>tag_files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tag_files\tag_files.h">
+      <Filter>tag_files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tag_files\tag_group_access.h">
+      <Filter>tag_files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tag_files\tag_group_dependencies.h">
+      <Filter>tag_files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\text\text.h">
+      <Filter>text</Filter>
+    </ClInclude>
+    <ClInclude Include="..\text\text_group.h">
+      <Filter>text</Filter>
+    </ClInclude>
+    <ClInclude Include="..\text\unicode.h">
+      <Filter>text</Filter>
+    </ClInclude>
+    <ClInclude Include="..\text\draw_string.h">
+      <Filter>text</Filter>
+    </ClInclude>
+    <ClInclude Include="..\text\font_cache.h">
+      <Filter>text</Filter>
+    </ClInclude>
+    <ClInclude Include="..\text\font_group.h">
+      <Filter>text</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tool\tool_patches_initialize.h">
+      <Filter>tool</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shell\windows\crash_report_window\crash_report_window.h">
+      <Filter>shell\windows\crash_report_window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shell\shell_windows.h">
+      <Filter>shell</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shell\shell_windows_internals.h">
+      <Filter>shell</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shell\shell_windows_pcc.h">
+      <Filter>shell</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shell\shell.h">
+      <Filter>shell</Filter>
+    </ClInclude>
+    <ClInclude Include="..\saved_games\saved_game_files.h">
+      <Filter>saved_games</Filter>
+    </ClInclude>
+    <ClInclude Include="..\saved_games\saved_game_files_async_windows.h">
+      <Filter>saved_games</Filter>
+    </ClInclude>
+    <ClInclude Include="..\saved_games\game_state.h">
+      <Filter>saved_games</Filter>
+    </ClInclude>
+    <ClInclude Include="..\saved_games\game_state_procs.h">
+      <Filter>saved_games</Filter>
+    </ClInclude>
+    <ClInclude Include="..\saved_games\game_variant.h">
+      <Filter>saved_games</Filter>
+    </ClInclude>
+    <ClInclude Include="..\saved_games\player_profile.h">
+      <Filter>saved_games</Filter>
+    </ClInclude>
+    <ClInclude Include="..\saved_games\saved_film.h">
+      <Filter>saved_games</Filter>
+    </ClInclude>
+    <ClInclude Include="..\saved_games\cartographer_player_profile\cartographer_player_profile_weapon_offsets.h">
+      <Filter>saved_games\cartographer_player_profile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\saved_games\cartographer_player_profile\cartographer_player_profile.h">
+      <Filter>saved_games\cartographer_player_profile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\achievements\achievement_live_interface.h">
+      <Filter>achievements</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>blamlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shell\shell_windows_ipc.h">
+      <Filter>shell</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="blamlib">
+      <UniqueIdentifier>{3034d9dc-244c-4c2d-90cb-ae81d482261e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="animations">
+      <UniqueIdentifier>{c92a5917-94f5-44b4-a4c9-026559670290}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="bink">
+      <UniqueIdentifier>{20ee95bd-eb91-46b7-a4ce-c3368cf5d971}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="bitmaps">
+      <UniqueIdentifier>{65e7aa36-66af-442f-8f92-9995f9269449}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cache">
+      <UniqueIdentifier>{cb78246a-fa0b-4c86-8768-d159f3a21f1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="camera">
+      <UniqueIdentifier>{933681ff-a5a4-4d9f-b4a7-1973698a881b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cartographer">
+      <UniqueIdentifier>{742a9f9c-5f58-4090-881a-4a29ead689dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cartographer\config">
+      <UniqueIdentifier>{b311f6f3-7eb5-4b2d-9f4a-56ea3e29c8d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cartographer\discord">
+      <UniqueIdentifier>{4906cc12-0170-4fce-905d-b8d49b46d1bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cartographer\tag_fixes">
+      <UniqueIdentifier>{e4c16522-2f8d-4e61-b5b1-03c8ad05b3ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cartographer\twizzler">
+      <UniqueIdentifier>{f15bd62c-b4ad-4f52-9d8c-a881d9860341}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cseries">
+      <UniqueIdentifier>{f98edf72-9212-48d5-a753-7f07cfe51b41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cutscene">
+      <UniqueIdentifier>{db18efa1-a027-4d7a-98ad-5a75649a1e65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="data_mining">
+      <UniqueIdentifier>{c03128a4-f331-4c45-bda9-62235cc66054}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="debug">
+      <UniqueIdentifier>{a9294b30-8864-4c23-8139-bc2abdc4a2db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="debug\menu">
+      <UniqueIdentifier>{063a1690-6706-4c6a-9149-89cd2e085d47}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dialogs">
+      <UniqueIdentifier>{12cb21c6-58dc-49e1-9bd8-ecd2db716641}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor">
+      <UniqueIdentifier>{0f41d122-ff72-4db6-8455-17fa9dfa94ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="errors">
+      <UniqueIdentifier>{9392bed6-148e-4ccd-8ab6-6b75e0a82b0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="filesys">
+      <UniqueIdentifier>{70cd1dca-e5cb-4030-9ed3-e0324d0ab586}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="game">
+      <UniqueIdentifier>{429bc98f-1600-496e-9474-b45048a2733a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="geometry">
+      <UniqueIdentifier>{36c1a4b0-2d90-4fed-9dd7-277742e1c7d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hs">
+      <UniqueIdentifier>{b042c9e1-76bb-4c06-8981-c7943ad9d12d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="input">
+      <UniqueIdentifier>{ae2f1b32-3738-4cad-939d-1c103e138c80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="kablam">
+      <UniqueIdentifier>{cfbbea73-1bdb-4a40-b924-1d1be793cb6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="main">
+      <UniqueIdentifier>{10f83023-8317-4f87-8794-ff588e9635a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="math">
+      <UniqueIdentifier>{be31aef3-a831-45ea-ab6a-0052c27882b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="memory">
+      <UniqueIdentifier>{eb33dc5b-eff6-475f-b2aa-028c0aa2b57e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="models">
+      <UniqueIdentifier>{018719d1-3a0d-4a38-b95a-06ba05698e79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="multithreading">
+      <UniqueIdentifier>{a0613a1d-81bf-45c5-8e5c-6c5a628c30cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="physics">
+      <UniqueIdentifier>{33424ad7-daad-4df1-8340-933fc10dd502}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sapien">
+      <UniqueIdentifier>{9e1c2769-2732-43b7-8951-bdbd6355f084}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scenario">
+      <UniqueIdentifier>{6e7eb2b8-d3e3-4595-9ba9-053285eb0acc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sound">
+      <UniqueIdentifier>{ef07ac1c-b9dd-4f06-8f50-a471b22c7769}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="structures">
+      <UniqueIdentifier>{7f43c1f6-32ff-4091-8043-8ad98628be01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tag_files">
+      <UniqueIdentifier>{29d88656-6ef4-4af5-acb0-3ae3894776ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tag_files\tag_loader">
+      <UniqueIdentifier>{ec4db9d0-5368-4476-a109-decd95e5c982}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tag_files\tag_loader\xml">
+      <UniqueIdentifier>{a1c3e080-d37c-449e-8034-50fa3a209f13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="text">
+      <UniqueIdentifier>{87c5c26c-9b6f-44e7-9787-98e6d06e1c35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tool">
+      <UniqueIdentifier>{472c56bb-f2de-4dc9-9b14-5813698ac883}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shell">
+      <UniqueIdentifier>{89e63182-9e93-41ea-ba72-964356a9fa97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shell\windows">
+      <UniqueIdentifier>{ad10f891-f8cd-4c90-a019-5ce2552f5157}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shell\windows\crash_report_window">
+      <UniqueIdentifier>{38defa8e-6a8a-409c-b10b-0978f5047f05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="saved_games">
+      <UniqueIdentifier>{b4192f42-c337-40be-aa43-c427657c6b98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="saved_games\cartographer_player_profile">
+      <UniqueIdentifier>{e61aff89-4a91-4be1-bad6-d1a5dcf4e35e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="achievements">
+      <UniqueIdentifier>{cd5883d9-f002-410c-8986-4679149bf8f2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

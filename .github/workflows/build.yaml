@@ -78,4 +78,4 @@ jobs:
         path: |
             ./Halo2/xlive.dll
             ./Halo2/xlive.map
-            ./xlive/objects/${{matrix.BUILD_CONFIGURATION}}/xlive.pdb
+            ./objects/${{matrix.BUILD_CONFIGURATION}}/xlive/xlive.pdb

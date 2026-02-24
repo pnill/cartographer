@@ -1,6 +1,4 @@
 #pragma once
-#include "game_options.h"
-#include "structures/cluster_partitions.h"
 
 /* constants */
 
@@ -14,41 +12,38 @@ enum
 	k_game_maximum_players_to_allow_ragdolls_new = 16
 };
 
+/* enums */
+
+enum e_game_simulation : int8
+{
+	_game_simulation_none = 0,
+	_game_simulation_local,
+	_game_simulation_synchronous_client,
+	_game_simulation_synchronous_server,
+	_game_simulation_distributed_client,
+	_game_simulation_distributed_server,
+	k_game_simulation_count,
+};
+
+enum e_game_mode : int32
+{
+	_game_mode_none = 0,
+	_game_mode_campaign,
+	_game_mode_multiplayer,
+	_game_mode_ui_shell,
+	_game_mode_tool,
+	k_game_mode_count
+};
+
 /* typedefs */
 
 typedef void(__cdecl* t_initialize_proc)(void);
 typedef void(__cdecl* t_dispose_proc)(void);
 typedef void(__cdecl* t_initialize_for_new_map_proc)(void);
 typedef void(__cdecl* t_dispose_from_old_map_proc)(void);
-typedef void(__cdecl* t_activation_proc)(s_game_cluster_bit_vectors*, s_game_cluster_bit_vectors*);
+typedef void(__cdecl* t_activation_proc)(struct s_game_cluster_bit_vectors*, struct s_game_cluster_bit_vectors*);
 
 /* structures */
-
-struct game_globals_storage
-{
-	bool initializing;
-	bool map_active;
-	int16 active_structure_bsp_index;
-	int32 unused_0;
-	s_game_options options;
-	bool game_in_progress;
-	bool game_is_lost;
-	int32 ticks_to_reset_game;
-	bool game_is_finished;
-	bool game_sounds_disabled;
-	int16 pad_1;
-	uint32 ticks_till_end;
-	int32 game_ragdoll_count;
-	int32 unused_1;
-	s_game_cluster_bit_vectors cluster_pvs;
-	s_game_cluster_bit_vectors cluster_pvs_local;
-	s_game_cluster_bit_vectors cluster_activation;
-	uint8 enable_scripted_camera_pvs;
-	uint8 pad_2;
-	uint16 pvs_activation_mode;
-	datum pvs_object_datum;
-};
-ASSERT_STRUCT_SIZE(game_globals_storage, 0x1270);
 
 struct s_game_systems
 {
@@ -80,11 +75,9 @@ void game_apply_pre_winmain_patches(void);
 
 s_game_systems* get_game_systems(void);
 
-game_globals_storage* get_main_game_globals(void);
-
 bool map_initialized(void);
-s_game_options* game_options_get(void);
-s_game_variant* current_game_variant(void);
+struct s_game_options* game_options_get(void);
+struct s_game_variant* current_game_variant(void);
 e_game_mode game_mode_get(void);
 bool game_in_editor(void);
 int16 game_get_active_structure_bsp_index();
@@ -110,7 +103,7 @@ bool game_is_authoritative(void);
 s_game_cluster_bit_vectors* game_get_cluster_activation(void);
 
 // Setup default player data in the game options structure
-void __cdecl game_options_setup_default_players(int32 player_count, s_game_options* game_options);
+void __cdecl game_options_setup_default_players(int32 player_count, struct s_game_options* game_options);
 
 void game_time_get_date_and_time(s_date_and_time* date_and_time);
 
@@ -124,9 +117,11 @@ void __cdecl game_tick(void);
 
 void __cdecl game_update(int32 desired_ticks, real32* elapsed_game_dt);
 
-void __cdecl game_initialize_for_new_map(const s_game_options* options);
+void __cdecl game_initialize_for_new_map(const struct s_game_options* options);
 
 void __cdecl game_frame(real32 dt);
+
+void cartographer_dump_game_globals_info(struct _iobuf* file);
 
 /* globals */
 

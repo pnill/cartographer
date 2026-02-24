@@ -11,7 +11,6 @@
 #include "networking/session/network_session.h"
 #include "networking/session/network_session_manager.h"
 #include "networking/session/network_observer.h"
-#include "networking/transport/transport_security.h"
 #include "networking/network_event.h"
 
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
@@ -260,7 +259,7 @@ void c_network_message_handler::handle_request_map_filename(const transport_addr
 			if (mapManager->GetMapFilename(map_filename))
 			{
 				session->get_transport_session_id(&data.session_data.identifier);
-				wcsncpy_s(data.file_name, map_filename.c_str(), map_filename.length());
+				ustrncpy(data.file_name, map_filename.c_str(), map_filename.length());
 				data.map_download_id = received_data->map_download_id;
 
 				event(

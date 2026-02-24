@@ -6,7 +6,8 @@
 #include "simulation/simulation_world.h"
 #include "simulation/simulation_gamestate_entities.h"
 
-#include "H2MOD/GUI/ImGui_Integration/Console/ImGui_ConsoleImpl.h"
+//#include "H2MOD/GUI/ImGui_Integration/Console/ImGui_ConsoleImpl.h"
+#define SIM_EVENT_QUEUE_DBG(...)
 
 #include "memory/bitstream.h"
 

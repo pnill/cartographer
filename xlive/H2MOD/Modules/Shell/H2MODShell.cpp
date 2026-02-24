@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "H2MODShell.h"
 
+#include "networking/network_event.h"
+
 void _Shell::OpenMessageBox(HWND hWnd, UINT uType, const char* caption,  const char* format, ...)
 {
 	va_list valist;
@@ -11,7 +13,7 @@ void _Shell::OpenMessageBox(HWND hWnd, UINT uType, const char* caption,  const c
 
 	if (stringLength == -1)
 	{
-		LOG_TRACE_GAME("{} - error trying to get string length size", __FUNCTION__);
+		event(_event_verbose, "%s - error trying to get string length size", __FUNCTION__);
 		return;
 	}
 

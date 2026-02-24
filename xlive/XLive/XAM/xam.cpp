@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "xam.h"
 
+#include "uithread.h"
+
 /* structs */
 
 struct NOTIFY_LISTEN
@@ -19,6 +21,7 @@ static NOTIFY_LISTEN g_listener[50];
 int notify_xlive_ui = -1;
 
 /* public code */
+
 
 // #5270: XNotifyCreateListener
 HANDLE WINAPI XNotifyCreateListener(ULONGLONG qwAreas)
@@ -350,16 +353,41 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 	return exit_code;
 }
 
+// #5297: XLiveInitializeEx
+int WINAPI XLiveInitializeEx(XLIVE_INITIALIZE_INFO* pXii, DWORD dwVersion)
+{
+	LOG_TRACE_XLIVE("XLiveInitializeEx()");
+
+	g_xlive_d3d_device = pXii->pD3D;
+	if (g_xlive_d3d_device)
+	{
+		InitializeD3D9((D3DPRESENT_PARAMETERS*)pXii->pD3DPP);
+	}
+
+	LOG_TRACE_XLIVE("XLiveInitializeEx() - dwVersion = {0:x}", dwVersion);
+	return 0;
+}
+
+// #5000: XLiveInitialize
+HRESULT WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pXii)
+{
+	return XLiveInitializeEx(pXii, 0);
+}
+
+// #5003: XLiveUninitialize
+int WINAPI XLiveUninitialize()
+{
+	LOG_TRACE_XLIVE("XLiveUninitialize");
+
+	D3D9ReleaseResources();
+
+	DeleteCriticalSection(&g_render_section);
+	return 0;
+}
+
 // #652: XNotifyPositionUI
 DWORD WINAPI XNotifyPositionUI(DWORD dwPosition)
 {
 	LOG_TRACE_XLIVE("XNotifyPositionUI ({})", dwPosition);
-	return 0;
-}
-
-// #653
-int WINAPI XNotifyDelayUI(int a1)
-{
-	LOG_TRACE_XLIVE("XNotifyDelayUI");
 	return 0;
 }

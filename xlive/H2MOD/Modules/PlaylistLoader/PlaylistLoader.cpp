@@ -7,6 +7,7 @@
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Utils/Utils.h"
 
+extern std::unordered_map<const wchar_t*, CustomVariantSettings::s_variant_settings> customVariantSettingsMap;
 
 namespace playlist_loader
 {
@@ -154,20 +155,19 @@ namespace playlist_loader
 
 				//Grab or create the Custom Settings for the current variant.
 				CustomVariantSettings::s_variant_settings* settings;
-				const auto variant_string = std::wstring(variant);
-				if (customVariantSettingsMap.count(variant_string) > 0)
-					settings = &customVariantSettingsMap.at(variant_string);
+				if (customVariantSettingsMap.count(variant) > 0)
+					settings = &customVariantSettingsMap.at(variant);
 				else
 				{
-					customVariantSettingsMap[variant_string] = CustomVariantSettings::s_variant_settings();
-					settings = &customVariantSettingsMap.at(variant_string);
+					customVariantSettingsMap[variant] = CustomVariantSettings::s_variant_settings();
+					settings = &customVariantSettingsMap.at(variant);
 				}
 				std::wstring wproperty(property_value);
 				size_t pos = 0;
 				std::wstring t;
 				byte cIndex = 0;
 
-				event(_event_verbose, "h2mod:playlistloader: Variant: %ws Custom Setting Detected: %ws = %ws", variant_string.c_str(), property_name, property_value);
+				event(_event_verbose, "h2mod:playlistloader: Variant: %ws Custom Setting Detected: %ws = %ws", variant, property_name, property_value);
 				switch (custom_setting_type)
 				{
 				case gravity:

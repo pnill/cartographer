@@ -2,7 +2,6 @@
 #include "interface/user_interface_widget.h"
 #include "interface/user_interface_widget_list.h"
 #include "interface/user_interface_widget_list_item.h"
-#include "interface/user_interface_widget_window.h"
 
 class c_brightness_level_edit_list : public c_list_widget
 {

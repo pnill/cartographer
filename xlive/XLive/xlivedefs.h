@@ -104,6 +104,10 @@
 #define XSESSION_CREATE_JOIN_VIA_PRESENCE_FRIENDS_ONLY  0x00000800  // Session is only joinable via presence for friends of the host
 
 
+#define XLOCATOR_SERVER_PAGE_MIN_ITEMS		50
+#define XLOCATOR_SERVER_PAGE_MAX_ITEMS_OLD	200
+#define XLOCATOR_SERVER_PAGE_MAX_ITEMS		2000	// Increased because we hit the limit
+
 typedef struct
 {
     IN_ADDR     ina;                            // IP address (zero if not static/DHCP)
@@ -183,26 +187,6 @@ typedef struct
     DWORD       dwNumProbeRepliesSent;          // Number of probe replies sent
 } XNQOSLISTENSTATS;
 
-
-INT   WINAPI XNetCleanup();
-
-INT   WINAPI XNetRandom(BYTE * pb, UINT cb);
-
-INT   WINAPI XNetCreateKey(XNKID * pxnkid, XNKEY * pxnkey);
-INT   WINAPI XNetRegisterKey(const XNKID * pxnkid, const XNKEY * pxnkey);
-INT   WINAPI XNetUnregisterKey(const XNKID * pxnkid);
-INT   WINAPI XNetReplaceKey(const XNKID * pxnkidUnregister, const XNKID * pxnkidReplace);
-
-INT   WINAPI XNetXnAddrToInAddr(const XNADDR * pxna, const XNKID * pxnkid, IN_ADDR * pina);
-INT   WINAPI XNetServerToInAddr(const IN_ADDR ina, DWORD dwServiceId, IN_ADDR * pina);
-INT   WINAPI XNetTsAddrToInAddr(const TSADDR * ptsa, DWORD dwServiceId, const XNKID * pxnkid, IN_ADDR * pina);
-INT   WINAPI XNetInAddrToXnAddr(const IN_ADDR ina, XNADDR * pxna, XNKID * pxnkid);
-INT   WINAPI XNetInAddrToServer(const IN_ADDR ina, IN_ADDR *pina);
-INT   WINAPI XNetInAddrToString(const IN_ADDR ina, char * pchBuf, INT cchBuf);
-INT   WINAPI XNetUnregisterInAddr(const IN_ADDR ina);
-INT   WINAPI XNetXnAddrToMachineId(const XNADDR * pxnaddr, ULONGLONG * pqwMachineId);
-
-
 #define XNET_XNADDR_PLATFORM_XBOX1          0x00000000 // Platform type is original Xbox
 #define XNET_XNADDR_PLATFORM_XBOX360        0x00000001 // Platform type is Xbox 360
 #define XNET_XNADDR_PLATFORM_WINPC          0x00000002 // Platform type is Windows PC
@@ -214,13 +198,6 @@ INT   WINAPI XNetGetXnAddrPlatform(const XNADDR * pxnaddr, DWORD * pdwPlatform);
 #define XNET_CONNECT_STATUS_PENDING         0x00000001 // Connecting in progress; not complete yet
 #define XNET_CONNECT_STATUS_CONNECTED       0x00000002 // Connection is established
 #define XNET_CONNECT_STATUS_LOST            0x00000003 // Connection was lost
-
-INT   WINAPI XNetConnect(const IN_ADDR ina);
-INT WINAPI XNetGetConnectStatus(const IN_ADDR ina);
-
-
-INT   WINAPI XNetDnsLookup(const char * pszHost, WSAEVENT hEvent, XNDNS ** ppxndns);
-INT   WINAPI XNetDnsRelease(XNDNS * pxndns);
 
 #define XNET_GET_XNADDR_PENDING             0x00000000 // Address acquisition is not yet complete
 #define XNET_GET_XNADDR_NONE                0x00000001 // XNet is uninitialized or no debugger found

@@ -22,6 +22,8 @@
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Utils/Utils.h"
 
+#include <XLive/xnet/xnet.h>
+
 /* enums */
 
 enum e_cartographer_screen_type_account_list_string_table

@@ -6,8 +6,6 @@
 #include "cutscene/cinematics.h"
 #include "game/player_mapping.h"
 #include "game/players.h"
-#include "rasterizer/dx9/rasterizer_dx9_main.h"
-#include "rasterizer/dx9/rasterizer_dx9_errors.h"
 #include "rasterizer/rasterizer_main.h"
 #include "render/render_cartographer_ingame_ui.h"
 
@@ -45,7 +43,7 @@ void main_render_apply_patches(void)
 	PatchCall(Memory::GetAddress(0x19228E), main_render_hook);
 
 	PatchCall(Memory::GetAddress(0x27009A), main_render_player_view);
-	PatchCall(Memory::GetAddress(0x2700A5), main_render_previous_backbuffer);
+	PatchCall(Memory::GetAddress(0x2700A5), main_render_pregame);
 	return;
 }
 
@@ -155,7 +153,7 @@ void __cdecl main_render_player_view(void)
 }
 
 
-void __cdecl main_render_previous_backbuffer(int32 a1, int32 a2)
+void __cdecl main_render_pregame(int32 a1, int32 a2)
 {
 	window_bound* g_window_bounds = window_bound_get();
 
@@ -174,38 +172,7 @@ void __cdecl main_render_previous_backbuffer(int32 a1, int32 a2)
 	}
 
 	render_nonplayer_frame(&g_window_bounds[0]);
-
-
-	s_rasterizer_dx9_main_globals* rasterizer_dx9_globals = rasterizer_dx9_main_globals_get();
-	IDirect3DSurface9* backbuffer;
-
-	if (screenshot_in_progress())
-	{
-		backbuffer = rasterizer_dx9_globals->global_d3d_surface_screenshot;
-		rasterizer_dx9_globals->global_d3d_surface_screenshot->AddRef();
-	}
-	else
-	{
-		rasterizer_dx9_log(
-			rasterizer_dx9_globals->global_d3d_device->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backbuffer)
-		);
-	}
-
-	rasterizer_dx9_log(
-		rasterizer_dx9_globals->global_d3d_device->StretchRect(
-			rasterizer_dx9_globals->global_d3d_surface_render_primary,
-			NULL,
-			backbuffer,
-			NULL,
-			D3DTEXF_NONE
-		)
-	);
-
-	if (backbuffer)
-	{
-		backbuffer->Release();
-	}
-
+	rasterizer_main_render_pregame();
 	return;
 }
 

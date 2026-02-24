@@ -3,7 +3,6 @@
 #ifndef IMGUI_DISABLE
 
 #include "input/controllers.h"
-#include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
 
 /* constants */
 
@@ -36,7 +35,6 @@ enum e_imgui_window_type
 
 /* globals */
 
-extern s_saved_game_cartographer_player_profile* g_advanced_settings_current_cartographer_profile;
 extern e_controller_index g_advanced_settings_current_controller_index;
 
 namespace ImGuiHandler
@@ -67,9 +65,9 @@ namespace ImGuiHandler
 	float WidthPercentage(float percent);
 	void TextVerticalPad(const char* label);
 	bool LoadTextureFromFile(const wchar_t* filename, s_imgui_images image, int* out_width, int* out_height);
-	PDIRECT3DTEXTURE9 GetTexture(s_imgui_images image);
+	void* GetTexture(s_imgui_images image);
 	void release_motd_texture();
-	e_imgui_aspect_ratio GetAspectRatio(const real_point2d* display_size);
+	e_imgui_aspect_ratio GetAspectRatio(const union real_point2d* display_size);
 	namespace ImMOTD {
 		void Render(bool* p_open);
 		void Open();

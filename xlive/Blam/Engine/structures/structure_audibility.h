@@ -52,21 +52,21 @@ struct s_structure_audibility
 
 	// max: k_maximum_machine_door_portal_associations*2*((((MAXIMUM_CLUSTERS_PER_STRUCTURE)+(LONG_BITS-1))>>LONG_BITS_BITS))
 	// 4096
-	tag_block<int32> encoded_door_pas;
+	s_tag_block encoded_door_pas;	// struct: int32
 
 	// max: MAXIMUM_CLUSTERS_PER_STRUCTURE*((((k_maximum_machine_door_portal_associations)+(LONG_BITS-1))>>LONG_BITS_BITS))
 	// 2048
-	tag_block<int32> cluster_door_portal_encoded_pas;
+	s_tag_block cluster_door_portal_encoded_pas;	// struct: int32
 
 	// max: (((((MAXIMUM_CLUSTERS_PER_STRUCTURE*(MAXIMUM_CLUSTERS_PER_STRUCTURE-1))/2)+(LONG_BITS-1))>>LONG_BITS_BITS))
 	// 4088
-	tag_block<int32> ai_deafening_pas;
+	s_tag_block ai_deafening_pas;	// struct: int32
 
 	// max: (MAXIMUM_CLUSTERS_PER_STRUCTURE*(MAXIMUM_CLUSTERS_PER_STRUCTURE-1))/2
 	// 130816
-	tag_block<int8> cluster_distances;
+	s_tag_block cluster_distances;	// struct: int8
 
 	// max: k_maximum_machine_door_portal_associations
-	tag_block<int8> machine_door_mapping;
+	s_tag_block machine_door_mapping;	// struct: int8
 };
 ASSERT_STRUCT_SIZE(s_structure_audibility, 52);

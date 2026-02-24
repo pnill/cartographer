@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="debug_msvc|Win32">
+      <Configuration>debug_msvc</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release_min_msvc|Win32">
+      <Configuration>release_min_msvc</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release_msvc|Win32">
+      <Configuration>release_msvc</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\decorators\decorator_definitions.cpp" />
+    <ClCompile Include="..\effects\beam.cpp" />
+    <ClCompile Include="..\effects\contrails.cpp" />
+    <ClCompile Include="..\effects\effects.cpp" />
+    <ClCompile Include="..\effects\particle.cpp" />
+    <ClCompile Include="..\effects\particle_definition_interface.cpp" />
+    <ClCompile Include="..\effects\particle_draw.cpp" />
+    <ClCompile Include="..\effects\particle_emitter.cpp" />
+    <ClCompile Include="..\effects\particle_location.cpp" />
+    <ClCompile Include="..\effects\particle_model_definition.cpp" />
+    <ClCompile Include="..\effects\particle_property.cpp" />
+    <ClCompile Include="..\effects\particle_state.cpp" />
+    <ClCompile Include="..\effects\particle_system.cpp" />
+    <ClCompile Include="..\effects\particle_system_definition.cpp" />
+    <ClCompile Include="..\effects\particle_update.cpp" />
+    <ClCompile Include="..\effects\player_effects.cpp" />
+    <ClCompile Include="..\rasterizer\dx12\rasterizer_dx12_main.cpp" />
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9.cpp" />
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_9on12.cpp" />
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_bitmaps.cpp" />
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_debug.cpp" />
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_decals.cpp" />
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_dof.cpp" />
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_dynamic_geometry.cpp" />
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_dynavobgeom.cpp" />
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_errors.cpp" />
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_fog.cpp" />
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_fullscreen_passes.cpp" />
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_lens_flares.cpp" />
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_main.cpp" />
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_motion_sensor.cpp" />
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_screen_effect.cpp" />
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_shader_submit.cpp" />
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_shader_submit_new.cpp" />
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_submit.cpp" />
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_targets.cpp" />
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_text.cpp" />
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_vertex_buffers.cpp" />
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_vertex_shaders.cpp" />
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_water.cpp" />
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_weather.cpp" />
+    <ClCompile Include="..\rasterizer\dx9\rasterizer_dx9_widgets.cpp" />
+    <ClCompile Include="..\rasterizer\rasterizer_cinematics.cpp" />
+    <ClCompile Include="..\rasterizer\rasterizer_dynamic_reflect.cpp" />
+    <ClCompile Include="..\rasterizer\rasterizer_fog.cpp" />
+    <ClCompile Include="..\rasterizer\rasterizer_globals.cpp" />
+    <ClCompile Include="..\rasterizer\rasterizer_lens_flares.cpp" />
+    <ClCompile Include="..\rasterizer\rasterizer_lights.cpp" />
+    <ClCompile Include="..\rasterizer\rasterizer_loading.cpp" />
+    <ClCompile Include="..\rasterizer\rasterizer_main.cpp" />
+    <ClCompile Include="..\rasterizer\rasterizer_memory.cpp" />
+    <ClCompile Include="..\rasterizer\rasterizer_occlusion.cpp" />
+    <ClCompile Include="..\rasterizer\rasterizer_profile.cpp" />
+    <ClCompile Include="..\rasterizer\rasterizer_screen_effects.cpp" />
+    <ClCompile Include="..\rasterizer\rasterizer_settings.cpp" />
+    <ClCompile Include="..\rasterizer\rasterizer_stipple.cpp" />
+    <ClCompile Include="..\rasterizer\rasterizer_text.cpp" />
+    <ClCompile Include="..\rasterizer\rasterizer_transparent_geometry.cpp" />
+    <ClCompile Include="..\rasterizer\rasterizer_vertex_shader_definitions.cpp" />
+    <ClCompile Include="..\render\render.cpp" />
+    <ClCompile Include="..\render\render_cameras.cpp" />
+    <ClCompile Include="..\render\render_cartographer_ingame_ui.cpp" />
+    <ClCompile Include="..\render\render_contrails.cpp" />
+    <ClCompile Include="..\render\render_debug.cpp" />
+    <ClCompile Include="..\render\render_first_person.cpp" />
+    <ClCompile Include="..\render\render_layers.cpp" />
+    <ClCompile Include="..\render\render_lights.cpp" />
+    <ClCompile Include="..\render\render_lod_new.cpp" />
+    <ClCompile Include="..\render\render_objects.cpp" />
+    <ClCompile Include="..\render\render_patchy_fog.cpp" />
+    <ClCompile Include="..\render\render_primitive.cpp" />
+    <ClCompile Include="..\render\render_prt.cpp" />
+    <ClCompile Include="..\render\render_section_visibility.cpp" />
+    <ClCompile Include="..\render\render_sky.cpp" />
+    <ClCompile Include="..\render\render_submit.cpp" />
+    <ClCompile Include="..\render\render_visibility.cpp" />
+    <ClCompile Include="..\render\render_visibility_collection.cpp" />
+    <ClCompile Include="..\render\render_visible_geometry.cpp" />
+    <ClCompile Include="..\render\render_water.cpp" />
+    <ClCompile Include="..\render\render_weather.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\decorators\decorator_definitions.h" />
+    <ClInclude Include="..\decorators\decorator_projected_decals.h" />
+    <ClInclude Include="..\effects\beam.h" />
+    <ClInclude Include="..\effects\contrails.h" />
+    <ClInclude Include="..\effects\decals.h" />
+    <ClInclude Include="..\effects\effects.h" />
+    <ClInclude Include="..\effects\effects_creation.h" />
+    <ClInclude Include="..\effects\effects_definitions.h" />
+    <ClInclude Include="..\effects\effect_location_definition.h" />
+    <ClInclude Include="..\effects\lens_flares.h" />
+    <ClInclude Include="..\effects\particle.h" />
+    <ClInclude Include="..\effects\particle_definition_interface.h" />
+    <ClInclude Include="..\effects\particle_draw.h" />
+    <ClInclude Include="..\effects\particle_emitter.h" />
+    <ClInclude Include="..\effects\particle_location.h" />
+    <ClInclude Include="..\effects\particle_model_definitions.h" />
+    <ClInclude Include="..\effects\particle_movement_definition.h" />
+    <ClInclude Include="..\effects\particle_property.h" />
+    <ClInclude Include="..\effects\particle_state.h" />
+    <ClInclude Include="..\effects\particle_system.h" />
+    <ClInclude Include="..\effects\particle_system_definition.h" />
+    <ClInclude Include="..\effects\particle_update.h" />
+    <ClInclude Include="..\effects\player_effects.h" />
+    <ClInclude Include="..\rasterizer\dx12\rasterizer_dx12_main.h" />
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9.h" />
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_9on12.h" />
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_bitmaps.h" />
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_debug.h" />
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_decals.h" />
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_dof.h" />
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_dynamic_geometry.h" />
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_dynavobgeom.h" />
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_errors.h" />
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_fog.h" />
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_fullscreen_passes.h" />
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_lens_flares.h" />
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_main.h" />
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_motion_sensor.h" />
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_screen_effect.h" />
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_shader_submit.h" />
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_shader_submit_new.h" />
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_submit.h" />
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_targets.h" />
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_text.h" />
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_vertex_buffers.h" />
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_vertex_shaders.h" />
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_water.h" />
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_weather.h" />
+    <ClInclude Include="..\rasterizer\dx9\rasterizer_dx9_widgets.h" />
+    <ClInclude Include="..\rasterizer\dx9\shaders\compiled\bloom_simple.h" />
+    <ClInclude Include="..\rasterizer\dx9\shaders\compiled\fog_atmospheric_apply.h" />
+    <ClInclude Include="..\rasterizer\dx9\shaders\compiled\motion_sensor_sweep.h" />
+    <ClInclude Include="..\rasterizer\dx9\shaders\compiled\sun_glow_convolve.h" />
+    <ClInclude Include="..\rasterizer\dx9\shaders\compiled\weather_particle_generic.h" />
+    <ClInclude Include="..\rasterizer\dx9\shaders\compiled\weather_particle_rain.h" />
+    <ClInclude Include="..\rasterizer\dx9\shaders\compiled\weather_plate.h" />
+    <ClInclude Include="..\rasterizer\dx9\shaders\compiled\zprime.h" />
+    <ClInclude Include="..\rasterizer\rasterizer_cinematics.h" />
+    <ClInclude Include="..\rasterizer\rasterizer_dynamic_reflect.h" />
+    <ClInclude Include="..\rasterizer\rasterizer_fog.h" />
+    <ClInclude Include="..\rasterizer\rasterizer_globals.h" />
+    <ClInclude Include="..\rasterizer\rasterizer_lens_flares.h" />
+    <ClInclude Include="..\rasterizer\rasterizer_lights.h" />
+    <ClInclude Include="..\rasterizer\rasterizer_loading.h" />
+    <ClInclude Include="..\rasterizer\rasterizer_main.h" />
+    <ClInclude Include="..\rasterizer\rasterizer_memory.h" />
+    <ClInclude Include="..\rasterizer\rasterizer_occlusion.h" />
+    <ClInclude Include="..\rasterizer\rasterizer_profile.h" />
+    <ClInclude Include="..\rasterizer\rasterizer_screen_effects.h" />
+    <ClInclude Include="..\rasterizer\rasterizer_settings.h" />
+    <ClInclude Include="..\rasterizer\rasterizer_stipple.h" />
+    <ClInclude Include="..\rasterizer\rasterizer_text.h" />
+    <ClInclude Include="..\rasterizer\rasterizer_transparent_geometry.h" />
+    <ClInclude Include="..\rasterizer\rasterizer_vertex_buffers.h" />
+    <ClInclude Include="..\rasterizer\rasterizer_vertex_shader_definitions.h" />
+    <ClInclude Include="..\render\render.h" />
+    <ClInclude Include="..\render\render_cameras.h" />
+    <ClInclude Include="..\render\render_cartographer_ingame_ui.h" />
+    <ClInclude Include="..\render\render_contrails.h" />
+    <ClInclude Include="..\render\render_debug.h" />
+    <ClInclude Include="..\render\render_debug_structure.h" />
+    <ClInclude Include="..\render\render_first_person.h" />
+    <ClInclude Include="..\render\render_layers.h" />
+    <ClInclude Include="..\render\render_lights.h" />
+    <ClInclude Include="..\render\render_lod_new.h" />
+    <ClInclude Include="..\render\render_objects.h" />
+    <ClInclude Include="..\render\render_patchy_fog.h" />
+    <ClInclude Include="..\render\render_primitive.h" />
+    <ClInclude Include="..\render\render_prt.h" />
+    <ClInclude Include="..\render\render_section_visibility.h" />
+    <ClInclude Include="..\render\render_sky.h" />
+    <ClInclude Include="..\render\render_sky_definitions.h" />
+    <ClInclude Include="..\render\render_submit.h" />
+    <ClInclude Include="..\render\render_visibility.h" />
+    <ClInclude Include="..\render\render_visibility_collection.h" />
+    <ClInclude Include="..\render\render_visible_geometry.h" />
+    <ClInclude Include="..\render\render_water.h" />
+    <ClInclude Include="..\render\render_weather.h" />
+    <ClInclude Include="..\render\weather_definitions.h" />
+    <ClInclude Include="..\shaders\pixel_shader.h" />
+    <ClInclude Include="..\shaders\shader_definitions.h" />
+    <ClInclude Include="..\shaders\shader_passes.h" />
+    <ClInclude Include="..\shaders\shader_postprocess_definitions.h" />
+    <ClInclude Include="..\shaders\shader_templates.h" />
+    <ClInclude Include="..\shaders\vertex_shader.h" />
+    <ClInclude Include="stdafx.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>18.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{D82C00DC-18C9-49FF-A189-F68274D2F680}</ProjectGuid>
+    <RootNamespace>graphicslib</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">
+    <OutDir>$(SolutionDir)\objects\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)\objects\$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)$(Platform)$(Configuration)</TargetName>
+    <ExternalIncludePath>$(DXSDK_DIR)Include;$(ExternalIncludePath)</ExternalIncludePath>
+    <LibraryPath>$(DXSDK_DIR)Lib\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">
+    <OutDir>$(SolutionDir)\objects\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)\objects\$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)$(Platform)$(Configuration)</TargetName>
+    <ExternalIncludePath>$(DXSDK_DIR)Include;$(ExternalIncludePath)</ExternalIncludePath>
+    <LibraryPath>$(DXSDK_DIR)Lib\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">
+    <OutDir>$(SolutionDir)\objects\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)\objects\$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)$(Platform)$(Configuration)</TargetName>
+    <ExternalIncludePath>$(DXSDK_DIR)Include;$(ExternalIncludePath)</ExternalIncludePath>
+    <LibraryPath>$(DXSDK_DIR)Lib\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ASSERTS_ENABLED;EVENTS_ENABLED;ERRORS_ENABLED;DEBUG_MEMORY_ENABLED;RASTERIZER_PROFILE_ENABLED;VALIDATE_REAL_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;DEBUG_MENU_ENABLED;HS_COMPILER_ENABLED;_ALLOW_RTCc_IN_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeaderOutputFile>$(IntDir)graphicslib.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..\..\..\3rdparty;.\;..\;..\..\..\;..\..\..\XLive</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <DisableSpecificWarnings>4505;4100;4201</DisableSpecificWarnings>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <AdditionalOptions>/DPSAPI_VERSION=1 /utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
+      <SupportJustMyCode>false</SupportJustMyCode>
+      <TreatSpecificWarningsAsErrors>4700</TreatSpecificWarningsAsErrors>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <PreBuildEvent>
+      <Command>CALL $(SolutionDir)GIT-VS-VERSION-GEN.bat "$(IntDir)" "$(SolutionDir)xlive\version_git.h"</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ERRORS_ENABLED;EVENTS_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;HS_COMPILER_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeaderOutputFile>$(IntDir)graphicslib.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <AdditionalIncludeDirectories>..\..\..\3rdparty;.\;..\;..\..\..\;..\..\..\XLive</AdditionalIncludeDirectories>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DisableSpecificWarnings>4505;4100;4201</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <AdditionalOptions>/DPSAPI_VERSION=1 /utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
+      <TreatSpecificWarningsAsErrors>4700</TreatSpecificWarningsAsErrors>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <PreBuildEvent>
+      <Command>CALL $(SolutionDir)GIT-VS-VERSION-GEN.bat "$(IntDir)" "$(SolutionDir)xlive\version_git.h"</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;IMGUI_DISABLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeaderOutputFile>$(IntDir)graphicslib.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <AdditionalIncludeDirectories>..\..\..\3rdparty;.\;..\;..\..\..\;..\..\..\XLive</AdditionalIncludeDirectories>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DisableSpecificWarnings>4505;4100;4201</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <AdditionalOptions>/DPSAPI_VERSION=1 /utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
+      <TreatSpecificWarningsAsErrors>4700</TreatSpecificWarningsAsErrors>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <PreBuildEvent>
+      <Command>CALL $(SolutionDir)GIT-VS-VERSION-GEN.bat "$(IntDir)" "$(SolutionDir)xlive\version_git.h"</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

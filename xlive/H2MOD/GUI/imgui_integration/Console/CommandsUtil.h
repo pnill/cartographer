@@ -143,7 +143,7 @@ public:
 		m_line_buf_size = newLineBufSize;
 
 		size_t newBufferSize = GetBufferSize();
-		ASSERT(newBufferSize > GetBufferSize());
+		assert(newBufferSize > GetBufferSize());
 
 		char* new_buffer = (char*)malloc(newBufferSize);
 		if (m_buf != NULL)
@@ -168,7 +168,7 @@ public:
 
 		size_t nullCharIdx = characterCount;
 
-		ASSERT(characterCount < m_line_buf_size - 1 || source[nullCharIdx] == '\0');
+		assert(characterCount < m_line_buf_size - 1 || source[nullCharIdx] == '\0');
 
 		char* destinationBuffer;
 		size_t destinationBufferSize = GetNewlineBuffer(m_line_buf_size, &destinationBuffer);
@@ -223,7 +223,7 @@ public:
 
 	const char* GetStringAtIndex(size_t headerIdx) const
 	{
-		ASSERT(headerIdx < GetHeaderCount());
+		assert(headerIdx < GetHeaderCount());
 		const StringLineHeader& string_header = GetHeader(headerIdx);
 		return GetStringAtIdx(string_header.idx);
 	}

@@ -11,6 +11,7 @@
 #include "screen_vsync_setting.h"
 #include "screen_splitscreen_setting.h"
 
+#include "cache/cache_files.h"
 #include "interface/user_interface_bitmap_block.h"
 #include "interface/user_interface_controller.h"
 #include "interface/user_interface_memory.h"
@@ -18,11 +19,7 @@
 #include "interface/user_interface_utilities.h"
 #include "rasterizer/rasterizer_settings.h"
 
-#include "tag_files/tag_loader/tag_injection.h"
-
 #include "H2MOD/Modules/Shell/Config.h"
-
-/* macro defines */
 
 /* constants */
 

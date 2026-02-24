@@ -4,7 +4,7 @@
 #include "interface/user_interface_memory.h"
 #include "rasterizer/rasterizer_globals.h"
 #include "rasterizer/rasterizer_settings.h"
-#include "rasterizer/dx9/rasterizer_dx9_main.h"
+#include "rasterizer/rasterizer_main.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
 
@@ -100,10 +100,10 @@ void c_vsync_edit_list::handle_item_pressed_event(s_event_record** pevent, datum
 	const bool choice = DATUM_INDEX_TO_ABSOLUTE_INDEX(*pitem_index) == _item_on ? true : false;
 	H2Config_use_vsync = choice;
 
-	if (rasterizer_dx9_main_globals_get()->global_d3d_device)
+	if (rasterizer_is_initialized())
 	{
 		rasterizer_globals_get()->reset_screen = true;
-		rasterizer_dx9_reset(false);
+		rasterizer_reset(false);
 	}
 
 	user_interface_back_out_from_channel(this->get_parent_channel(), this->get_parent_render_window());

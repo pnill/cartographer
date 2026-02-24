@@ -1,10 +1,12 @@
 #include "stdafx.h"
 #include "rasterizer_dx9_shader_submit_new.h"
 
+#include "rasterizer_dx9.h"
 #include "rasterizer_dx9_main.h"
 #include "rasterizer_dx9_targets.h"
 
 #include "cache/cache_files.h"
+#include "camera/camera.h"
 #include "game/game_globals.h"
 #include "interface/new_hud_draw.h"
 #include "objects/light_definitions.h"
@@ -13,6 +15,7 @@
 #include "render/render.h"
 #include "render/render_first_person.h"
 #include "shaders/shader_definitions.h"
+#include "shaders/shader_passes.h"
 
 /* globals */
 
@@ -300,6 +303,53 @@ void __cdecl rasterizer_flags_unknown_function_2(int32* a1)
 int32* rasterizer_unknown_shader_submit_unknown_value_get()
 {
 	return Memory::GetAddress<int32*>(0x9765D8);
+}
+
+void rasterizer_dx9_setup_2d_vertex_shader_user_interface_constants(void)
+{
+	real_vector4d vc[5];
+	int16 width, height;
+
+	const s_render* render = render_get();
+
+	width = rectangle2d_width(&render->camera.viewport_bounds);
+	height = rectangle2d_height(&render->camera.viewport_bounds);
+
+	// vertex shaders use normalized device coordinates system (NDC)
+	vc[0].i = 2.0f / (real32)width; // x
+	vc[0].j = 0.0f;
+	vc[0].k = 0.0f;
+	vc[0].l = -(1.0f / (real32)width + 1.0f) - ((real32)render->camera.viewport_bounds.left * 2.0f / width); // offset from x
+
+	vc[1].i = 0.0f;
+	vc[1].j = -(2.0f / (real32)height); // y
+	vc[1].k = 0.0f;
+	vc[1].l = (1.0f / (real32)height + 1.0f) + ((real32)render->camera.viewport_bounds.top * 2.0f / height); // offset from y
+
+	vc[2].i = 0.0f;
+	vc[2].j = 0.0f;
+	vc[2].k = 0.0f; // z
+	vc[2].l = 0.5f; // acts as an offset, facing (<=1.0f is towards the viewport, above 1.0f facing from the viewport)
+
+	vc[3].i = 0.0f;
+	vc[3].j = 0.0f;
+	vc[3].k = 0.0f;
+	vc[3].l = 1.0f; // w scaling component
+
+	// the c181 register seems unused?
+	vc[4].i = 0.0f;
+	vc[4].j = 0.0f;
+	vc[4].k = 0.0f;
+	vc[4].l = 0.0f;
+
+	IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
+
+	// avoid unnecessary API calls by testing the user mode memory cache
+	if (rasterizer_get_main_vertex_shader_cache()->test_cache(177, vc, NUMBEROF(vc)))
+	{
+		global_d3d_device->SetVertexShaderConstantF(177, (const real32*)vc, NUMBEROF(vc));
+	}
+	return;
 }
 
 /* private code */

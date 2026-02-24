@@ -9,7 +9,7 @@ public:
 
 	bool m_unk_bool_0;
 	int8 m_pad[3];
-	HANDLE m_session_handle;
+	void* m_session_handle;
 	XSESSION_INFO m_session;
 	int8 m_gap_44[12];
 	uint32 m_network_time;
@@ -24,9 +24,9 @@ public:
 	int32 m_xuid_update_state;
 	int8 m_gap_16C[4];
 	int32 m_xuid_count_170;
-	BOOL m_field_174;
+	int32 m_field_174;
 	XUID m_xuids_178[16];
-	BOOL m_private_slots[16];
+	int32 m_private_slots[16];
 	XOVERLAPPED m_overlap;
 	uint32 m_state;
 };

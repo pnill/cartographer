@@ -1,0 +1,418 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="GUI\imgui_integration\AdvancedSettings.cpp">
+      <Filter>GUI\imgui_integration</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\imgui_integration\Console\CommandCollection.cpp">
+      <Filter>GUI\imgui_integration\Console</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\imgui_integration\Console\CommandHandler.cpp">
+      <Filter>GUI\imgui_integration\Console</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\imgui_integration\Console\ComVar.cpp">
+      <Filter>GUI\imgui_integration\Console</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\imgui_integration\Console\ImGui_ConsoleImpl.cpp">
+      <Filter>GUI\imgui_integration\Console</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\imgui_integration\ImGui_CartographerStyle.cpp">
+      <Filter>GUI\imgui_integration</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\imgui_integration\imgui_handler.cpp">
+      <Filter>GUI\imgui_integration</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\imgui_integration\ImGui_NetworkStatsOverlay.cpp">
+      <Filter>GUI\imgui_integration</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\imgui_integration\MessageBox.cpp">
+      <Filter>GUI\imgui_integration</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\imgui_integration\MOTD.cpp">
+      <Filter>GUI\imgui_integration</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\imgui_integration\WeaponOffsets.cpp">
+      <Filter>GUI\imgui_integration</Filter>
+    </ClCompile>
+    <ClCompile Include="Variants\VariantSystem.cpp">
+      <Filter>Variants</Filter>
+    </ClCompile>
+    <ClCompile Include="Variants\GraveRobber\GraveRobber.cpp">
+      <Filter>Variants\GraveRobber</Filter>
+    </ClCompile>
+    <ClCompile Include="Variants\GunGame\GunGame.cpp">
+      <Filter>Variants\GunGame</Filter>
+    </ClCompile>
+    <ClCompile Include="Variants\H2X\H2X.cpp">
+      <Filter>Variants\H2X</Filter>
+    </ClCompile>
+    <ClCompile Include="Variants\Infection\Infection.cpp">
+      <Filter>Variants\Infection</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\Utils.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Accounts\AccountCreate.cpp">
+      <Filter>Modules\Accounts</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Accounts\AccountLogin.cpp">
+      <Filter>Modules\Accounts</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Accounts\Accounts.cpp">
+      <Filter>Modules\Accounts</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Achievements\Achievements.cpp">
+      <Filter>Modules\Achievements</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\CustomMenu\CustomLanguage.cpp">
+      <Filter>Modules\CustomMenu</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\CustomMenu\CustomMenuGlobals.cpp">
+      <Filter>Modules\CustomMenu</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\CustomVariantSettings\CustomVariantSettings.cpp">
+      <Filter>Modules\CustomVariantSettings</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\DirectorHooks\DirectorHooks.cpp">
+      <Filter>Modules\DirectorHooks</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\EventHandler\EventHandler.cpp">
+      <Filter>Modules\EventHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\GamePhysics\Patches\ProjectileFix.cpp">
+      <Filter>Modules\GamePhysics\Patches</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Input\ControllerInput.cpp">
+      <Filter>Modules\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Input\KeyboardInput.cpp">
+      <Filter>Modules\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\MainMenu\MapSlots.cpp">
+      <Filter>Modules\MainMenu</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\MainMenu\Ranks.cpp">
+      <Filter>Modules\MainMenu</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\MapManager\MapManager.cpp">
+      <Filter>Modules\MapManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\OnScreenDebug\OnscreenDebug.cpp">
+      <Filter>Modules\OnScreenDebug</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\PlaylistLoader\PlaylistLoader.cpp">
+      <Filter>Modules\PlaylistLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\RenderHooks\RenderHooks.cpp">
+      <Filter>Modules\RenderHooks</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Shell\H2MODShell.cpp">
+      <Filter>Modules\Shell</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Shell\Config.cpp">
+      <Filter>Modules\Shell</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Shell\Startup\Startup.cpp">
+      <Filter>Modules\Shell\Startup</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\SpecialEvents\SpecialEventHelpers.cpp">
+      <Filter>Modules\SpecialEvents</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\SpecialEvents\SpecialEvents.cpp">
+      <Filter>Modules\SpecialEvents</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\SpecialEvents\Events\Birthday.cpp">
+      <Filter>Modules\SpecialEvents\Events</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\SpecialEvents\Events\Christmas.cpp">
+      <Filter>Modules\SpecialEvents\Events</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\SpecialEvents\Events\MapObjectPlacements\Halloween\Coagulation.cpp">
+      <Filter>Modules\SpecialEvents\Events\MapObjectPlacements\Halloween</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\SpecialEvents\Events\MapObjectPlacements\Halloween\Lockout.cpp">
+      <Filter>Modules\SpecialEvents\Events\MapObjectPlacements\Halloween</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\SpecialEvents\Events\Halloween.cpp">
+      <Filter>Modules\SpecialEvents\Events</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\SpecialEvents\Events\Mook.cpp">
+      <Filter>Modules\SpecialEvents\Events</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\SpecialEvents\Events\Paddy.cpp">
+      <Filter>Modules\SpecialEvents\Events</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\TagFixes\TagFixes.cpp">
+      <Filter>Modules\TagFixes</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Updater\Updater.cpp">
+      <Filter>Modules\Updater</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\curl-interface.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\H2MOD.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="GUI\imgui_integration\AdvancedSettingsStringTable.h">
+      <Filter>GUI\imgui_integration</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\imgui_integration\Console\CommandCollection.h">
+      <Filter>GUI\imgui_integration\Console</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\imgui_integration\Console\CommandHandler.h">
+      <Filter>GUI\imgui_integration\Console</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\imgui_integration\Console\CommandsUtil.h">
+      <Filter>GUI\imgui_integration\Console</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\imgui_integration\Console\ComVar.h">
+      <Filter>GUI\imgui_integration\Console</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\imgui_integration\Console\ImGui_ConsoleImpl.h">
+      <Filter>GUI\imgui_integration\Console</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\imgui_integration\ImGui_CartographerStyle.h">
+      <Filter>GUI\imgui_integration</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\imgui_integration\imgui_handler.h">
+      <Filter>GUI\imgui_integration</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\imgui_integration\ImGui_NetworkStatsOverlay.h">
+      <Filter>GUI\imgui_integration</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\imgui_integration\imgui_ProdigyCleanTTF.h">
+      <Filter>GUI\imgui_integration</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\imgui_integration\WeaponOffsetsStringTable.h">
+      <Filter>GUI\imgui_integration</Filter>
+    </ClInclude>
+    <ClInclude Include="Variants\VariantSystem.h">
+      <Filter>Variants</Filter>
+    </ClInclude>
+    <ClInclude Include="Variants\GraveRobber\GraveRobber.h">
+      <Filter>Variants\GraveRobber</Filter>
+    </ClInclude>
+    <ClInclude Include="Variants\GunGame\GunGame.h">
+      <Filter>Variants\GunGame</Filter>
+    </ClInclude>
+    <ClInclude Include="Variants\H2X\H2X.h">
+      <Filter>Variants\H2X</Filter>
+    </ClInclude>
+    <ClInclude Include="Variants\Infection\Infection.h">
+      <Filter>Variants\Infection</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Utils.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Accounts\AccountCreate.h">
+      <Filter>Modules\Accounts</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Accounts\AccountLogin.h">
+      <Filter>Modules\Accounts</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Accounts\Accounts.h">
+      <Filter>Modules\Accounts</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Achievements\Achievements.h">
+      <Filter>Modules\Achievements</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\CustomMenu\CustomLanguage.h">
+      <Filter>Modules\CustomMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\CustomMenu\CustomMenuGlobals.h">
+      <Filter>Modules\CustomMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\CustomVariantSettings\CustomVariantSettings.h">
+      <Filter>Modules\CustomVariantSettings</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\DirectorHooks\DirectorHooks.h">
+      <Filter>Modules\DirectorHooks</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\EventHandler\EventHandler.hpp">
+      <Filter>Modules\EventHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\GamePhysics\Patches\ProjectileFix.h">
+      <Filter>Modules\GamePhysics\Patches</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Input\ControllerInput.h">
+      <Filter>Modules\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Input\KeyboardInput.h">
+      <Filter>Modules\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\MainMenu\MapSlots.h">
+      <Filter>Modules\MainMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\MainMenu\Ranks.h">
+      <Filter>Modules\MainMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\MapManager\MapManager.h">
+      <Filter>Modules\MapManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\OnScreenDebug\OnscreenDebug.h">
+      <Filter>Modules\OnScreenDebug</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\PlaylistLoader\PlaylistLoader.h">
+      <Filter>Modules\PlaylistLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\RenderHooks\RenderHooks.h">
+      <Filter>Modules\RenderHooks</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Shell\H2MODShell.h">
+      <Filter>Modules\Shell</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Shell\Config.h">
+      <Filter>Modules\Shell</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Shell\Startup\Startup.h">
+      <Filter>Modules\Shell\Startup</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\SpecialEvents\SpecialEvents.h">
+      <Filter>Modules\SpecialEvents</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\SpecialEvents\SpecialEventHelpers.h">
+      <Filter>Modules\SpecialEvents</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\SpecialEvents\Events\Birthday.h">
+      <Filter>Modules\SpecialEvents\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\SpecialEvents\Events\Christmas.h">
+      <Filter>Modules\SpecialEvents\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\SpecialEvents\Events\MapObjectPlacements\Halloween\Coagulation.h">
+      <Filter>Modules\SpecialEvents\Events\MapObjectPlacements\Halloween</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\SpecialEvents\Events\MapObjectPlacements\Halloween\Lockout.h">
+      <Filter>Modules\SpecialEvents\Events\MapObjectPlacements\Halloween</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\SpecialEvents\Events\Halloween.h">
+      <Filter>Modules\SpecialEvents\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\SpecialEvents\Events\Mook.h">
+      <Filter>Modules\SpecialEvents\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\SpecialEvents\Events\Paddy.h">
+      <Filter>Modules\SpecialEvents\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\TagFixes\TagFixes.h">
+      <Filter>Modules\TagFixes</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Updater\Updater.h">
+      <Filter>Modules\Updater</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\curl_constants.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\curl-interface.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\H2MOD.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="GUI">
+      <UniqueIdentifier>{e7cf5ce1-c8c0-4f17-8ade-8b72392ae734}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules">
+      <UniqueIdentifier>{f99ff8ee-a8a2-4159-924b-774fe515ac32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{524d9d14-4f9a-473b-a667-90a61bd241c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Variants">
+      <UniqueIdentifier>{a6582c68-9295-46c9-8f06-f84d65117e4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\imgui_integration">
+      <UniqueIdentifier>{aa3d219e-69f3-4151-bc3a-ce2a8e0ec638}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\imgui_integration\Console">
+      <UniqueIdentifier>{ca71ef5e-c77a-4bf0-bd8d-53692af5f59d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Variants\GraveRobber">
+      <UniqueIdentifier>{9ee4da64-b901-4acd-aa7b-8300712886e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Variants\GunGame">
+      <UniqueIdentifier>{9f56a325-cd70-4770-9d56-d6ff004da5f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Variants\H2X">
+      <UniqueIdentifier>{289f39fb-b780-4afe-9334-d2ac143dfe52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Variants\Infection">
+      <UniqueIdentifier>{2e6c5267-4c45-4ad2-b8a6-284416ce5109}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\Accounts">
+      <UniqueIdentifier>{4ebbf9a8-877d-402b-9771-60bec9f49bb5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\Achievements">
+      <UniqueIdentifier>{0104adcb-2520-4f6f-8662-f78be34258cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\CustomMenu">
+      <UniqueIdentifier>{a745338b-a084-4a42-ac7c-2d605c7d9338}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\CustomVariantSettings">
+      <UniqueIdentifier>{9495d55e-9b03-45f8-8917-52c0c9bf29bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\DirectorHooks">
+      <UniqueIdentifier>{94733467-dd52-43d6-b085-e7627d56800e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\EventHandler">
+      <UniqueIdentifier>{d46d22fc-a345-4d11-a0e4-c03ec74c4639}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\GamePhysics">
+      <UniqueIdentifier>{065bc1cc-2556-4da4-b7bd-2a49305e936d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\h2log">
+      <UniqueIdentifier>{151f917a-543b-43a1-8a2d-00c66cb86d86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\GamePhysics\Patches">
+      <UniqueIdentifier>{94e33398-bea0-43ee-8d4a-ea4cb8c303ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\Input">
+      <UniqueIdentifier>{becb905a-c722-4f54-81d1-b793a65d4838}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\MainMenu">
+      <UniqueIdentifier>{1349ac2c-8e3a-46a2-853f-7fb9efedf6d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\MapManager">
+      <UniqueIdentifier>{572eb2e5-3a14-479e-b81f-2b5b234bd4e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\OnScreenDebug">
+      <UniqueIdentifier>{514b2a40-1a55-4b5c-95ec-17d9aab71de9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\PlaylistLoader">
+      <UniqueIdentifier>{dfe72296-15c4-4550-8d3a-ae1fb35e0b85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\RenderHooks">
+      <UniqueIdentifier>{aeaae3d7-7b98-4b28-a028-d262f0ad0579}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\Shell">
+      <UniqueIdentifier>{3a7f5ae3-d06e-4f7d-93db-a5c834630afc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\SpecialEvents">
+      <UniqueIdentifier>{687acfc5-e214-4a1d-a4d0-38e21f9229dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\Stats">
+      <UniqueIdentifier>{8999a703-37b9-4821-9636-71892ef28ab5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\TagFixes">
+      <UniqueIdentifier>{d6bcd813-a7e8-4276-8b28-af350bc56f00}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\Updater">
+      <UniqueIdentifier>{66338986-0a28-43e4-b5f2-83f19f7708c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\Shell\Startup">
+      <UniqueIdentifier>{be1953c5-d296-40fc-8575-078d60cb0f5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\SpecialEvents\Events">
+      <UniqueIdentifier>{2966df25-6bcc-4a2a-8f51-3f671a45fa18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\SpecialEvents\Events\MapObjectPlacements">
+      <UniqueIdentifier>{da859bd6-cef9-4653-b5c9-487ce0b4739e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\SpecialEvents\Events\MapObjectPlacements\Halloween">
+      <UniqueIdentifier>{08b3c8ad-9ada-4814-8fde-6f1ca701e230}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

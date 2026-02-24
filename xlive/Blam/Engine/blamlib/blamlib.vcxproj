@@ -1,0 +1,610 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="debug_msvc|Win32">
+      <Configuration>debug_msvc</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release_min_msvc|Win32">
+      <Configuration>release_min_msvc</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release_msvc|Win32">
+      <Configuration>release_msvc</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>18.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{98C40449-08C0-4F58-8CB3-DEFA93A036E3}</ProjectGuid>
+    <RootNamespace>blamlib</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">
+    <OutDir>$(SolutionDir)\objects\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)\objects\$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)$(Platform)$(Configuration)</TargetName>
+    <ExternalIncludePath>$(DXSDK_DIR)Include;$(ExternalIncludePath)</ExternalIncludePath>
+    <LibraryPath>$(DXSDK_DIR)Lib\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">
+    <OutDir>$(SolutionDir)\objects\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)\objects\$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)$(Platform)$(Configuration)</TargetName>
+    <ExternalIncludePath>$(DXSDK_DIR)Include;$(ExternalIncludePath)</ExternalIncludePath>
+    <LibraryPath>$(DXSDK_DIR)Lib\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">
+    <OutDir>$(SolutionDir)\objects\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)\objects\$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)$(Platform)$(Configuration)</TargetName>
+    <ExternalIncludePath>$(DXSDK_DIR)Include;$(ExternalIncludePath)</ExternalIncludePath>
+    <LibraryPath>$(DXSDK_DIR)Lib\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ASSERTS_ENABLED;EVENTS_ENABLED;ERRORS_ENABLED;DEBUG_MEMORY_ENABLED;RASTERIZER_PROFILE_ENABLED;VALIDATE_REAL_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;DEBUG_MENU_ENABLED;HS_COMPILER_ENABLED;_ALLOW_RTCc_IN_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeaderOutputFile>$(IntDir)blamlib.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..\..\..\3rdparty;..\..\..\3rdparty\imgui\imgui;..\..\..\3rdparty\discord\include;..\..\..\3rdparty\spdlog\include;..\..\..\3rdparty\tinyxml;..\..\..\3rdparty\zlib\src;..\..\XLive;.\;..\;..\..\..\;..\blamlib</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <DisableSpecificWarnings>4505;4100;4201</DisableSpecificWarnings>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <AdditionalOptions>/DPSAPI_VERSION=1 /utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
+      <SupportJustMyCode>false</SupportJustMyCode>
+      <TreatSpecificWarningsAsErrors>4700</TreatSpecificWarningsAsErrors>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ERRORS_ENABLED;EVENTS_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;HS_COMPILER_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeaderOutputFile>$(IntDir)blamlib.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <AdditionalIncludeDirectories>..\..\..\3rdparty;..\..\..\3rdparty\imgui\imgui;..\..\..\3rdparty\discord\include;..\..\..\3rdparty\spdlog\include;..\..\..\3rdparty\tinyxml;..\..\..\3rdparty\zlib\src;..\..\XLive;.\;..\;..\..\..\;..\blamlib</AdditionalIncludeDirectories>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DisableSpecificWarnings>4505;4100;4201</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <AdditionalOptions>/DPSAPI_VERSION=1 /utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
+      <TreatSpecificWarningsAsErrors>4700</TreatSpecificWarningsAsErrors>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;IMGUI_DISABLE;SPDLOG_DISABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeaderOutputFile>$(IntDir)blamlib.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <AdditionalIncludeDirectories>..\..\..\3rdparty;..\..\..\3rdparty\imgui\imgui;..\..\..\3rdparty\discord\include;..\..\..\3rdparty\spdlog\include;..\..\..\3rdparty\tinyxml;..\..\..\3rdparty\zlib\src;..\..\XLive;.\;..\;..\..\..\;..\blamlib</AdditionalIncludeDirectories>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DisableSpecificWarnings>4505;4100;4201</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <AdditionalOptions>/DPSAPI_VERSION=1 /utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
+      <TreatSpecificWarningsAsErrors>4700</TreatSpecificWarningsAsErrors>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\achievements\achievement_live_interface.cpp" />
+    <ClCompile Include="..\animations\animation_channel.cpp" />
+    <ClCompile Include="..\animations\animation_definitions.cpp" />
+    <ClCompile Include="..\animations\animation_id.cpp" />
+    <ClCompile Include="..\animations\animation_interpolation.cpp" />
+    <ClCompile Include="..\animations\animation_manager.cpp" />
+    <ClCompile Include="..\animations\ik_point_iterator.cpp" />
+    <ClCompile Include="..\bink\wmv_playback.cpp" />
+    <ClCompile Include="..\bitmaps\bitmaps.cpp" />
+    <ClCompile Include="..\bitmaps\bitmap_group.cpp" />
+    <ClCompile Include="..\bitmaps\bitmap_utilities.cpp" />
+    <ClCompile Include="..\bitmaps\targa_file.cpp" />
+    <ClCompile Include="..\bitmaps\tiff_file.cpp" />
+    <ClCompile Include="..\cache\cache_files.cpp" />
+    <ClCompile Include="..\cache\cache_files_windows.cpp" />
+    <ClCompile Include="..\cache\cache_file_verification.cpp" />
+    <ClCompile Include="..\cache\pc_geometry_cache.cpp" />
+    <ClCompile Include="..\cache\pc_texture_cache.cpp" />
+    <ClCompile Include="..\cache\phyical_memory_map.cpp" />
+    <ClCompile Include="..\camera\camera.cpp" />
+    <ClCompile Include="..\camera\dead_camera.cpp" />
+    <ClCompile Include="..\camera\director.cpp" />
+    <ClCompile Include="..\camera\editor_camera.cpp" />
+    <ClCompile Include="..\camera\first_person_camera.cpp" />
+    <ClCompile Include="..\camera\following_camera.cpp" />
+    <ClCompile Include="..\camera\observer.cpp" />
+    <ClCompile Include="..\cartographer\cartographer.cpp" />
+    <ClCompile Include="..\cartographer\config\endpoints.cpp" />
+    <ClCompile Include="..\cartographer\discord\discord_interface.cpp" />
+    <ClCompile Include="..\cartographer\tag_fixes\tag_fixes.cpp" />
+    <ClCompile Include="..\cartographer\twizzler\twizzler.cpp" />
+    <ClCompile Include="..\cseries\async.cpp" />
+    <ClCompile Include="..\cseries\async_helpers.cpp" />
+    <ClCompile Include="..\cseries\cseries.cpp" />
+    <ClCompile Include="..\cseries\cseries_errors.cpp" />
+    <ClCompile Include="..\cseries\cseries_system_memory.cpp" />
+    <ClCompile Include="..\cseries\cseries_windows.cpp" />
+    <ClCompile Include="..\cseries\cseries_windows_debug.cpp" />
+    <ClCompile Include="..\cseries\cseries_windows_debug_pc.cpp" />
+    <ClCompile Include="..\cseries\cseries_windows_minidump.cpp" />
+    <ClCompile Include="..\cseries\cseries_windows_minidump_logs.cpp" />
+    <ClCompile Include="..\cseries\cseries_windows_modules.cpp" />
+    <ClCompile Include="..\cseries\debug_memory.cpp" />
+    <ClCompile Include="..\cseries\profile.cpp" />
+    <ClCompile Include="..\cseries\runtime_state.cpp" />
+    <ClCompile Include="..\cseries\sort.cpp" />
+    <ClCompile Include="..\cseries\stack_walk_windows.cpp" />
+    <ClCompile Include="..\cseries\threads_windows.cpp" />
+    <ClCompile Include="..\cutscene\cinematics.cpp" />
+    <ClCompile Include="..\cutscene\recorded_animations.cpp" />
+    <ClCompile Include="..\data_mining\data_mining.cpp" />
+    <ClCompile Include="..\debug\menu\debug_menu_main.cpp" />
+    <ClCompile Include="..\dialogs\edit_text.cpp" />
+    <ClCompile Include="..\editor\editor_stubs.cpp" />
+    <ClCompile Include="..\filesys\pc_file_system.cpp" />
+    <ClCompile Include="..\game\aim_assist.cpp" />
+    <ClCompile Include="..\game\cheats.cpp" />
+    <ClCompile Include="..\game\game.cpp" />
+    <ClCompile Include="..\game\game_allegiance.cpp" />
+    <ClCompile Include="..\game\game_engine.cpp" />
+    <ClCompile Include="..\game\game_engine_simulation.cpp" />
+    <ClCompile Include="..\game\game_engine_util.cpp" />
+    <ClCompile Include="..\game\game_globals.cpp" />
+    <ClCompile Include="..\game\game_grief.cpp" />
+    <ClCompile Include="..\game\game_options.cpp" />
+    <ClCompile Include="..\game\game_results.cpp" />
+    <ClCompile Include="..\game\game_statborg.cpp" />
+    <ClCompile Include="..\game\game_time.cpp" />
+    <ClCompile Include="..\game\players.cpp" />
+    <ClCompile Include="..\game\player_control.cpp" />
+    <ClCompile Include="..\game\player_mapping.cpp" />
+    <ClCompile Include="..\game\player_vibration.cpp" />
+    <ClCompile Include="..\game\preferences.cpp" />
+    <ClCompile Include="..\hs\hs.cpp" />
+    <ClCompile Include="..\hs\hs_compile.cpp" />
+    <ClCompile Include="..\hs\hs_function.cpp" />
+    <ClCompile Include="..\hs\hs_globals_external.cpp" />
+    <ClCompile Include="..\hs\hs_runtime.cpp" />
+    <ClCompile Include="..\hs\object_lists.cpp" />
+    <ClCompile Include="..\input\controllers.cpp" />
+    <ClCompile Include="..\input\input_abstraction.cpp" />
+    <ClCompile Include="..\input\input_process.cpp" />
+    <ClCompile Include="..\input\input_windows.cpp" />
+    <ClCompile Include="..\input\input_xinput.cpp" />
+    <ClCompile Include="..\kablam\kablam.cpp" />
+    <ClCompile Include="..\kablam\kablamsvc_client.cpp" />
+    <ClCompile Include="..\kablam\kablam_config.cpp" />
+    <ClCompile Include="..\kablam\kablam_log.cpp" />
+    <ClCompile Include="..\main\console.cpp" />
+    <ClCompile Include="..\main\debug_keys.cpp" />
+    <ClCompile Include="..\main\game_preferences.cpp" />
+    <ClCompile Include="..\main\interpolator.cpp" />
+    <ClCompile Include="..\main\levels.cpp" />
+    <ClCompile Include="..\main\licensing.cpp" />
+    <ClCompile Include="..\main\loading.cpp" />
+    <ClCompile Include="..\main\main.cpp" />
+    <ClCompile Include="..\main\main_game.cpp" />
+    <ClCompile Include="..\main\main_render.cpp" />
+    <ClCompile Include="..\main\main_screenshot.cpp" />
+    <ClCompile Include="..\main\main_time.cpp" />
+    <ClCompile Include="..\main\map_repository.cpp" />
+    <ClCompile Include="..\math\color_math.cpp" />
+    <ClCompile Include="..\math\function_definitions.cpp" />
+    <ClCompile Include="..\math\integer_math.cpp" />
+    <ClCompile Include="..\math\matrix_math.cpp" />
+    <ClCompile Include="..\math\periodic_functions.cpp" />
+    <ClCompile Include="..\math\random_direction_table.cpp" />
+    <ClCompile Include="..\math\random_math.cpp" />
+    <ClCompile Include="..\math\real_math.cpp" />
+    <ClCompile Include="..\math\real_quantization.cpp" />
+    <ClCompile Include="..\memory\bitstream.cpp" />
+    <ClCompile Include="..\memory\data.cpp" />
+    <ClCompile Include="..\memory\lruv_cache.cpp" />
+    <ClCompile Include="..\memory\memory_pool.cpp" />
+    <ClCompile Include="..\memory\rockall_heap_manager.cpp" />
+    <ClCompile Include="..\memory\static_arrays.cpp" />
+    <ClCompile Include="..\models\model_definitions.cpp" />
+    <ClCompile Include="..\models\render_models.cpp" />
+    <ClCompile Include="..\multithreading\synchronization.cpp" />
+    <ClCompile Include="..\physics\character_physics_mode_ground.cpp" />
+    <ClCompile Include="..\physics\character_physics_mode_melee.cpp" />
+    <ClCompile Include="..\physics\collisions.cpp" />
+    <ClCompile Include="..\physics\collision_bsp.cpp" />
+    <ClCompile Include="..\physics\collision_model_definitions.cpp" />
+    <ClCompile Include="..\physics\collision_usage.cpp" />
+    <ClCompile Include="..\physics\havok.cpp" />
+    <ClCompile Include="..\physics\havok_memory.cpp" />
+    <ClCompile Include="..\physics\impacts.cpp" />
+    <ClCompile Include="..\physics\physics_constants.cpp" />
+    <ClCompile Include="..\physics\physics_model_definitions.cpp" />
+    <ClCompile Include="..\sapien\editor.cpp" />
+    <ClCompile Include="..\sapien\patches_initialize.cpp" />
+    <ClCompile Include="..\saved_games\cartographer_player_profile\cartographer_player_profile.cpp" />
+    <ClCompile Include="..\saved_games\cartographer_player_profile\cartographer_player_profile_weapon_offsets.cpp" />
+    <ClCompile Include="..\saved_games\game_state.cpp" />
+    <ClCompile Include="..\saved_games\game_state_procs.cpp" />
+    <ClCompile Include="..\saved_games\game_variant.cpp" />
+    <ClCompile Include="..\saved_games\player_profile.cpp" />
+    <ClCompile Include="..\saved_games\saved_game_files.cpp" />
+    <ClCompile Include="..\saved_games\saved_game_files_async_windows.cpp" />
+    <ClCompile Include="..\scenario\scenario.cpp" />
+    <ClCompile Include="..\scenario\scenario_fog.cpp" />
+    <ClCompile Include="..\scenario\scenario_interpolators.cpp" />
+    <ClCompile Include="..\scenario\scenario_kill_trigger_volumes.cpp" />
+    <ClCompile Include="..\shell\shell.cpp" />
+    <ClCompile Include="..\shell\shell_windows.cpp" />
+    <ClCompile Include="..\shell\shell_windows_internals.cpp" />
+    <ClCompile Include="..\shell\shell_windows_ipc.cpp" />
+    <ClCompile Include="..\shell\shell_windows_pcc.cpp" />
+    <ClCompile Include="..\shell\windows\crash_report_window\crash_report_window.cpp" />
+    <ClCompile Include="..\sound\game_sound.cpp" />
+    <ClCompile Include="..\sound\game_sound_deterministic.cpp" />
+    <ClCompile Include="..\sound\sound_cache_file_definitions.cpp" />
+    <ClCompile Include="..\sound\sound_manager.cpp" />
+    <ClCompile Include="..\structures\cluster_partitions.cpp" />
+    <ClCompile Include="..\structures\structures.cpp" />
+    <ClCompile Include="..\structures\structure_bsp_definitions.cpp" />
+    <ClCompile Include="..\tag_files\files.cpp" />
+    <ClCompile Include="..\tag_files\files_windows.cpp" />
+    <ClCompile Include="..\tag_files\tag_files.cpp" />
+    <ClCompile Include="..\tag_files\tag_groups.cpp" />
+    <ClCompile Include="..\tag_files\tag_group_dependencies.cpp" />
+    <ClCompile Include="..\tag_files\tag_loader\tag_injection.cpp" />
+    <ClCompile Include="..\tag_files\tag_loader\tag_injection_manager.cpp" />
+    <ClCompile Include="..\tag_files\tag_loader\tag_injection_table.cpp" />
+    <ClCompile Include="..\tag_files\tag_loader\xml\xml_agent.cpp" />
+    <ClCompile Include="..\tag_files\tag_loader\xml\xml_definition_block.cpp" />
+    <ClCompile Include="..\tag_files\tag_loader\xml\xml_definition_loader.cpp" />
+    <ClCompile Include="..\text\draw_string.cpp" />
+    <ClCompile Include="..\text\font_cache.cpp" />
+    <ClCompile Include="..\text\font_group.cpp" />
+    <ClCompile Include="..\text\text_group.cpp" />
+    <ClCompile Include="..\text\unicode.cpp" />
+    <ClCompile Include="..\tool\tool_patches_initialize.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\achievements\achievement_live_interface.h" />
+    <ClInclude Include="..\animations\animation_channel.h" />
+    <ClInclude Include="..\animations\animation_definitions.h" />
+    <ClInclude Include="..\animations\animation_id.h" />
+    <ClInclude Include="..\animations\animation_interpolation.h" />
+    <ClInclude Include="..\animations\animation_manager.h" />
+    <ClInclude Include="..\animations\ik_point_iterator.h" />
+    <ClInclude Include="..\bink\wmv_playback.h" />
+    <ClInclude Include="..\bitmaps\bitmaps.h" />
+    <ClInclude Include="..\bitmaps\bitmap_group.h" />
+    <ClInclude Include="..\bitmaps\bitmap_utilities.h" />
+    <ClInclude Include="..\bitmaps\targa_file.h" />
+    <ClInclude Include="..\bitmaps\tiff_file.h" />
+    <ClInclude Include="..\cache\cache_files.h" />
+    <ClInclude Include="..\cache\cache_files_windows.h" />
+    <ClInclude Include="..\cache\cache_file_verification.h" />
+    <ClInclude Include="..\cache\pc_geometry_cache.h" />
+    <ClInclude Include="..\cache\pc_texture_cache.h" />
+    <ClInclude Include="..\cache\physical_memory_map.h" />
+    <ClInclude Include="..\cache\predicted_resources.h" />
+    <ClInclude Include="..\camera\camera.h" />
+    <ClInclude Include="..\camera\camera_track_definition.h" />
+    <ClInclude Include="..\camera\dead_camera.h" />
+    <ClInclude Include="..\camera\director.h" />
+    <ClInclude Include="..\camera\editor_camera.h" />
+    <ClInclude Include="..\camera\first_person_camera.h" />
+    <ClInclude Include="..\camera\following_camera.h" />
+    <ClInclude Include="..\camera\observer.h" />
+    <ClInclude Include="..\cartographer\cartographer.h" />
+    <ClInclude Include="..\cartographer\config\endpoints.h" />
+    <ClInclude Include="..\cartographer\discord\discord_interface.h" />
+    <ClInclude Include="..\cartographer\tag_fixes\tag_fixes.h" />
+    <ClInclude Include="..\cartographer\twizzler\twizzler.h" />
+    <ClInclude Include="..\cseries\async.h" />
+    <ClInclude Include="..\cseries\async_helpers.h" />
+    <ClInclude Include="..\cseries\cseries.h" />
+    <ClInclude Include="..\cseries\cseries_errors.h" />
+    <ClInclude Include="..\cseries\cseries_system_memory.h" />
+    <ClInclude Include="..\cseries\cseries_windows.h" />
+    <ClInclude Include="..\cseries\cseries_windows_debug.h" />
+    <ClInclude Include="..\cseries\cseries_windows_debug_pc.h" />
+    <ClInclude Include="..\cseries\cseries_windows_minidump.h" />
+    <ClInclude Include="..\cseries\cseries_windows_minidump_logs.h" />
+    <ClInclude Include="..\cseries\cseries_windows_modules.h" />
+    <ClInclude Include="..\cseries\debug_memory.h" />
+    <ClInclude Include="..\cseries\profile.h" />
+    <ClInclude Include="..\cseries\runtime_state.h" />
+    <ClInclude Include="..\cseries\sort.h" />
+    <ClInclude Include="..\cseries\stack_walk_windows.h" />
+    <ClInclude Include="..\cseries\threads_windows.h" />
+    <ClInclude Include="..\cutscene\cinematics.h" />
+    <ClInclude Include="..\cutscene\cinematics_definitions.h" />
+    <ClInclude Include="..\cutscene\recorded_animations.h" />
+    <ClInclude Include="..\cutscene\recorded_animation_definitions.h" />
+    <ClInclude Include="..\data_mining\data_mining.h" />
+    <ClInclude Include="..\debug\menu\debug_menu_main.h" />
+    <ClInclude Include="..\dialogs\edit_text.h" />
+    <ClInclude Include="..\editor\editor_flags.h" />
+    <ClInclude Include="..\editor\editor_stubs.h" />
+    <ClInclude Include="..\errors\error_reports.h" />
+    <ClInclude Include="..\filesys\pc_file_system.h" />
+    <ClInclude Include="..\filesys\pc_saved_game.h" />
+    <ClInclude Include="..\game\aim_assist.h" />
+    <ClInclude Include="..\game\cheats.h" />
+    <ClInclude Include="..\game\game.h" />
+    <ClInclude Include="..\game\game_allegiance.h" />
+    <ClInclude Include="..\game\game_engine.h" />
+    <ClInclude Include="..\game\game_engine_simulation.h" />
+    <ClInclude Include="..\game\game_engine_spawning.h" />
+    <ClInclude Include="..\game\game_engine_territories.h" />
+    <ClInclude Include="..\game\game_engine_util.h" />
+    <ClInclude Include="..\game\game_globals.h" />
+    <ClInclude Include="..\game\game_grief.h" />
+    <ClInclude Include="..\game\game_options.h" />
+    <ClInclude Include="..\game\game_portals.h" />
+    <ClInclude Include="..\game\game_results.h" />
+    <ClInclude Include="..\game\game_statborg.h" />
+    <ClInclude Include="..\game\game_time.h" />
+    <ClInclude Include="..\game\materials.h" />
+    <ClInclude Include="..\game\multiplayer_globals.h" />
+    <ClInclude Include="..\game\players.h" />
+    <ClInclude Include="..\game\player_constants.h" />
+    <ClInclude Include="..\game\player_control.h" />
+    <ClInclude Include="..\game\player_mapping.h" />
+    <ClInclude Include="..\game\player_vibration.h" />
+    <ClInclude Include="..\game\preferences.h" />
+    <ClInclude Include="..\geometry\geometry_block.h" />
+    <ClInclude Include="..\geometry\geometry_definitions_new.h" />
+    <ClInclude Include="..\hs\hs.h" />
+    <ClInclude Include="..\hs\hs_compile.h" />
+    <ClInclude Include="..\hs\hs_function.h" />
+    <ClInclude Include="..\hs\hs_globals_external.h" />
+    <ClInclude Include="..\hs\hs_library_internal_compile.h" />
+    <ClInclude Include="..\hs\hs_library_internal_runtime.h" />
+    <ClInclude Include="..\hs\hs_runtime.h" />
+    <ClInclude Include="..\hs\hs_unit_seats.h" />
+    <ClInclude Include="..\hs\object_lists.h" />
+    <ClInclude Include="..\input\controllers.h" />
+    <ClInclude Include="..\input\input_abstraction.h" />
+    <ClInclude Include="..\input\input_constants.h" />
+    <ClInclude Include="..\input\input_process.h" />
+    <ClInclude Include="..\input\input_windows.h" />
+    <ClInclude Include="..\input\input_xinput.h" />
+    <ClInclude Include="..\kablam\kablam.h" />
+    <ClInclude Include="..\kablam\kablamsvc_client.h" />
+    <ClInclude Include="..\kablam\kablam_config.h" />
+    <ClInclude Include="..\kablam\kablam_log.h" />
+    <ClInclude Include="..\main\console.h" />
+    <ClInclude Include="..\main\debug_keys.h" />
+    <ClInclude Include="..\main\game_preferences.h" />
+    <ClInclude Include="..\main\interpolator.h" />
+    <ClInclude Include="..\main\levels.h" />
+    <ClInclude Include="..\main\level_definitions.h" />
+    <ClInclude Include="..\main\licensing.h" />
+    <ClInclude Include="..\main\loading.h" />
+    <ClInclude Include="..\main\main.h" />
+    <ClInclude Include="..\main\main_game.h" />
+    <ClInclude Include="..\main\main_render.h" />
+    <ClInclude Include="..\main\main_screenshot.h" />
+    <ClInclude Include="..\main\main_time.h" />
+    <ClInclude Include="..\main\map_manager.h" />
+    <ClInclude Include="..\main\map_repository.h" />
+    <ClInclude Include="..\math\color_math.h" />
+    <ClInclude Include="..\math\crypto_windows.h" />
+    <ClInclude Include="..\math\function_definitions.h" />
+    <ClInclude Include="..\math\integer_math.h" />
+    <ClInclude Include="..\math\matrix_math.h" />
+    <ClInclude Include="..\math\periodic_functions.h" />
+    <ClInclude Include="..\math\random_direction_table.h" />
+    <ClInclude Include="..\math\random_math.h" />
+    <ClInclude Include="..\math\real_math.h" />
+    <ClInclude Include="..\math\real_quantization.h" />
+    <ClInclude Include="..\memory\bitstream.h" />
+    <ClInclude Include="..\memory\data.h" />
+    <ClInclude Include="..\memory\hashtable.h" />
+    <ClInclude Include="..\memory\lruv_cache.h" />
+    <ClInclude Include="..\memory\memory_pool.h" />
+    <ClInclude Include="..\memory\rockall_heap_manager.h" />
+    <ClInclude Include="..\memory\static_arrays.h" />
+    <ClInclude Include="..\models\models.h" />
+    <ClInclude Include="..\models\model_definitions.h" />
+    <ClInclude Include="..\models\render_models.h" />
+    <ClInclude Include="..\models\render_model_definitions.h" />
+    <ClInclude Include="..\multithreading\synchronization.h" />
+    <ClInclude Include="..\physics\breakable_surface_definitions.h" />
+    <ClInclude Include="..\physics\character_physics_definitions.h" />
+    <ClInclude Include="..\physics\character_physics_mode_ground.h" />
+    <ClInclude Include="..\physics\character_physics_mode_melee.h" />
+    <ClInclude Include="..\physics\collisions.h" />
+    <ClInclude Include="..\physics\collision_bsp.h" />
+    <ClInclude Include="..\physics\collision_bsp_definition.h" />
+    <ClInclude Include="..\physics\collision_models.h" />
+    <ClInclude Include="..\physics\collision_model_definitions.h" />
+    <ClInclude Include="..\physics\collision_usage.h" />
+    <ClInclude Include="..\physics\havok.h" />
+    <ClInclude Include="..\physics\havok_component.h" />
+    <ClInclude Include="..\physics\havok_memory.h" />
+    <ClInclude Include="..\physics\impacts.h" />
+    <ClInclude Include="..\physics\physics_constants.h" />
+    <ClInclude Include="..\physics\physics_models.h" />
+    <ClInclude Include="..\physics\physics_model_definitions.h" />
+    <ClInclude Include="..\physics\structure_physics.h" />
+    <ClInclude Include="..\sapien\editor.h" />
+    <ClInclude Include="..\sapien\patches_initialize.h" />
+    <ClInclude Include="..\saved_games\cartographer_player_profile\cartographer_player_profile.h" />
+    <ClInclude Include="..\saved_games\cartographer_player_profile\cartographer_player_profile_weapon_offsets.h" />
+    <ClInclude Include="..\saved_games\game_state.h" />
+    <ClInclude Include="..\saved_games\game_state_procs.h" />
+    <ClInclude Include="..\saved_games\game_variant.h" />
+    <ClInclude Include="..\saved_games\player_profile.h" />
+    <ClInclude Include="..\saved_games\saved_film.h" />
+    <ClInclude Include="..\saved_games\saved_game_files.h" />
+    <ClInclude Include="..\saved_games\saved_game_files_async_windows.h" />
+    <ClInclude Include="..\scenario\scenario.h" />
+    <ClInclude Include="..\scenario\scenario_definitions.h" />
+    <ClInclude Include="..\scenario\scenario_fog.h" />
+    <ClInclude Include="..\scenario\scenario_interpolators.h" />
+    <ClInclude Include="..\scenario\scenario_kill_trigger_volumes.h" />
+    <ClInclude Include="..\scenario\scenario_lights.h" />
+    <ClInclude Include="..\shell\shell.h" />
+    <ClInclude Include="..\shell\shell_windows.h" />
+    <ClInclude Include="..\shell\shell_windows_internals.h" />
+    <ClInclude Include="..\shell\shell_windows_ipc.h" />
+    <ClInclude Include="..\shell\shell_windows_pcc.h" />
+    <ClInclude Include="..\shell\windows\crash_report_window\crash_report_window.h" />
+    <ClInclude Include="..\sound\game_sound.h" />
+    <ClInclude Include="..\sound\game_sound_deterministic.h" />
+    <ClInclude Include="..\sound\sound_cache_file_definitions.h" />
+    <ClInclude Include="..\sound\sound_classes.h" />
+    <ClInclude Include="..\sound\sound_clusters.h" />
+    <ClInclude Include="..\sound\sound_definitions.h" />
+    <ClInclude Include="..\sound\sound_manager.h" />
+    <ClInclude Include="..\sound\sound_scenery.h" />
+    <ClInclude Include="..\structures\cluster_partitions.h" />
+    <ClInclude Include="..\structures\instanced_geometry_definitions.h" />
+    <ClInclude Include="..\structures\leaf_map.h" />
+    <ClInclude Include="..\structures\structures.h" />
+    <ClInclude Include="..\structures\structure_audibility.h" />
+    <ClInclude Include="..\structures\structure_bsp_definitions.h" />
+    <ClInclude Include="..\structures\structure_lightmap.h" />
+    <ClInclude Include="..\structures\structure_lightmap_definitions.h" />
+    <ClInclude Include="..\structures\structure_runtime_decals.h" />
+    <ClInclude Include="..\tag_files\data_reference.h" />
+    <ClInclude Include="..\tag_files\files.h" />
+    <ClInclude Include="..\tag_files\files_windows.h" />
+    <ClInclude Include="..\tag_files\tag_block.h" />
+    <ClInclude Include="..\tag_files\tag_files.h" />
+    <ClInclude Include="..\tag_files\tag_groups.h" />
+    <ClInclude Include="..\tag_files\tag_group_access.h" />
+    <ClInclude Include="..\tag_files\tag_group_dependencies.h" />
+    <ClInclude Include="..\tag_files\tag_import_definitions.h" />
+    <ClInclude Include="..\tag_files\tag_loader\tag_injection.h" />
+    <ClInclude Include="..\tag_files\tag_loader\tag_injection_define.h" />
+    <ClInclude Include="..\tag_files\tag_loader\tag_injection_manager.h" />
+    <ClInclude Include="..\tag_files\tag_loader\tag_injection_table.h" />
+    <ClInclude Include="..\tag_files\tag_loader\xml\xml_agent.h" />
+    <ClInclude Include="..\tag_files\tag_loader\xml\xml_definition_block.h" />
+    <ClInclude Include="..\tag_files\tag_loader\xml\xml_definition_loader.h" />
+    <ClInclude Include="..\tag_files\tag_reference.h" />
+    <ClInclude Include="..\text\draw_string.h" />
+    <ClInclude Include="..\text\font_cache.h" />
+    <ClInclude Include="..\text\font_group.h" />
+    <ClInclude Include="..\text\text.h" />
+    <ClInclude Include="..\text\text_group.h" />
+    <ClInclude Include="..\text\unicode.h" />
+    <ClInclude Include="..\tool\tool_patches_initialize.h" />
+    <ClInclude Include="stdafx.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -8,12 +8,15 @@
 #include "sapien/patches_initialize.h"
 #include "shell/shell.h"
 #include "shell/shell_windows.h"
+#include "tag_files/files.h"
 #include "tool/tool_patches_initialize.h"
 
 #include "H2MOD.h"
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Utils/Utils.h"
+
+#include <XLive/xnet/xnet.h>
 
 /* constants */
 
@@ -125,7 +128,7 @@ void H2DedicatedServerStartup() {
 
 // use only after initLocalAppData has been called
 // by default useAppDataLocalPath is set to true, if not specified
-void log_file_name_prepare(const wchar_t* logFileName, c_static_wchar_string<MAX_PATH>* path)
+void log_file_name_prepare(const wchar_t* logFileName, c_static_wchar_string<MAX_PATH>* path_wide)
 {
 	const bool is_dedi = shell_is_dedicated_server();
 	const wchar_t* process_name = is_dedi ? k_server_process_name : k_client_process_name;
@@ -149,21 +152,27 @@ void log_file_name_prepare(const wchar_t* logFileName, c_static_wchar_string<MAX
 	// Place logs in server folder when portable or dedi
 	if (g_h2_portable || is_dedi)
 	{
-		path->set(g_h2_process_file_path);
-		path->append(L"\\");
+		path_wide->set(g_h2_process_file_path);
+		path_wide->append(L"\\");
 	}
 	else
 	{
-		path->set(g_h2_appdata_local_path);
+		path_wide->set(g_h2_appdata_local_path);
 	}
-	path->append(folders.get_string());
+	path_wide->append(folders.get_string());
 
 	// try making logs directory
-	SHCreateDirectoryEx(NULL, path->get_string(), NULL);
+	s_file_reference path_ref;
 
-	path->append(L"\\");
-	path->append(logFileName);
-	path->append(L".log");
+	char path[MAX_PATH];
+	wchar_string_to_utf8_string(path_wide->get_string(), path, MAX_PATH);
+
+	file_reference_create_from_path(&path_ref, path, true);
+	file_create_parent_directories_if_not_present(&path_ref);
+
+	path_wide->append(L"\\");
+	path_wide->append(logFileName);
+	path_wide->append(L".log");
 	return;
 }
 

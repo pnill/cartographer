@@ -2,6 +2,7 @@
 #include "game_variant.h"
 
 #include "game/game.h"
+#include "game/game_options.h"
 
 /* public code */
 

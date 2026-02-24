@@ -12,6 +12,8 @@
 
 /* globals */
 
+extern s_saved_game_cartographer_player_profile* g_advanced_settings_current_cartographer_profile;
+
 static c_static_string<256> g_weapon_offsets_temp_string;
 
 /* prototypes */

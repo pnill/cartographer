@@ -866,6 +866,13 @@ bool config_use_instance_name(const wchar_t** instance_name)
 	return shell_is_dedicated_server() && *instance_name != NULL;
 }
 
+const char* h2config_get_dedi_server_name(void)
+{
+	return H2Config_dedi_server_name;
+}
+
+/* private code */
+
 static bool config_local_instance_exists(wchar_t* config_file_path, size_t count)
 {
 	// Get local config path
