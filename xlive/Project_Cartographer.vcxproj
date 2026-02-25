@@ -1310,6 +1310,9 @@
     <ClCompile Include="Blam\Engine\saved_games\saved_game_files.cpp" />
     <ClInclude Include="Blam\Engine\networking\network_constants.h" />
     <ClInclude Include="Blam\Engine\networking\network_loading.h" />
+    <ClInclude Include="Blam\Engine\networking\replication\replication_event_manager_view.h" />
+    <ClInclude Include="Blam\Engine\networking\replication\replication_game_results.h" />
+    <ClInclude Include="Blam\Engine\networking\replication\replication_scheduler.h" />
     <ClInclude Include="Blam\Engine\objects\object_scenario_definitions.h" />
     <ClCompile Include="Blam\Engine\scenario\scenario.cpp" />
     <ClCompile Include="Blam\Engine\scenario\scenario_fog.cpp" />
@@ -2437,6 +2440,7 @@
     <ClInclude Include="Blam\Engine\simulation\simulation_queue_global_events.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_type_collection.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_view.h" />
+    <ClInclude Include="Blam\Engine\simulation\simulation_view_telemetry.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_watcher.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_world.h" />
     <ClInclude Include="Blam\Engine\sound\game_sound.h" />

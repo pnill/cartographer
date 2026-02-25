@@ -1,6 +1,5 @@
 #pragma once
 
-#pragma pack(push, 1)
 struct s_player_predicted_aim_assist
 {
 	float primary_auto_aim_level;
@@ -32,4 +31,3 @@ struct s_player_motion
 	BYTE gap33;
 };
 ASSERT_STRUCT_SIZE(s_player_motion, 0x34);
-#pragma pack(pop)

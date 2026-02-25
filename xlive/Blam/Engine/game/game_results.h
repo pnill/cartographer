@@ -289,6 +289,18 @@ public:
 };
 ASSERT_STRUCT_SIZE(c_game_results, 0xDC68);
 
+struct s_game_results_incremental_update
+{
+	bool initialized;
+	bool started;
+	int32 start_time;
+	bool finalized;
+	int32 finish_time;
+	s_game_results_player_statistics player_statistics[k_maximum_players];
+	int8 data[5402]; // todo: finish
+};
+ASSERT_STRUCT_SIZE(s_game_results_incremental_update, 19404);
+
 /* prototypes */
 
 void game_results_stop_recording(void);

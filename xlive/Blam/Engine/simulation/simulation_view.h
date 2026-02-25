@@ -1,6 +1,12 @@
 #pragma once
 
 #include "machine_id.h"
+#include "networking/delivery/network_channel.h"
+#include "networking/replication/replication_event_manager_view.h"
+#include "networking/replication/replication_game_results.h"
+#include "networking/replication/replication_scheduler.h"
+
+/* enums */
 
 enum e_simulation_view_type : __int16
 {
@@ -29,71 +35,56 @@ enum e_simulation_view_death_reason
 	k_simulation_view_reason_count = 0xC,
 };
 
-#pragma pack(push,1)
-struct c_simulation_view
+/* structures */
+
+class c_simulation_view
 {
-	char field_0[2];
+public:
+	int16 m_identifier;
 	e_simulation_view_type m_view_type;
-	datum view_datum_index;
-	int m_distributed_view;
-	void* m_world;
-	unsigned int m_view_index;
-	s_machine_identifier machine_id;
-	char gap_1A[2];
-	int m_peer_index;
-	void* m_observer;
-	unsigned int m_observer_channel_index;
+	datum m_view_datum_index;
+	class c_simulation_distributed_view* m_distributed_view;
+	class c_simulation_world* m_world;
+	uint32 m_world_view_index;
+	s_machine_identifier m_remote_machine_identifier;
+	int32 m_remote_machine_index;
+	c_network_observer* m_observer;
+	uint32 m_observer_channel_index;
 	e_simulation_view_death_reason m_view_death_reason;
-	DWORD m_view_establishment_mode;
-	DWORD field_30;
-	int field_34;
-	unsigned int field_38;
+	int32 m_view_establishment_mode;
+	int32 m_view_establishment_identifier;
+	int32 m_remote_establishment_mode;
+	uint32 m_remote_establishment_identifier;
 	int32 m_channel_index;
-	unsigned int field_40;
-	void* field_44;
-	int field_48;
-	int field_4C;
-	int field_50;
-	int field_54;
-	int field_58;
-	int field_5C;
-	int field_60;
-	int field_64;
-	int field_68;
-	int field_6C;
-	int field_70;
-	char gap_74;
-	char field_74;
-	char field_76[2];
-	char field_78[4];
-	int field_7C;
-	unsigned int field_80;
-	unsigned int field_84;
-	char field_88[8];
-	signed int field_90;
+	uint32 m_channel_connection_identifier;
+	c_network_channel_simulation_interface m_channel_interface;
+	bool m_simulation_active;
+	uint32 m_simulation_player_acknowledged_mask;
+	uint32 m_synchronous_received_action_number;
+	uint32 m_synchronous_acknowledged_update_number;
+	bool m_synchronous_client_blocked;
+	uint32 m_synchronous_client_block_timestamp;
+	int32 m_synchronous_catchup_attempt_count;
 	void* m_synchronous_catchup_buffer;
-	int field_98;
-	int field_9C;
-	int field_A0;
-	char gap_A4[8];
-	int field_AC;
-	int field_B0;
+	int32 m_synchronous_catchup_buffer_size;
+	int32 m_synchronous_catchup_stream_capacity;
+	int32 m_synchronous_catchup_stream_data;
+	int32 m_synchronous_catchup_stream_read_offset;
+	int32 m_synchronous_catchup_stream_used;
+	int32 m_synchronous_catchup_buffer_offset;
+	int32 m_synchronous_next_action_number;
 };
-#pragma pack(pop)
 ASSERT_STRUCT_SIZE(c_simulation_view, 0xB4);
 
 class c_simulation_distributed_view
 {
-	int32 m_field_0;
-	void* m_replication_scheduler_vftable;
-	int8 m_replication_scheduler[40];
-	void* m_replication_entity_manager_view_vftable;
-	int8 m_replication_entity_manager_view[20540];
-	void* m_replication_event_manager_view_vftable;
-	int8 m_replication_event_manager_view[36];
-	void* m_replication_control_view_vftable;
-	int8 m_replication_control_view[3868];
-	void* m_simulation_view_telemetry_provider_vftable;
-	int8 m_simulation_view_telemetry_provider[19616];
+private:
+	int16 identifier;
+	c_replication_scheduler m_replication_scheduler;
+	c_replication_entity_manager_view m_entity_view;
+	c_replication_event_manager_view m_event_view;
+	c_replication_control_view m_control_view;
+	c_simulation_view_telemetry_provider m_telemetry_provider;
+	c_game_results_replicator m_game_results_replicator;
 };
-ASSERT_STRUCT_SIZE(c_simulation_distributed_view, 44124);
+ASSERT_STRUCT_SIZE(c_simulation_distributed_view, 0xAC3C);

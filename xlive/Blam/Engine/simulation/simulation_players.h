@@ -2,6 +2,7 @@
 #include "machine_id.h"
 
 #include "game/player_control.h"
+#include "game/player_constants.h"
 #include "networking/network_game_definitions.h"
 
 /* enums */
@@ -44,6 +45,25 @@ struct simulation_player_update
 	s_player_identifier swap_player_identifier;
 };
 ASSERT_STRUCT_SIZE(simulation_player_update, 0xB4);
+
+struct s_player_collection_player
+{
+	s_player_identifier identifier;
+	bool left_game;
+	uint32 left_game_time;
+	s_machine_identifier machine_identifier;
+	uint32 user_index;
+	e_controller_index controller_index;
+	s_player_configuration configuration_data;
+};
+ASSERT_STRUCT_SIZE(s_player_collection_player, 0xA4);
+
+struct s_player_collection
+{
+	uint32 player_valid_mask;
+	s_player_collection_player players[k_maximum_players];
+};
+ASSERT_STRUCT_SIZE(s_player_collection, 0xA44);
 
 /* classes */
 

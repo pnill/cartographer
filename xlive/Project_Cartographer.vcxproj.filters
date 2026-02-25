@@ -2077,6 +2077,10 @@
     <ClInclude Include="Blam\Engine\physics\character_physics_mode_flying.h" />
     <ClInclude Include="Blam\Engine\physics\character_physics_mode_sentinel.h" />
     <ClInclude Include="Blam\Engine\creatures\creatures.h" />
+    <ClInclude Include="Blam\Engine\networking\replication\replication_scheduler.h" />
+    <ClInclude Include="Blam\Engine\simulation\simulation_view_telemetry.h" />
+    <ClInclude Include="Blam\Engine\networking\replication\replication_event_manager_view.h" />
+    <ClInclude Include="Blam\Engine\networking\replication\replication_game_results.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

@@ -1,6 +1,8 @@
 #pragma once
 #include "networking/transport/transport_address.h"
 
+/* enums */
+
 enum e_network_channel_closure_reason
 {
 	_network_channel_reason_none = 0,
@@ -29,6 +31,32 @@ enum e_network_channel_state
 {
 	_network_channel_state_2 = 2,
 	_network_channel_state_5 = 5,
+};
+
+/* structures */
+
+class c_network_channel_owner
+{
+public:
+	virtual void desire_heartbeat() = 0;
+	virtual int32 channel_get_state() = 0;
+	virtual void attempt_channel_reconnection() = 0;
+	virtual void notify_channel_connection() = 0;
+	virtual void notify_channel_died() = 0;
+	virtual void vtable_function_6() = 0;
+};
+
+class c_network_channel_client
+{
+public:
+	virtual const char* get_client_name() = 0;
+	virtual bool connection_lost(e_network_channel_closure_reason* channel_closure_reason) = 0;
+	virtual bool has_data_to_transmit(bool* data_requires_acknowledgement) = 0;
+	virtual int32 space_required_bits(int32 packet_size_bits, int32 packet_remaining_bits) = 0;
+	virtual bool write_data_to_packet(int32 a1, class c_bitstream* bitstream_1, class c_bitstream* bitstream_2, int32 a4, int32 a5) = 0;
+	virtual bool read_from_packet(int32* packet_sequence_number, class c_bitstream* packet, int32 unused) = 0;
+	virtual void notify_packet_acknowledged(int32 outgoing_packet_sequence_number) = 0;
+	virtual void notify_packet_retired(int32 outgoing_packet_sequence_number, bool delivered) = 0;
 };
 
 struct s_network_channel
@@ -84,3 +112,21 @@ struct s_network_channel
 };
 ASSERT_STRUCT_SIZE(s_network_channel, 248);
 
+struct s_network_channel_client_info
+{
+	uint32 flags;
+	c_network_channel_client* client;
+};
+ASSERT_STRUCT_SIZE(s_network_channel_client_info, 8);
+
+class c_network_channel_simulation_interface
+{
+	bool m_initialized;
+	void* m_simulation_context;
+	void(__cdecl* m_simulation_closure_callback)(void*);
+	int32 m_simulation_client_count;
+	s_network_channel_client_info m_simulation_clients[4]; // k_number_of_users?
+	bool m_simulation_is_authority;
+	bool m_established;
+};
+ASSERT_STRUCT_SIZE(c_network_channel_simulation_interface, 52);
