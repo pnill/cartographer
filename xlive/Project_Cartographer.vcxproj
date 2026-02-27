@@ -1310,6 +1310,7 @@
     <ClCompile Include="Blam\Engine\saved_games\saved_game_files.cpp" />
     <ClInclude Include="Blam\Engine\networking\network_constants.h" />
     <ClInclude Include="Blam\Engine\networking\network_loading.h" />
+    <ClInclude Include="Blam\Engine\networking\replication\replication_event.h" />
     <ClInclude Include="Blam\Engine\networking\replication\replication_event_manager_view.h" />
     <ClInclude Include="Blam\Engine\networking\replication\replication_game_results.h" />
     <ClInclude Include="Blam\Engine\networking\replication\replication_scheduler.h" />

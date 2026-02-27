@@ -21,7 +21,6 @@ enum e_entity_update_block_order
 	k_entity_update_block_order_count
 };
 
-// TODO reverse parent class: c_replication_entity_manager
 class c_simulation_entity_database : public c_replication_entity_manager_client
 {
 public:

@@ -272,7 +272,7 @@ void c_simulation_world::reset_world(void)
 
 	m_time_immediate_update = false;
 	m_out_of_sync = false;
-	m_flush_gamestate = false;
+	m_gamestate_flushed = false;
 	if (this->is_distributed())
 	{
 		ASSERT(m_distributed_world);

@@ -7,6 +7,7 @@
 #include "simulation/game_interface/simulation_game_events.h"
 
 #include "networking/network_memory.h"
+#include "networking/replication/replication_control_view.h"
 
 /* globals */
 
@@ -29,6 +30,11 @@ void simulation_event_handler_apply_patches(void)
 {
 	DETOUR_ATTACH(p_process_incoming_event, Memory::GetAddress<t_process_incoming_event>(0x1D3E02, 0x1D9092), jmp_c_simulation_event_handler_process_incoming_event);
 	return;
+}
+
+int32 c_simulation_event_handler::read_incoming_event(int32 a2, int32 a3, int32 a4, uint32* a5, int32 a6, int32 a7)
+{
+	return INVOKE_TYPE(0x1D3D45, 0x1D8FD5, int32(__thiscall*)(int32, int32, int32, uint32*, int32, int32), a2, a3, a4, a5, a6, a7);
 }
 
 void c_simulation_event_handler::process_incoming_event(e_simulation_event_type event_type, int32* entity_reference_indices, int32 block_count, s_replication_allocation_block* payload_block)
@@ -78,4 +84,24 @@ void c_simulation_event_handler::process_incoming_event(e_simulation_event_type 
 		random_seed_disallow_use();
 	}
 	return;
+}
+
+void c_simulation_event_handler::write_outgoing_event(int32 a2, int32 a3, uint32* a4, int8* a5)
+{
+	INVOKE_TYPE(0x1D3E75, 0x1D9105, void(__thiscall*)(c_simulation_event_handler*, int32, int32, uint32*, int8*), this, a2, a3, a4, a5);
+}
+
+void c_simulation_event_handler::notify_outgoing_event_retired(int32 a2)
+{
+	INVOKE_TYPE(0x01D3FAF, 0x1D923F, void(__thiscall*)(c_simulation_event_handler*, int32), this, a2);
+}
+
+int8 c_simulation_event_handler::calculate_requirements(int32 a2, uint32** a3, real32* a4, uint32* a5)
+{
+	return INVOKE_TYPE(0x1D3E9D, 0x1D912D, int8(__thiscall*)(c_simulation_event_handler*, int32, uint32**, real32*, uint32*), this, a2, a3, a4, a5);
+}
+
+int32 c_simulation_event_handler::write_description_to_string(int32 a2, int32 a3, int32 a4, int32 a5)
+{
+	return INVOKE_TYPE(0x1D3F70, 0x1D9200, int32(__thiscall*)(c_simulation_event_handler*, int32, int32, int32, int32), this, a2, a3, a4, a5);
 }

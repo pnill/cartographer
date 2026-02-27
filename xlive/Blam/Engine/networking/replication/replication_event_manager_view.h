@@ -1,6 +1,13 @@
 #pragma once
 #include "replication_scheduler.h"
 
+/* constants */
+
+enum
+{
+	k_network_maximum_views_per_simulation = 16
+};
+
 /* structures */
 
 struct s_replication_event_manager_view_statistics

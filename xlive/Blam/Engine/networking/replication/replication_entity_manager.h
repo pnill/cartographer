@@ -9,9 +9,6 @@ enum
 	k_simulation_entity_database_maximum_entities = 1024
 };
 
-// Forward declaration
-class c_replication_entity_manager_client;
-
 struct s_replication_entity_manager_data
 {
 	uint8 mask;
@@ -28,12 +25,13 @@ public:
 	void reset(void);
 
 private: 
-	c_replication_entity_manager_client* m_client;
+	class c_simulation_entity_database* m_client;
 	c_replication_entity_manager_view* m_views[k_maximum_players];
 	uint32 m_view_mask;
 	s_replication_entity_manager_data m_entity_data[k_simulation_entity_database_maximum_entities];
-	int32 m_field_2048;
+	int32 m_entity_creation_start_position;
 };
+
 
 class c_replication_entity_manager_client
 {
@@ -57,8 +55,8 @@ public:
 
 protected:
 	bool m_initialized;
-	bool m_field_5;
-	int8 pad[2];
-	void* m_world;
+	bool m_resetting;
+	class c_simulation_world* m_world;
 	c_replication_entity_manager* m_entity_manager;
 };
+ASSERT_STRUCT_SIZE(c_replication_entity_manager_client, 16);

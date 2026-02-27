@@ -8,7 +8,7 @@
 class c_simulation_watcher : c_network_channel_owner
 {
 private:
-	class c_simulation_world* m_world;
+	c_simulation_world* m_world;
 	class c_network_observer* m_observer;
 	class c_network_session* m_session;
 	int32 m_machine_last_local_membership_update_number;

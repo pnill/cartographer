@@ -8,11 +8,16 @@
 
 #include "networking/replication/replication_event_manager.h"
 
+/* constants */
+
 enum
 {
-	k_simulation_world_maximum_views = (k_maximum_players + 1)
+	k_simulation_world_maximum_views = k_maximum_players,
+	k_network_maximum_actors_per_simulation = 16,
+	k_network_maximum_players_per_session = k_maximum_players
 };
 
+/* enums */
 
 enum e_simulation_queue_type
 {
@@ -45,6 +50,32 @@ enum e_simulation_world_state
 	k_simulation_world_state_count = 0x7,
 };
 
+/* structure */
+
+struct s_world_state_disconnected
+{
+	uint32 disconnected_timestamp;
+};
+
+struct s_world_state_data_joining
+{
+	uint32 join_start_timestamp;
+	uint32 join_client_machine_mask;
+};
+
+struct s_world_state_data_active
+{
+	uint32 active_client_machine_mask;
+};
+
+union s_world_state_data
+{
+	s_world_state_disconnected disconnected;
+	s_world_state_data_joining joining;
+	s_world_state_data_active active;
+};
+ASSERT_STRUCT_SIZE(s_world_state_data, 0x8);
+
 class c_simulation_distributed_world
 {
 public:
@@ -57,43 +88,40 @@ ASSERT_STRUCT_SIZE(c_simulation_distributed_world, 45260);
 
 class c_simulation_world
 {
-	void* m_watcher;
+	class c_simulation_watcher* m_watcher;
 	c_simulation_distributed_world* m_distributed_world;
 	e_simulation_world_type m_world_type;
 	bool m_local_machine_identifier_valid;
 	s_machine_identifier m_local_machine_identifier;
-	uint8 gap_13;
 	int32 m_local_machine_index;
 	e_simulation_world_state m_world_state;
-	int32 m_join_time_start;
-	int32 m_valid_machines_mask;
+	s_world_state_data m_world_state_data;
 	bool m_time_running;
 	bool m_time_immediate_update;
-	uint8 gap_26[2];
-	uint32 m_next_update_number;
+	int m_next_update_number;
 	bool m_out_of_sync;
-	uint8 gap_2D;
-	bool m_flush_gamestate;
+	bool m_out_of_sync_determinism_failure;
+	bool m_gamestate_flushed;
 	bool m_attached_to_map;
-	int32 m_join_attempt_count;
-	int32 m_join_failure_start;
-	int field_38;
-	int32 m_join_timeout;
+	int32 m_unsuccessful_join_attempts;
+	uint32 m_last_active_timestamp;
+	int32 m_next_view_establishment_identifier;
+	int32 m_joining_total_wait_msec;
 	int32 m_view_count;
 	c_simulation_view* m_views[k_simulation_world_maximum_views];
+	int32 m_player_count; // guessed name for potential use, field is completely unused
 	c_simulation_player m_players[k_maximum_players];
-	c_simulation_actor m_actors[k_maximum_players];
-	char field_1288;
-	uint8 gap_1289[3];
-	int32 m_synchronous_gamestate_write_progress;
-	void* m_synchronous_gamestate_write_buffer;
-	uint32 field_1294;
-	int32 m_synchronous_client_next_update_number_to_dequeue;
-	int32 m_synchronous_client_latest_update_number_received;
-	int32 m_synchronous_client_queue_length;
-	void* m_synchronous_client_queue_head;
-	void* m_synchronous_client_queue_tail;
-	char gap_12A8[4];
+	c_simulation_actor m_actors[k_network_maximum_players_per_session];
+	bool m_gamestate_flush_active;
+	int32 m_bookkeeping_queue_index;
+	int32 m_bookkeeping_queue_buffer;
+	uint32 m_synchronous_catchup_initiation_failure_timestamp;
+	int32 m_update_queue_next_update_number_to_dequeue;
+	int32 m_update_queue_latest_entry_received_update_number;
+	int32 m_update_queue_length;
+	int32 m_update_queue_head;
+	int32 m_update_queue_tail;
+	int32 _pad_12AC;
 
 public:
 	void gamestate_flush_immediate(void);

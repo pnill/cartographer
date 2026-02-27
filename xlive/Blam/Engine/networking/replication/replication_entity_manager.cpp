@@ -10,7 +10,7 @@ void c_replication_entity_manager::reset(void)
 			this->m_views[i]->reset();
 	}
 	csmemset(this->m_entity_data, 0, sizeof(m_entity_data));
-	m_field_2048 = 0;
+	m_entity_creation_start_position = 0;
 	return;
 }
 

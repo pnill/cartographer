@@ -629,7 +629,7 @@ void c_simulation_entity_database::entity_delete_internal(int32 entity_index)
 
 void c_simulation_entity_database::reset(void)
 {
-	m_field_5 = true;
+	m_resetting = true;
 	if (!m_initialized)
 	{
 		csmemset(m_entity_data, 0, sizeof(m_entity_data));
@@ -651,7 +651,7 @@ void c_simulation_entity_database::reset(void)
 			entity->entity_type = _simulation_entity_type_none;
 		}
 	}
-	m_field_5 = false;
+	m_resetting = false;
 	return;
 }
 
