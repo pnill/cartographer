@@ -1,7 +1,7 @@
 #pragma once
 
+#include "networking/network_constants.h"
 #include "simulation/simulation_queue.h"
-#include "simulation/simulation_event_handler.h"
 #include "simulation/simulation_type_collection.h"
 
 struct s_simulation_queue_events_apply

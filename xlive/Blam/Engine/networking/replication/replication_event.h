@@ -1,5 +1,5 @@
 #pragma once
-#include "networking/network_time.h"
+#include "networking/network_constants.h"
 
 /* structures */
 
@@ -10,7 +10,7 @@ private:
 	int32 m_type;
 	uint32 m_timestamp;
 	int32 m_cancel_timer_milliseconds;
-	int32 m_entity_references[2];
+	int32 m_entity_references[k_entity_reference_indices_count_max];
 	uint8* m_payload_data;
 	int32 m_payload_data_size;
 	uint32 m_outgoing_mask;

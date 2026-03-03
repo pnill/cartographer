@@ -82,7 +82,7 @@ public:
 	c_replication_entity_manager m_entity_manager;
 	c_replication_event_manager m_event_manager;
 	c_simulation_entity_database m_entity_database;
-	c_simulation_event_handler m_event_handler;
+	c_simulation_event_handler m_event_handler;	
 };
 ASSERT_STRUCT_SIZE(c_simulation_distributed_world, 45260);
 
@@ -113,14 +113,14 @@ class c_simulation_world
 	c_simulation_player m_players[k_maximum_players];
 	c_simulation_actor m_actors[k_network_maximum_players_per_session];
 	bool m_gamestate_flush_active;
-	int32 m_bookkeeping_queue_index;
-	int32 m_bookkeeping_queue_buffer;
+	int32 m_synchronous_gamestate_write_progress;
+	void* m_synchronous_gamestate_write_buffer;
 	uint32 m_synchronous_catchup_initiation_failure_timestamp;
-	int32 m_update_queue_next_update_number_to_dequeue;
-	int32 m_update_queue_latest_entry_received_update_number;
-	int32 m_update_queue_length;
-	int32 m_update_queue_head;
-	int32 m_update_queue_tail;
+	int32 m_synchronous_client_next_update_number_to_dequeue;
+	int32 m_synchronous_client_latest_update_number_received;
+	int32 m_synchronous_client_queue_length;
+	void* m_synchronous_client_queue_head;
+	void* m_synchronous_client_queue_tail;
 	int32 _pad_12AC;
 
 public:

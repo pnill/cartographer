@@ -1,11 +1,6 @@
 #pragma once
 #include "game_interface/simulation_game_events.h"
 
-enum
-{
-    k_entity_reference_indices_count_max = 2,
-};
-
 class c_replication_event_manager_client
 {
 public:

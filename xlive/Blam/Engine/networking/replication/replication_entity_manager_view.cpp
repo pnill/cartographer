@@ -24,6 +24,7 @@ bool c_replication_entity_manager_view::build_outgoing_requests(const s_simulati
 
 int32 c_replication_entity_manager_view::terminator_required_bits()
 {
+	// todo: determine if its a bits_required for a specific structure or a constant
 	return 3;
 }
 
