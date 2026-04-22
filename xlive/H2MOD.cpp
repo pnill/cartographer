@@ -457,7 +457,7 @@ static bool __cdecl OnMapLoad(s_game_options* options)
 	}
 	else
 	{
-		event(_event_status, "h2mod: engine type: {}", (int)options->game_mode);
+		event(_event_status, "h2mod: engine type: %d", (int)options->game_mode);
 
 		if (!shell_is_dedicated_server())
 		{
@@ -511,13 +511,6 @@ static bool __cdecl OnMapLoad(s_game_options* options)
 			toggle_xbox_tickrate(options, true);
 			if (H2Config_discord_enable)
 			{
-				c_static_wchar_string<MAX_PATH> scenario_path(game_options_get()->scenario_path);
-				int32 index = scenario_path.last_index_of(L"\\");
-				const wchar_t* scenario_name_wide = &scenario_path.get_string()[index + 1];
-				utf8 scenario_name[MAX_PATH];
-				wchar_string_to_utf8_string(scenario_name_wide, scenario_name, sizeof(scenario_name));
-
-				discord_interface_update_map_info_campaign(options->map_id, scenario_name);
 				discord_interface_set_difficulty(options->difficulty);
 			}
 		}
