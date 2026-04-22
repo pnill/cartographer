@@ -14,7 +14,7 @@ jobs:
     steps:
       - name: Check if DXSDK is cached
         id: cache-dxsdk
-        uses: actions/cache@v4
+        uses: actions/cache@v5.0.5
         with:
           path: D:\depends\DXSDK
           key: dxsdk-june2010
@@ -51,14 +51,14 @@ jobs:
         BUILD_CONFIGURATION: [debug_msvc, release_msvc, release_min_msvc]
 
     steps:
-    - uses: actions/checkout@v4.1.6
+    - uses: actions/checkout@v6.0.2
 
     - name: Add MSBuild to PATH
-      uses: microsoft/setup-msbuild@v2
+      uses: microsoft/setup-msbuild@v3
 
     - name: Install cached DXSDK
       id: cache-dxsdk
-      uses: actions/cache@v4
+      uses: actions/cache@v5.0.5
       with:
         path: ${{needs.fetch-dxsdk2010.outputs.dxsdk-path}}
         key: dxsdk-june2010
@@ -72,7 +72,7 @@ jobs:
       run: msbuild /m /p:Configuration=${{matrix.BUILD_CONFIGURATION}} /p:Platform=${{env.PLATFORM}} ${{matrix.SOLUTION_FILE_PATH}} /p:DXSDK_DIR=${{needs.fetch-dxsdk2010.outputs.dxsdk-path}}/
       
     - name: Upload Artifacts
-      uses: actions/upload-artifact@v4.5.0
+      uses: actions/upload-artifact@v7.0.1
       with:
         name: xlive ${{matrix.BUILD_CONFIGURATION}}
         path: |
