@@ -15,6 +15,8 @@ static kablam_log_t p_kablam_log;
 
 static void __cdecl kablam_log(const char* format, ...);
 
+static void kablam_error_log_initialize(void);
+
 /* public code */
 
 void kablam_log_apply_patches(void)
@@ -48,12 +50,17 @@ void kablam_log_initialize(void)
 		*Memory::GetAddress<bool*>(0x0, 0x4904E8) = true;	// Set logging to true
 		*Memory::GetAddress<_iobuf**>(0x0, 0x4904EC) = ufopen(log_name, L"a+b");
 	}
+
+	kablam_error_log_initialize();
+
 	return;
 }
 
 /* private code */
 
-static void __cdecl kablam_log(const char* format, ...)
+static void __cdecl kablam_log(
+	const char* format,
+	...)
 {
 	va_list args;
 	va_start(args, format);
@@ -68,5 +75,20 @@ static void __cdecl kablam_log(const char* format, ...)
 	}
 
 	va_end(args);
+	return;
+}
+
+static void kablam_error_log_initialize(void)
+{
+	char subdirectory[128];
+
+	const wchar_t* instance_name = kablam_shell_argument_get(L"-instance:");
+
+	wchar_string_to_utf8_string(instance_name, subdirectory, NUMBEROF(subdirectory));
+
+#ifdef ERRORS_ENABLED
+	errors_set_log_subdirectory(subdirectory);
+#endif
+
 	return;
 }

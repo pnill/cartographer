@@ -732,7 +732,10 @@ static void player_configuration_validate_team(
 				event(
 					_event_message,
 					"game_engine:players: %s player 0x%08X configuration had invalid team index %d (valid_teams 0x%04X), setting to observer",
-				
+					game_is_authoritative() ? "authority" : "client",
+					player_index,
+					configuration->team_index,
+					globals->team_bitmask
 				);
 
 				configuration->team_index = _game_team_observer;

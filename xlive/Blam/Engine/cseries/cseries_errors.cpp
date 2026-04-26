@@ -27,6 +27,10 @@ enum
 
 	k_error_log_entry_max_count= 1024,
 	k_error_file_cache_size= SHORT_MAX+1,
+
+	k_error_log_idle_interval = 5000,	// Dump the logs stored in memory onto the disk every # of milliseconds
+
+	k_error_log_max_filesize = 0x200000,
 };
 
 static const char k_too_many_errors_msg[] = "[...too many errors to print...]\r\n";
@@ -47,7 +51,7 @@ public:
 
 	void flush(void);
 
-	void append_to_buffer(size_t length, const char* string);
+	void append_to_buffer(size_t length, char const* string);
 	
 	void write_file(void);
 
@@ -190,13 +194,15 @@ s_file_reference* c_error_file::get_file_reference(void) const
 	return m_file;
 }
 
-void c_error_file::set_file_reference(s_file_reference* reference)
+void c_error_file::set_file_reference(
+	s_file_reference* reference)
 {
 	ASSERT(reference);
 	
 	write_file();
 	m_file = reference;
 	m_buffer_length = 0;
+
 	return;
 }
 
@@ -211,7 +217,9 @@ void c_error_file::flush(void)
 	return;
 }
 
-void c_error_file::append_to_buffer(size_t length, const char* string)
+void c_error_file::append_to_buffer(
+	size_t length,
+	const char* string)
 {
 	ASSERT(m_file);
 
@@ -251,28 +259,42 @@ void c_error_file::write_file(void)
 	return;
 }
 
-void errors_output_to_debug_file(bool output_to_debug_file)
+void errors_output_to_debug_file(
+	bool output_to_debug_file)
 {
 	error_globals.output_to_debug_file = output_to_debug_file;
+
 	return;
 }
 
-s_file_reference* create_report_file_reference(s_file_reference* reference, const char* name)
+void errors_set_log_subdirectory(
+	char const* subdirectory)
+{
+	csstrncpy(error_globals.error_subdirectory, subdirectory, NUMBEROF(error_globals.error_subdirectory));
+
+	return;
+}
+
+s_file_reference* create_report_file_reference(
+	s_file_reference* reference,
+	const char* name)
 {
 	// Construct the path
 	char path[256];
 	csstrncpy(path, "reports", NUMBEROF(path));
 	csstrncat(path, "\\", NUMBEROF(path));
 
-	if (error_globals.error_subdirectory[0])
+	if (error_globals.error_subdirectory[0]!='\0')
 	{
 		csstrncat(path, error_globals.error_subdirectory, NUMBEROF(path));
 		csstrncat(path, "\\", NUMBEROF(path));
 	}
+
 	csstrncat(path, name, NUMBEROF(path));
 
 	// Create file reference
-	s_file_reference* result = file_reference_create_from_path(reference, path, 0);
+	s_file_reference* result = file_reference_create_from_path(reference, path, false);
+
 	ASSERT(result != NULL);
 
 	// Create files
@@ -280,6 +302,7 @@ s_file_reference* create_report_file_reference(s_file_reference* reference, cons
 	{
 		file_create_parent_directories_if_not_present(result);
 	}
+
 	return result;
 }
 
@@ -311,7 +334,9 @@ void errors_initialize(void)
 	stack_walk_initialize();
 	
 	atexit(error_write_to_file);
+	
 	error_globals.delayed = true;
+
 	return;
 }
 
@@ -319,13 +344,17 @@ void errors_dispose(void)
 {
 	error_write_to_file();
 	stack_walk_dispose();
+
 	error_globals.delayed = false;
+	
 	return;
 }
 
-bool errors_add_fatal_error_callback(void (*proc)(void))
+bool errors_add_fatal_error_callback(
+	void (*proc)(void))
 {
 	bool result = false;
+
 	ASSERT(error_globals.callback_count >= 0);
 	
 	if (error_globals.callback_count >= k_error_callback_count)
@@ -338,6 +367,7 @@ bool errors_add_fatal_error_callback(void (*proc)(void))
 		++error_globals.callback_count;
 		result = true;
 	}
+
 	return result;
 }
 
@@ -351,10 +381,14 @@ void call_fatal_error_callbacks(void)
 			proc();
 		}
 	}
+
 	return;
 }
 
-void error(e_error_priority priority, const char* format, ...)
+void error(
+	e_error_priority priority,
+	const char* format,
+	...)
 {
 	va_list va_args;
 	va_start(va_args, format);
@@ -362,10 +396,15 @@ void error(e_error_priority priority, const char* format, ...)
 	error_va(_error_category_generic, priority, format, va_args);
 	
 	va_end(va_args);
+
 	return;
 }
 
-void error(e_error_category category, e_error_priority priority, const char* format, ...)
+void error(
+	e_error_category category,
+	e_error_priority priority,
+	const char* format,
+	...)
 {
 	va_list va_args;
 	va_start(va_args, format);
@@ -373,10 +412,13 @@ void error(e_error_category category, e_error_priority priority, const char* for
 	error_va(category, priority, format, va_args);
 
 	va_end(va_args);
+
 	return;
 }
 
-void error_category_enable(const char* category_string, bool enable)
+void error_category_enable(
+	const char* category_string,
+	bool enable)
 {
 	const e_error_category category = error_get_category_from_string(category_string);
 	if (category >= k_error_category_count)
@@ -389,37 +431,56 @@ void error_category_enable(const char* category_string, bool enable)
 	{
 		error_category_disable(category, enable);
 	}
+
 	return;
 }
 
-bool error_category_enabled(e_error_category category)
+bool error_category_enabled(
+	e_error_category category)
 {
 	ASSERT(VALID_INDEX(category, k_error_category_count));
+
 	return !error_globals.category_disabled[category];
 }
 
-real_rgb_color* error_category_color(real_rgb_color* color, e_error_category category)
+real_rgb_color* error_category_color(
+	real_rgb_color* color,
+	e_error_category category)
 {
 	ASSERT(category < NUMBEROF(k_category_constants));
+
 	*color = k_category_constants[category].color;
+
 	return color;
 }
 
-void error_category_disable(e_error_category category, bool disable)
+void error_category_disable(
+	e_error_category category,
+	bool disable)
 {
 	ASSERT(VALID_INDEX(category, k_error_category_count));
+
 	error_globals.category_disabled[category] = disable == false;
+
 	return;
 }
 
-void error_category_write_to_primary_log(e_error_category category, bool enable)
+void error_category_write_to_primary_log(
+	e_error_category category,
+	bool enable)
 {
 	ASSERT(VALID_INDEX(category, k_error_category_count));
+
 	error_globals.prevent_write_to_primary_log[category] = enable == false;
+
 	return;
 }
 
-void error_va(e_error_category category, e_error_priority priority, const char* format, char* ap)
+void error_va(
+	e_error_category category,
+	e_error_priority priority,
+	const char* format,
+	char* ap)
 {
 	if (error_globals.delayed)
 	{
@@ -522,6 +583,7 @@ void error_va(e_error_category category, e_error_priority priority, const char* 
 				}
 
 				write_to_error_file(category, priority, string, true);
+
 				if (priority >= _error_delayed)
 				{
 					const int32 copy_size = cstrlen(string);
@@ -574,18 +636,21 @@ void error_va(e_error_category category, e_error_priority priority, const char* 
 		OutputDebugStringA("some kind of error is occurring at initialization time");
 		DebugBreak();
 	}
+
 	return;
 }
 
 void error_enable_suppression(void)
 {
 	error_globals.suppress_all = true;
+
 	return;
 }
 
 void error_disable_suppression(void)
 {
 	error_globals.suppress_all = false;
+
 	return;
 }
 
@@ -593,6 +658,7 @@ void errors_terminate_logging(void)
 {
 	errors_terminate_files();
 	error_globals.suppress_all = true;
+
 	return;
 }
 
@@ -600,6 +666,7 @@ void errors_clear(void)
 {
 	error_globals.message_buffer_size = 0;
 	error_globals.message_buffer[0] = '\0';
+
 	return;
 }
 
@@ -613,18 +680,23 @@ void errors_terminate_files(void)
 	{
 		error_write_string_to_file_internal(NULL, category, "", "", true);
 	}
+
 	return;
 }
 
-void error_output_to_debug_file_enable(bool enable)
+void error_output_to_debug_file_enable(
+	bool enable)
 {
 	error_globals.output_to_debug_file = enable;
+
 	return;
 }
 
-void errors_overflow_suppression_enable(bool enable)
+void errors_overflow_suppression_enable(
+	bool enable)
 {
 	error_globals.overflow_suppression = enable;
+
 	return;
 }
 
@@ -636,6 +708,7 @@ const char* error_get(void)
 const wchar_t* error_get_wide(void)
 {
 	utf8_string_to_wchar_string(error_globals.message_buffer, error_globals.message_buffer_wide, NUMBEROF(error_globals.message_buffer));
+
 	return error_globals.message_buffer_wide;
 }
 
@@ -643,19 +716,25 @@ void error_message_write_and_flush(void)
 {
 	error_write_to_file();
 	errors_clear();
+
 	return;
 }
 
 void error_idle(void)
 {
-	if (error_globals.idle_logging_and_caching && system_milliseconds() - error_globals.last_time >= 5000)
+	if (error_globals.idle_logging_and_caching && system_milliseconds() - error_globals.last_time >= k_error_log_idle_interval)
 	{
 		error_write_to_file();
 	}
+
 	return;
 }
 
-void write_to_error_file(e_error_category category, e_error_priority priority, const char* string, bool append_time)
+void write_to_error_file(
+	e_error_category category,
+	e_error_priority priority,
+	const char* string,
+	bool append_time)
 {
 	const bool write_immediate= priority>_error_delayed;
 
@@ -677,9 +756,11 @@ void write_to_error_file(e_error_category category, e_error_priority priority, c
 
 /* private code */
 
-static e_error_category error_get_category_from_string(const char* category_string)
+static e_error_category error_get_category_from_string(
+	const char* category_string)
 {
 	e_error_category result = k_error_category_count;
+	
 	for (e_error_category category = _error_category_generic; category < k_error_category_count; ++category)
 	{
 		if (!csstricmp(category_string, k_category_constants[category].name))
@@ -688,10 +769,15 @@ static e_error_category error_get_category_from_string(const char* category_stri
 			break;
 		}
 	}
+
 	return result;
 }
 
-static void write_to_error_file_internal(e_error_category category, const char* string, const char* time, bool write_immediate)
+static void write_to_error_file_internal(
+	e_error_category category,
+	const char* string,
+	const char* time,
+	bool write_immediate)
 {
 	ASSERT(string);
 
@@ -772,6 +858,7 @@ static void error_write_string_to_file(
 	{
 		error_write_string_to_file_internal(files, _error_category_internal_subfolder, string, time, write_immediate);
 	}
+
 	return;
 }
 
@@ -808,8 +895,10 @@ static void error_write_string_to_file_internal(
 		);
 		write_string_to_error_file(file, category, "\r\n\r\n", NULL, write_immediate);
 	}
+
 	// Write the actual error now
 	write_string_to_error_file(file, category, string, time, write_immediate);
+
 	return;
 }
 
@@ -846,6 +935,7 @@ static void write_string_to_error_file(
 			error_category_file_entry_close(category, write_immediate);
 		}
 	}
+
 	return;
 }
 
@@ -886,6 +976,7 @@ static void error_write_to_file(void)
 	}
 
 	const int32 count = g_error_file_cache.entry_stack.get_count();
+
 	for (int32 i = 0; i < count; ++i)
 	{
 		const s_error_entry entry = g_error_file_cache.entry_stack[i];
@@ -911,6 +1002,7 @@ static void error_write_to_file(void)
 	g_error_file_cache.entry_stack.clear();
 	g_error_file_cache.current_size = 0;
 	g_error_file_cache.entry_mask.clear();
+
 	return;
 }
 
@@ -919,6 +1011,7 @@ static s_file_reference* error_category_file_entry_get(e_error_category category
 	s_file_reference* result = &g_error_category_file_entries[category];
 
 	const bool not_initialized = g_error_category_file_is_initialized[category] == false;
+
 	if (!g_error_category_file_currently_open[category])
 	{
 		if (category > _error_category_generic)
@@ -949,16 +1042,18 @@ static s_file_reference* error_category_file_entry_get(e_error_category category
 
 		if (not_initialized)
 		{
-			file_trim(result, 0x200000);
+			file_trim(result, k_error_log_max_filesize);
 		}
 
 		e_file_open_flags flags = (e_file_open_flags)(_permission_write_allow_read_bit | _permission_write_append_bit | _permission_write_bit);
 		e_file_open_error error_code;
+		
 		if (file_open(result, flags, &error_code))
 		{
 			g_error_category_file_currently_open[category] = true;
 			g_error_category_file_is_initialized[category] = true;
 		}
+
 	}
 
 	return result;
@@ -971,10 +1066,12 @@ static void error_category_file_entry_close(e_error_category category, bool writ
 		if (g_error_category_file_currently_open[category])
 		{
 			s_file_reference* reference = &g_error_category_file_entries[category];
+			
 			file_close(reference);
 			g_error_category_file_currently_open[category] = false;
 		}
 	}
+
 	return;
 }
 

@@ -4,7 +4,7 @@
 
 /* enums */
 
-enum e_error_priority : int32
+enum e_error_priority
 {
 	_error_log= 0,
 	_error_silent,
@@ -13,7 +13,7 @@ enum e_error_priority : int32
 	k_error_priority_count,
 };
 
-enum e_error_category : int32
+enum e_error_category
 {
 	_error_category_generic= 0,
 	_error_category_internal_full,
@@ -41,6 +41,9 @@ enum e_error_category : int32
 /* prototypes */
 
 void errors_output_to_debug_file(bool output_to_debug_file);
+
+// Set subdirectory where logs are dumped to within the current report folder
+void errors_set_log_subdirectory(char const* subdirectory);
 
 struct s_file_reference* create_report_file_reference(struct s_file_reference* reference, const char* name);
 
