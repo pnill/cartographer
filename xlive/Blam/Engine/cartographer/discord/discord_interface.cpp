@@ -341,7 +341,7 @@ void discord_interface_set_context(
 	e_context_id context_id,
 	uint32 contex_value)
 {
-	if (!shell_is_dedicated_server() && H2Config_discord_enable && g_instance_number <= 1)
+	if (!shell_is_dedicated_server() && H2Config_discord_enable && shell_get_instance_num() <= 1)
 	{
 		switch (context_id)
 		{
@@ -433,7 +433,7 @@ static unsigned __stdcall discord_thread_proc(
 {
 	// Set discord instance based on instance ID
 #ifdef TEST_DISCORD_INSTANCE
-	int32 instance_id = g_instance_number;
+	int32 instance_id = shell_get_instance_num();
 	wchar_t instance[2]{};
 	swprintf(instance, 2, L"%d", instance_id - 1);
 	SetEnvironmentVariableW(L"DISCORD_INSTANCE_ID", instance);

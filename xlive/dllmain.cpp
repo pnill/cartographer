@@ -62,7 +62,7 @@ void discord_initialize(void)
 	if (module && !shell_is_dedicated_server()
 		&& H2Config_discord_enable
 #ifdef TEST_DISCORD_INSTANCE
-		&& g_instance_number == 1
+		&& shell_get_instance_num() == 1
 #endif
 		)
 	{
@@ -77,7 +77,7 @@ void discord_dispose(void)
 	if (!shell_is_dedicated_server()
 		&& H2Config_discord_enable
 #ifdef TEST_DISCORD_INSTANCE
-		&& g_instance_number == 1
+		&& shell_get_instance_num() == 1
 #endif
 		)
 	{

@@ -43,7 +43,7 @@ static bool(__cdecl* p_shell_set_game_cursor_state)(bool enabled);
 
 static bool g_custom_mouse_cursor_enabled = false;
 
-uint32 g_instance_number = 0;
+static uint32 g_instance_number = 0;
 
 /* prototypes */
 
@@ -115,6 +115,12 @@ static void shell_windows_setup_cartographer_protocol();
 s_window_globals* window_globals_get(void)
 {
 	return Memory::GetAddress<s_window_globals*>(0x46D9B8);
+}
+
+uint32 shell_get_instance_num(void)
+{
+	ASSERT(g_instance_number > 0);
+	return g_instance_number;
 }
 
 bool shell_platform_initialize(void)
@@ -556,10 +562,10 @@ static void shell_windows_yield_thread(LARGE_INTEGER last_counter, real32 desire
 
 static void shell_windows_adjust_name(void)
 {
-	if (g_instance_number > 1)
+	if (shell_get_instance_num() > 1)
 	{
 		s_window_globals* window_globals = window_globals_get();
-		usnprintf(window_globals->window_name, NUMBEROF(window_globals->window_name), L"%ws (P%d)", window_globals->window_name, g_instance_number);
+		usnprintf(window_globals->window_name, NUMBEROF(window_globals->window_name), L"%ws (P%d)", window_globals->window_name, shell_get_instance_num());
 	}
 	return;
 }

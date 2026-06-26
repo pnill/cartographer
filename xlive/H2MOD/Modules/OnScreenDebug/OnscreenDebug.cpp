@@ -17,6 +17,7 @@ std::recursive_mutex addTextMutex;
 
 void addDebugTextInternal(char* text) {
 
+	ASSERT(initialisedDebugText == true && "addDebugText() called before initialize");
 	if (!initialisedDebugText) return;
 
 	int lenInput = strlen(text);

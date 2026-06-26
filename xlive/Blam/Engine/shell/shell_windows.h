@@ -27,9 +27,9 @@ struct s_window_globals
 
 /* globals */
 
-extern uint32 g_instance_number;
-
 /* prototypes */
+
+uint32 shell_get_instance_num();
 
 s_window_globals* window_globals_get(void);
 

@@ -136,7 +136,7 @@ void log_file_name_prepare(const wchar_t* logFileName, c_static_wchar_string<MAX
 
 	if (!config_use_instance_name(&instance_string))
 	{
-		usnprintf(instance_number_string, NUMBEROF(instance_number_string), L"%d", g_instance_number);
+		usnprintf(instance_number_string, NUMBEROF(instance_number_string), L"%d", shell_get_instance_num());
 		instance_string = instance_number_string;
 	}
 

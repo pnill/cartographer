@@ -815,15 +815,15 @@ void ReadH2Config()
 		}
 
 		// Increment base port for multiple instances so we don't interfere with each other
-		if (g_instance_number > 1 && H2Config_base_port == k_default_base_port)
+		if (shell_get_instance_num() > 1 && H2Config_base_port == k_default_base_port)
 		{
 			if (H2Config_base_port < 64000 + 1)
 			{
-				H2Config_base_port += 1000 * (uint16)g_instance_number;
+				H2Config_base_port += 1000 * (uint16)shell_get_instance_num();
 			}
 			else if (H2Config_base_port < 65535 - 10 + 1)
 			{
-				H2Config_base_port += 10 * (uint16)g_instance_number;
+				H2Config_base_port += 10 * (uint16)shell_get_instance_num();
 			}
 		}
 
@@ -837,7 +837,7 @@ void ReadH2Config()
 #pragma region Config Init/Deinit
 void InitH2Config()
 {
-	H2Config_disable_ingame_keyboard = g_instance_number > 1 ? true : false;
+	H2Config_disable_ingame_keyboard = shell_get_instance_num() > 1 ? true : false;
 	ReadH2Config();
 	H2MOD::RefreshTogglexDelay();
 	g_h2config_initialized = true;
@@ -889,7 +889,7 @@ static void config_get_formatted_path(wchar_t* config_file_path, const wchar_t* 
 	// Use instance number by default
 	else
 	{
-		usnprintf(config_file_path, count, L"%ws%ws%d.ini", main_path, k_h2config_filenames[is_dedicated_server], g_instance_number);
+		usnprintf(config_file_path, count, L"%ws%ws%d.ini", main_path, k_h2config_filenames[is_dedicated_server], shell_get_instance_num());
 	}
 	return;
 }
