@@ -288,7 +288,7 @@ int32 usnprintf(wchar_t* string, size_t size, const wchar_t* format, ...)
 	ASSERT(string != NULL);
 	ASSERT(size > 0);
 
-	int32 result = _vsnwprintf_s(string, size - 1, UINT_MAX, format, va_args);
+	int32 result = _vsnwprintf_s(string, size - 1, _TRUNCATE, format, va_args);
 	va_end(va_args);
 	return result;
 }
@@ -311,7 +311,7 @@ int32 uvsnprintf(wchar_t* string, size_t size, const wchar_t* format, char* ap)
 	ASSERT(string && format);
 	ASSERT(size > 0);
 
-	return _vsnwprintf_s(string, size - 1, UINT_MAX, format, ap);
+	return _vsnwprintf_s(string, size - 1, _TRUNCATE, format, ap);
 }
 
 _iobuf* ufdopen(int32 fd, const wchar_t* path)

@@ -56,7 +56,7 @@ void addDebugText(const wchar_t* format, ...)
 	}
 
 	wchar_t* textBufferW = (wchar_t*)calloc(stringLength, sizeof(wchar_t));
-	uvsnprintf(textBufferW, stringLength, format, valist);
+	_vsnwprintf_s(textBufferW, stringLength, _TRUNCATE, format, valist);
 
 	char* textBufferA = (char*)calloc(stringLength, sizeof(char));
 	csprintf(textBufferA, stringLength, "%ls", textBufferW);
