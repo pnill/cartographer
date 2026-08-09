@@ -426,35 +426,21 @@ void c_squad_settings_list::handle_item_change_variant(
 void c_squad_settings_list::handle_item_change_level(
 	s_event_record* const& event)
 {
-	s_screen_parameters params;
-	params.m_flags = 0;
-	params.m_window_index = _window_4;
-	params.m_context = 0;
-	params.m_user_flags = FLAG(event->controller);
-	params.m_channel_type = _user_interface_channel_type_gameshell_dialog;
-	params.m_screen_state.field_0 = NONE;
-	params.m_screen_state.m_last_focused_item_order = NONE;
-	params.m_screen_state.m_last_focused_item_index = NONE;
-	params.m_load_function = c_screen_single_player_level_select::load_lobby;
-	params.m_load_function(&params);
+	c_screen_parameters params;
 	
+	params.initialize_default_user(FLAG(event->controller), _user_interface_channel_type_gameshell_dialog, _window_4, c_screen_single_player_level_select::load_lobby);
+	params.execute_load_function();
+
 	return;
 }
 
 void c_squad_settings_list::handle_item_change_difficulty(
 	s_event_record* const& event)
 {
-	s_screen_parameters params;
-	params.m_flags = 0;
-	params.m_window_index = _window_4;
-	params.m_context = 0;
-	params.m_user_flags = FLAG(event->controller);
-	params.m_channel_type = _user_interface_channel_type_gameshell_dialog;
-	params.m_screen_state.field_0 = NONE;
-	params.m_screen_state.m_last_focused_item_order = NONE;
-	params.m_screen_state.m_last_focused_item_index = NONE;
-	params.m_load_function = c_screen_single_player_difficulty_select::load_lobby;
-	params.m_load_function(&params);
+	c_screen_parameters params;
+
+	params.initialize_default_user(FLAG(event->controller), _user_interface_channel_type_gameshell_dialog, _window_4, c_screen_single_player_difficulty_select::load_lobby);
+	params.execute_load_function();
 
 	return;
 }
@@ -792,12 +778,12 @@ bool c_screen_squad_settings::handle_event(s_event_record* event)
 	return INVOKE_TYPE(0x24FE49, 0x0, bool(__thiscall*)(c_screen_widget*, s_event_record*), this, event);
 }
 
-void c_screen_squad_settings::initialize(s_screen_parameters* parameters)
+void c_screen_squad_settings::initialize(c_screen_parameters* parameters)
 {
-	INVOKE_TYPE(0x24F043, 0x0, void(__thiscall*)(c_screen_squad_settings*, s_screen_parameters*), this, parameters);
+	INVOKE_TYPE(0x24F043, 0x0, void(__thiscall*)(c_screen_squad_settings*, c_screen_parameters*), this, parameters);
 }
 
-void* c_screen_squad_settings::load(s_screen_parameters* parameters)
+void* c_screen_squad_settings::load(c_screen_parameters* parameters)
 {
 	//return INVOKE(0x24FE89, 0x0, c_screen_squad_settings::load, parameters);
 
@@ -807,9 +793,10 @@ void* c_screen_squad_settings::load(s_screen_parameters* parameters)
 	if (pool)
 	{
 		screen = new (pool) c_screen_squad_settings(
-			parameters->m_channel_type,
-			parameters->m_window_index,
-			parameters->m_user_flags);
+			parameters->get_channel_type(),
+			parameters->get_window_index(),
+			parameters->get_user_flags()
+		);
 
 		screen->m_allocated = true;
 		user_interface_register_screen_to_channel(screen, parameters);

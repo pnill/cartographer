@@ -41,8 +41,8 @@ protected:
 	bool m_using_qtr_arrows;
 
 public:
-	static void* load(s_screen_parameters* parameters);
-	static void* load_qtr(s_screen_parameters* parameters);
+	static void* load(c_screen_parameters* parameters);
+	static void* load_qtr(c_screen_parameters* parameters);
 	static void apply_patches_on_ui_map_load();
 	static void apply_patches_on_mp_map_load();
 	static void apply_instance_patches();

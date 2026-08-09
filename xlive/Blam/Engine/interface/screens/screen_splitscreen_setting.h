@@ -40,7 +40,7 @@ protected:
 	c_splitscreen_edit_list m_splitscreen_edit_list;
 
 public:
-	static void* load(s_screen_parameters* parameters);
+	static void* load(c_screen_parameters* parameters);
 	static const wchar_t* const get_header_string();
 	static const wchar_t* const get_option_string();
 	c_screen_splitscreen_menu(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, uint16 user_flags);
@@ -48,7 +48,7 @@ public:
 	// c_screen_splitscreen_menu virtual functions
 
 	virtual ~c_screen_splitscreen_menu() = default;
-	virtual void initialize(s_screen_parameters* parameters) override;
+	virtual void initialize(c_screen_parameters* parameters) override;
 	virtual void post_initialize() override;
 	virtual const void* load_proc() const override;
 

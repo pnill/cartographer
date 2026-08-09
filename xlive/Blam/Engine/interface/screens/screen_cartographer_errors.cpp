@@ -134,30 +134,33 @@ void c_cartographer_error_menu::get_error_label(e_cartographer_error_id error_id
 
 void* c_cartographer_error_menu::load_by_error_id(e_cartographer_error_id error_id) {
 
-	s_screen_parameters params;
+	c_screen_parameters params;
 	c_cartographer_error_menu* error_menu = NULL;
 
-	params.m_flags = 0;
-	params.m_window_index = _window_4;
-	params.m_context = NULL;
-	params.m_user_flags = user_interface_controller_get_signed_in_controllers_mask() | FLAG(k_windows_device_controller_index);
-	params.m_channel_type = _user_interface_channel_type_game_error;
-	params.m_screen_state.field_0 = NONE;
-	params.m_screen_state.m_last_focused_item_order = NONE;
-	params.m_screen_state.m_last_focused_item_index = NONE;
-	params.m_load_function = c_cartographer_error_menu::load;
-	error_menu = (c_cartographer_error_menu*)params.m_load_function(&params);
+	params.initialize_default_user(
+		user_interface_controller_get_signed_in_controllers_mask() | FLAG(k_windows_device_controller_index),
+		_user_interface_channel_type_game_error,
+		_window_4,
+		c_cartographer_error_menu::load
+	);
+
+	error_menu = (c_cartographer_error_menu*)params.execute_load_function();
 
 	error_menu->m_error_id = error_id;
 	return error_menu;
 }
 
-void* c_cartographer_error_menu::load(s_screen_parameters* parameters)
+void* c_cartographer_error_menu::load(c_screen_parameters* parameters)
 {
 	c_cartographer_error_menu* error_menu = nullptr;
 	BYTE* ui_buffer = ui_pool_allocate_space(sizeof(c_cartographer_error_menu), 0);
 	if (ui_buffer) {
-		error_menu = new (ui_buffer) c_cartographer_error_menu(parameters->m_channel_type, parameters->m_window_index, parameters->m_user_flags);
+		error_menu = new (ui_buffer) c_cartographer_error_menu(
+			parameters->get_channel_type(),
+			parameters->get_window_index(),
+			parameters->get_user_flags()
+		);
+		
 		error_menu->m_allocated	= true;
 	}
 	user_interface_register_screen_to_channel(error_menu, parameters);
@@ -211,7 +214,7 @@ bool c_cartographer_error_menu::handle_event(s_event_record* event)
 	return result;
 }
 
-void c_cartographer_error_menu::initialize(s_screen_parameters* screen_parameters)
+void c_cartographer_error_menu::initialize(c_screen_parameters* screen_parameters)
 {
 	s_interface_expected_screen_layout layout;
 	csmemset(&layout, 0, sizeof(layout));

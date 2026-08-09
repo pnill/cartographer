@@ -113,20 +113,14 @@ void c_multiplayer_video_settings_list::update_list_items(c_list_item_widget* it
 	return;
 }
 
-void c_multiplayer_video_settings_list::handle_item_pressed_event(s_event_record* const& event, datum* pitem_index)
+void c_multiplayer_video_settings_list::handle_item_pressed_event(
+	s_event_record* const& event,
+	datum* pitem_index)
 {
 	//INVOKE_TYPE(0x258F3E, 0x0, void(__thiscall*)(c_multiplayer_video_settings_list*, s_event_record**, datum*), this, pevent, pitem_index);
 
-	s_screen_parameters params;
-	params.m_flags = 0;
-	params.m_window_index = this->get_parent_render_window();
-	params.m_context = 0;
-	params.m_user_flags = FLAG(event->controller);
-	params.m_channel_type = this->get_parent_channel();
-	params.m_screen_state.field_0 = NONE;
-	params.m_screen_state.m_last_focused_item_order = NONE;
-	params.m_screen_state.m_last_focused_item_index = NONE;
-	params.m_load_function = nullptr; // stop warning of using uinitialized var
+	proc_ui_screen_load_cb_t load_function = NULL;
+	c_screen_parameters params;
 
 	if (*pitem_index != NONE)
 	{
@@ -136,38 +130,45 @@ void c_multiplayer_video_settings_list::handle_item_pressed_event(s_event_record
 		switch (item_type)
 		{
 		case _item_display_mode:
-			params.m_load_function = &c_screen_display_mode_menu::load_mp;
+			load_function = &c_screen_display_mode_menu::load_mp;
 			break;
 		case _item_resolution:
-			params.m_load_function = &c_screen_resolution_menu::load_mp;
+			load_function = &c_screen_resolution_menu::load_mp;
 			break;
 		case _item_vsync:
-			params.m_load_function = &c_screen_vsync_menu::load;
+			load_function = &c_screen_vsync_menu::load;
 			break;
 		case _item_brightness_level:
-			params.m_load_function = &c_screen_brightness_level_menu::load_mp;
+			load_function = &c_screen_brightness_level_menu::load_mp;
 			break;
 		case _item_gamma_setting:
-			params.m_load_function = &c_screen_gamma_menu::load_mp;
+			load_function = &c_screen_gamma_menu::load_mp;
 			break;
 		case _item_anti_aliasing:
-			params.m_load_function = &c_screen_anti_aliasing_menu::load_mp;
+			load_function = &c_screen_anti_aliasing_menu::load_mp;
 			break;
 		case _item_safe_area:
-			params.m_load_function = &c_screen_safe_area_menu::load_mp;
+			load_function = &c_screen_safe_area_menu::load_mp;
 			break;
 		case _item_splitscreen:
-			params.m_load_function = &c_screen_splitscreen_menu::load;
+			load_function = &c_screen_splitscreen_menu::load;
 			break;
 		case _item_restore_defaults:
-			params.m_load_function = &c_screen_restore_video_defaults_setting_menu::load_mp;
+			load_function = &c_screen_restore_video_defaults_setting_menu::load_mp;
 			break;
 		default:
 			unreachable();
 		}
 	}
 
-	if (params.m_load_function != nullptr)
+	params.initialize_default_user(
+		FLAG(event->controller),
+		get_parent_channel(),
+		get_parent_render_window(),
+		load_function
+	);
+
+	if (load_function!=NULL)
 	{
 		if (user_interface_globals_get_edit_player_profile_index() != NONE)
 			user_interface_globals_finish_saving_profile_changes();
@@ -178,8 +179,10 @@ void c_multiplayer_video_settings_list::handle_item_pressed_event(s_event_record
 		user_interface_controller_get_profile_data(this->get_any_responding_controller(), &profile, &profile_index);
 		user_interface_globals_set_edit_player_profile(this->get_any_responding_controller(), profile_index, &profile);
 
-		params.m_load_function(&params);
+		params.execute_load_function();
 	}
+
+	return;
 };
 
 
@@ -199,7 +202,7 @@ const void* c_screen_multiplayer_video_settings::load_proc() const
 	return &c_screen_multiplayer_video_settings::load;
 }
 
-void* c_screen_multiplayer_video_settings::load(s_screen_parameters* parameters)
+void* c_screen_multiplayer_video_settings::load(c_screen_parameters* parameters)
 {
 	//return INVOKE(0x24DCD9, 0x0, c_screen_multiplayer_video_settings::load, parameters);
 
@@ -209,9 +212,10 @@ void* c_screen_multiplayer_video_settings::load(s_screen_parameters* parameters)
 	if (pool)
 	{
 		screen = new (pool) c_screen_multiplayer_video_settings(
-			parameters->m_channel_type,
-			parameters->m_window_index,
-			parameters->m_user_flags);
+			parameters->get_channel_type(),
+			parameters->get_window_index(),
+			parameters->get_user_flags()
+		);
 
 		screen->m_allocated = true;
 		user_interface_register_screen_to_channel(screen, parameters);

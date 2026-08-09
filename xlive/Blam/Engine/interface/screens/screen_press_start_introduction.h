@@ -15,20 +15,19 @@ protected:
 	char gap[3];
 	s_event_record m_saved_input;
 
-
 	void handle_item_pressed_event(s_event_record* const& event, datum* pitem_index);
 
 public:
-	static void* load(s_screen_parameters* parameters);
-	static void apply_instance_patches();
+	static void* load(class c_screen_parameters* parameters);
+	static void apply_instance_patches(void);
 	c_screen_press_start_introduction(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags);
 
 	// c_screen_press_start_introduction virtual functions
 
-	virtual ~c_screen_press_start_introduction() = default;
-	virtual void update() override;
-	bool handle_event(s_event_record* event) override;
-	virtual void initialize(s_screen_parameters* parameters) override;
+	virtual ~c_screen_press_start_introduction(void) = default;
+	virtual void update(void) override;
+	bool handle_event(struct s_event_record* event) override;
+	virtual void initialize(class c_screen_parameters* parameters) override;
 	virtual void sub_60EBC2(int32 a1) override;
 	virtual const void* load_proc(void) const override;
 };

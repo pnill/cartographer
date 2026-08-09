@@ -423,7 +423,7 @@ public:
 	// c_screen_widget additions
 
 	virtual void sub_60E884(void);
-	virtual void initialize(struct s_screen_parameters* parameters) = 0;
+	virtual void initialize(class c_screen_parameters* parameters) = 0;
 	virtual void post_initialize(void);
 	virtual void post_initialize_button_keys(void);
 	virtual c_user_interface_widget* sub_6102C5(void);
@@ -471,7 +471,7 @@ public:
 	virtual ~c_screen_with_menu(void) = default;
 	virtual bool handle_event(s_event_record* event) override;
 	virtual class c_user_interface_widget* sub_6121F6(rectangle2d* point) override;
-	virtual void initialize(struct s_screen_parameters* parameters) override;
+	virtual void initialize(c_screen_parameters* parameters) override;
 
 protected:
 	class c_list_widget* m_child_list;
@@ -490,4 +490,4 @@ ASSERT_STRUCT_SIZE(c_screen_with_menu, 0xA60);
 /* prototypes */
 
 // Todo : move to proper location
-void user_interface_register_screen_to_channel(class c_screen_widget* new_screen, struct s_screen_parameters* parameters);
+void user_interface_register_screen_to_channel(class c_screen_widget* new_screen, class c_screen_parameters* parameters);

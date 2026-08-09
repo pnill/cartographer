@@ -228,7 +228,8 @@ void c_main_menu_list::handle_item_pressed_event(s_event_record* const& event, d
 	}
 }
 
-void c_main_menu_list::handle_item_campaign(s_event_record* const& event)
+void c_main_menu_list::handle_item_campaign(
+	s_event_record* const& event)
 {
 	//INVOKE_TYPE(0xB198, 0x0, void(__thiscall*)(c_main_menu_list*, s_event_record**), this, pevent);
 
@@ -244,17 +245,10 @@ void c_main_menu_list::handle_item_campaign(s_event_record* const& event)
 	}
 	else if (online_connected_to_xbox_live())
 	{
-		s_screen_parameters params;
-		params.m_flags = 0;
-		params.m_window_index = _window_4;
-		params.m_context = 0;
-		params.m_user_flags = FLAG(event->controller);
-		params.m_channel_type = _user_interface_channel_type_gameshell_dialog;
-		params.m_screen_state.field_0 = NONE;
-		params.m_screen_state.m_last_focused_item_order = NONE;
-		params.m_screen_state.m_last_focused_item_index = NONE;
-		params.m_load_function = &c_screen_campaign_options::load;
-		params.m_load_function(&params);
+		c_screen_parameters params;
+
+		params.initialize_default_user(FLAG(event->controller), _user_interface_channel_type_gameshell_dialog, _window_4, c_screen_campaign_options::load);
+		params.execute_load_function();
 	}
 	else
 	{
@@ -265,9 +259,12 @@ void c_main_menu_list::handle_item_campaign(s_event_record* const& event)
 			screen_show_campaign_options_without_achievement,
 			_ui_error_confirm_campaign_without_achievements);
 	}
+
+	return;
 }
 
-void c_main_menu_list::handle_item_xbox_live(s_event_record* const& event)
+void c_main_menu_list::handle_item_xbox_live(
+	s_event_record* const& event)
 {
 	//return INVOKE_TYPE(0xB257, 0x0, bool(__thiscall*)(c_main_menu_list*, s_event_record**), this, pevent);
 
@@ -288,19 +285,10 @@ void c_main_menu_list::handle_item_xbox_live(s_event_record* const& event)
 	//h2v on the other hand checks for live-connection-status and the flag
 	if (online_connected_to_xbox_live() || shell_command_line_flag_is_set(_shell_command_line_flag_unlock_xbox_live_menus))
 	{
-		s_screen_parameters params;
-		params.m_flags = 0;
-		params.m_window_index = _window_4;
-		params.m_context = 0;
-		params.m_user_flags = FLAG(event->controller);
-		params.m_channel_type = _user_interface_channel_type_gameshell_screen;
-		params.m_screen_state.field_0 = NONE;
-		params.m_screen_state.m_last_focused_item_order = NONE;
-		params.m_screen_state.m_last_focused_item_index = NONE;
-		//params.m_load_function = &c_screen_bungie_news::load; // replacing with 4way_screen
-		params.m_load_function = &c_screen_4way_signin::load_for_xbox_live;
+		c_screen_parameters params;
 
-		params.m_load_function(&params);
+		params.initialize_default_user(FLAG(event->controller), _user_interface_channel_type_gameshell_screen, _window_4, c_screen_4way_signin::load_for_xbox_live);
+		params.execute_load_function();
 	}
 	else
 	{
@@ -319,6 +307,8 @@ void c_main_menu_list::handle_item_xbox_live(s_event_record* const& event)
 				nullptr);
 		}
 	}
+
+	return;
 }
 
 void c_main_menu_list::handle_item_splitscreen(s_event_record* const& event)
@@ -381,18 +371,12 @@ void c_main_menu_list::handle_item_settings(s_event_record* const& event)
 {
 	//return INVOKE_TYPE(0xB32B, 0x0, bool(__thiscall*)(c_main_menu_list*, s_event_record**), this, pevent);
 
-	s_screen_parameters params;
-	params.m_flags = 0;
-	params.m_window_index = _window_4;
-	params.m_context = NULL;
-	params.m_user_flags = FLAG(event->controller);
-	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
-	params.m_screen_state.field_0 = NONE;
-	params.m_screen_state.m_last_focused_item_order = NONE;
-	params.m_screen_state.m_last_focused_item_index = NONE;
-	params.m_load_function = &c_screen_settings::load;
+	c_screen_parameters params;
 
-	params.m_load_function(&params);
+	params.initialize_default_user(FLAG(event->controller), _user_interface_channel_type_gameshell_screen, _window_4, c_screen_settings::load);
+	params.execute_load_function();
+
+	return;
 }
 
 //void c_main_menu_list::handle_item_guide(s_event_record* const& event)
@@ -411,23 +395,21 @@ static bool __cdecl screen_show_campaign_options_without_achievement(e_controlle
 {
 	//return INVOKE(0x213673, 0x0, screen_show_campaign_options_without_achievement, controller_index);
 
-	s_screen_parameters params;
-	params.m_flags = 0;
-	params.m_window_index = _window_4;
-	params.m_context = 0;
-	params.m_user_flags = user_interface_controller_get_signed_in_controllers_mask(); //replacing 0xFF with active_controllers so that controller-removed-handler stops panicking here
-	params.m_channel_type = _user_interface_channel_type_gameshell_dialog;
-	params.m_screen_state.field_0 = NONE;
-	params.m_screen_state.m_last_focused_item_order = NONE;
-	params.m_screen_state.m_last_focused_item_index = NONE;
-	params.m_load_function = &c_screen_campaign_options::load;
+	c_screen_parameters params;
 
-	params.m_load_function(&params);
+	params.initialize_default_user(
+		user_interface_controller_get_signed_in_controllers_mask(), //replacing 0xFF with active_controllers so that controller-removed-handler stops panicking here
+		_user_interface_channel_type_gameshell_dialog,
+		_window_4,
+		c_screen_campaign_options::load
+	);
+	params.execute_load_function();
 
 	return true;
 }
 
-static bool __cdecl screen_show_screen_4way_signin_splitscreen_offline(e_controller_index controller_index)
+static bool __cdecl screen_show_screen_4way_signin_splitscreen_offline(
+	e_controller_index controller_index)
 {
 	online_account_transition_to_offline();
 	user_interface_transition_to_offline();
@@ -438,18 +420,15 @@ static bool __cdecl screen_show_screen_4way_signin_splitscreen_offline(e_control
 	}
 	else
 	{
-		s_screen_parameters params;
-		params.m_flags = 0;
-		params.m_window_index = _window_4;
-		params.m_context = 0;
-		params.m_user_flags = user_interface_controller_get_signed_in_controllers_mask();
-		params.m_channel_type = _user_interface_channel_type_gameshell_screen;
-		params.m_screen_state.field_0 = NONE;
-		params.m_screen_state.m_last_focused_item_order = NONE;
-		params.m_screen_state.m_last_focused_item_index = NONE;
-		params.m_load_function = &c_screen_4way_signin::load_for_splitscreen;
+		c_screen_parameters params;
 
-		params.m_load_function(&params);
+		params.initialize_default_user(
+			user_interface_controller_get_signed_in_controllers_mask(),
+			_user_interface_channel_type_gameshell_screen,
+			_window_4,
+			c_screen_4way_signin::load_for_splitscreen
+		);
+		params.execute_load_function();
 	}
 
 	return true;
@@ -468,18 +447,15 @@ static bool __cdecl screen_show_screen_4way_signin_system_link_offline(e_control
 	{
 		if (transport_available())
 		{
-			s_screen_parameters params;
-			params.m_flags = 0;
-			params.m_window_index = _window_4;
-			params.m_context = 0;
-			params.m_user_flags = user_interface_controller_get_signed_in_controllers_mask();
-			params.m_channel_type = _user_interface_channel_type_gameshell_screen;
-			params.m_screen_state.field_0 = NONE;
-			params.m_screen_state.m_last_focused_item_order = NONE;
-			params.m_screen_state.m_last_focused_item_index = NONE;
-			params.m_load_function = &c_screen_4way_signin::load_for_system_link;
+			c_screen_parameters params;
 
-			params.m_load_function(&params);
+			params.initialize_default_user(
+				user_interface_controller_get_signed_in_controllers_mask(),
+				_user_interface_channel_type_gameshell_screen,
+				_window_4,
+				c_screen_4way_signin::load_for_system_link
+			);
+			params.execute_load_function();
 		}
 		else
 		{
@@ -513,18 +489,16 @@ static bool __cdecl screen_show_screen_4way_signin_xbox_live_callback(void)
 			nullptr);
 	}
 
-	s_screen_parameters params;
-	params.m_flags = 0;
-	params.m_window_index = _window_4;
-	params.m_context = 0;
-	params.m_user_flags = user_interface_controller_get_signed_in_controllers_mask();
-	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
-	params.m_screen_state.field_0 = NONE;
-	params.m_screen_state.m_last_focused_item_order = NONE;
-	params.m_screen_state.m_last_focused_item_index = NONE;
-	params.m_load_function = &c_screen_4way_signin::load_for_xbox_live;
+	c_screen_parameters params;
 
-	params.m_load_function(&params);
+	params.initialize_default_user(
+		user_interface_controller_get_signed_in_controllers_mask(),
+		_user_interface_channel_type_gameshell_screen,
+		_window_4,
+		c_screen_4way_signin::load_for_xbox_live
+	);
+	params.execute_load_function();
+	
 	return true;
 }
 

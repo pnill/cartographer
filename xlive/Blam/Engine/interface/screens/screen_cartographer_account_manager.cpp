@@ -594,7 +594,7 @@ void c_cartographer_account_manager_menu::pre_destroy()
 }
 
 // c_screen_with_menu specific interface
-void c_cartographer_account_manager_menu::initialize(s_screen_parameters* screen_parameters)
+void c_cartographer_account_manager_menu::initialize(c_screen_parameters* screen_parameters)
 {
 	c_screen_with_menu::initialize(screen_parameters);
 
@@ -663,7 +663,7 @@ void c_cartographer_account_manager_menu::set_menu_open_context(e_cartographer_a
 }
 
 
-void* __cdecl c_cartographer_account_manager_menu::load(s_screen_parameters* parameters)
+void* __cdecl c_cartographer_account_manager_menu::load(c_screen_parameters* parameters)
 {
 	ASSERT(g_open_cartographer_account_manager_context != _cartographer_account_manager_screen_type_none);
 
@@ -700,7 +700,13 @@ void* __cdecl c_cartographer_account_manager_menu::load(s_screen_parameters* par
 
 	if (ui_buffer) {
 		account_list_menu = new (ui_buffer) c_cartographer_account_manager_menu(
-			parameters->m_channel_type, parameters->m_window_index, parameters->m_user_flags, g_open_cartographer_account_manager_context, button_count, selected_button_index);
+			parameters->get_channel_type(),
+			parameters->get_window_index(),
+			parameters->get_user_flags(),
+			g_open_cartographer_account_manager_context,
+			button_count,
+			selected_button_index
+		);
 		account_list_menu->m_allocated = true;
 	}
 
@@ -710,7 +716,7 @@ void* __cdecl c_cartographer_account_manager_menu::load(s_screen_parameters* par
 	return account_list_menu;
 }
 
-void* c_cartographer_account_manager_menu::load_default_context(s_screen_parameters* parameters)
+void* c_cartographer_account_manager_menu::load_default_context(c_screen_parameters* parameters)
 {
 	set_menu_open_context(_cartographer_account_manager_screen_type_list);
 	return load(parameters);

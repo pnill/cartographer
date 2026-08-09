@@ -6,11 +6,11 @@ c_list_item_widget::c_list_item_widget() :
 {
 	//return INVOKE_TYPE(0x21FFC9, 0x0, c_list_item_widget*(__thiscall*)(c_list_item_widget*), this);
 
-	this->m_last_data_index = NONE;
-	this->m_intro_delay_milliseconds = 0;
-	this->field_78 = 1;
-	this->m_widget_type = _widget_type_list_item;
-	this->field_6D = 1;
+	m_last_data_index = NONE;
+	m_intro_delay_milliseconds = 0;
+	field_78 = 1;
+	m_widget_type = _widget_type_list_item;
+	field_6D = 1;
 
 }
 
@@ -22,14 +22,14 @@ void c_list_item_widget::set_last_data_index(int32 index)
 
 datum c_list_item_widget::get_last_data_index(void) const
 {
-	return this->m_last_data_index;
+	return m_last_data_index;
 }
 
 void c_list_item_widget::set_item_transitioning(bool state)
 {
 	// only used by main_menu_list ?
 	// maybe transitioning?
-	this->field_78 = state;
+	field_78 = state;
 }
 
 
@@ -43,7 +43,7 @@ void c_list_item_widget::update()
 int32 c_list_item_widget::get_intro_delay()
 {
 	//return INVOKE_TYPE(0x220053, 0x0, int32(__thiscall*)(c_list_item_widget*), this);
-	return this->m_intro_delay_milliseconds;
+	return m_intro_delay_milliseconds;
 }
 
 bool c_list_item_widget::handle_event(s_event_record* event)

@@ -55,12 +55,12 @@ protected:
 	c_cartographer_guide_edit_list m_guide_edit_list;
 public:
 	c_cartographer_guide_menu(e_user_interface_channel_type _ui_channel, e_user_interface_render_window _window_index, uint16 _flags);
-	static void* load(s_screen_parameters* parameters);
+	static void* load(c_screen_parameters* parameters);
 	
 	// c_cartographer_guide_menu virtual functions
 
 	virtual ~c_cartographer_guide_menu() = default;
-	virtual void initialize(s_screen_parameters* screen_parameters) override;
+	virtual void initialize(c_screen_parameters* screen_parameters) override;
 	virtual const void* load_proc(void) const override;
 };
 
@@ -91,13 +91,13 @@ class c_cartographer_credits_menu : public c_screen_with_menu
 	c_cartographer_credits_edit_list m_credits_edit_list;
 public:
 	c_cartographer_credits_menu(e_user_interface_channel_type _ui_channel, e_user_interface_render_window _window_index, uint16 _flags);
-	static void* load(s_screen_parameters* parameters);
+	static void* load(c_screen_parameters* parameters);
 
 	// c_cartographer_credits_menu virtual functions
 
 	virtual ~c_cartographer_credits_menu() = default;
 	virtual const void* load_proc(void) const override;
-	virtual void initialize(s_screen_parameters* screen_parameters) override;
+	virtual void initialize(c_screen_parameters* screen_parameters) override;
 };
 
 
@@ -135,14 +135,14 @@ protected:
 public:
 	c_cartographer_update_menu(e_user_interface_channel_type _ui_channel, e_user_interface_render_window _window_index, uint16 _flags);
 	void set_update_status(e_cartographer_update_status status);
-	static void* load(s_screen_parameters* parameters);
+	static void* load(c_screen_parameters* parameters);
 
 	// c_cartographer_update_menu virtual functions
 
 	virtual ~c_cartographer_update_menu() = default;
 	virtual void update() override;
 	virtual const void* load_proc(void) const override;
-	virtual void initialize(s_screen_parameters* screen_parameters) override;
+	virtual void initialize(c_screen_parameters* screen_parameters) override;
 };
 
 // update notice
@@ -173,13 +173,13 @@ protected:
 	c_cartographer_update_notice_edit_list m_update_notice_edit_list;
 public:
 	c_cartographer_update_notice_menu(e_user_interface_channel_type _ui_channel, e_user_interface_render_window _window_index, uint16 _flags);
-	static void* load(s_screen_parameters* parameters);
+	static void* load(c_screen_parameters* parameters);
 
 	// c_cartographer_update_notice_menu virtual functions.
 
 	virtual ~c_cartographer_update_notice_menu() = default;
 	virtual const void* load_proc(void) const override;
-	virtual void initialize(s_screen_parameters* screen_parameters) override;
+	virtual void initialize(c_screen_parameters* screen_parameters) override;
 };
 
 //public code

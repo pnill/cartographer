@@ -49,7 +49,7 @@ protected:
 	c_video_settings_list m_video_settings_list;
 
 public:
-	static void* load(s_screen_parameters* parameters);
+	static void* load(c_screen_parameters* parameters);
 	static void apply_patches_on_map_load();
 	c_screen_video_settings(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, uint16 user_flags);
 

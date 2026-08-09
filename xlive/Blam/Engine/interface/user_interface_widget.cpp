@@ -231,6 +231,7 @@ void c_user_interface_widget::start_widget_animation(
 	int32 type)
 {
 	INVOKE_TYPE(0x212604, 0x0, void(__thiscall*)(c_user_interface_widget*, int32), this, type);
+	return;
 }
 
 void c_user_interface_widget::set_change_color(

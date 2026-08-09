@@ -14,7 +14,6 @@
 
 #include "cache/cache_files.h"
 #include "interface/user_interface_bitmap_block.h"
-#include "interface/user_interface_controller.h"
 #include "interface/user_interface_memory.h"
 #include "interface/user_interface_screen_widget_definition.h"
 #include "interface/user_interface_shared_globals.h"
@@ -180,7 +179,7 @@ void c_video_settings_list::update_list_items(c_list_item_widget* item, int32 sk
 			secondary_string = _string_id_empty_string;
 			break;
 		default:
-			DISPLAY_ASSERT("primary_string is undefined and will be used");
+			vassert(false, "primary_string is undefined and will be used", NULL);
 		}
 
 		if (primary_string != _string_id_invalid)
@@ -190,10 +189,7 @@ void c_video_settings_list::update_list_items(c_list_item_widget* item, int32 sk
 	}
 	else
 	{
-		if (!secondary_text)
-			return;
-
-		DISPLAY_ASSERT("secondary_string is undefined and will be used");
+		vassert(secondary_text, "secondary_string is undefined and will be used", NULL);
 	}
 
 	if (secondary_text)
@@ -203,6 +199,8 @@ void c_video_settings_list::update_list_items(c_list_item_widget* item, int32 sk
 			secondary_text->set_text_from_string_id(secondary_string);
 		}
 	}
+
+	return;
 }
 
 void c_video_settings_list::handle_item_pressed_event(s_event_record* const& event, datum* pitem_index)
@@ -216,55 +214,54 @@ void c_video_settings_list::handle_item_pressed_event(s_event_record* const& eve
 		return;
 	}
 
-	s_screen_parameters params;
-	params.m_flags = 0;
-	params.m_window_index = _window_4;
-	params.m_context = 0;
-	params.m_user_flags = FLAG(event->controller);
-	params.m_channel_type = _user_interface_channel_type_gameshell_dialog;
-	params.m_screen_state.field_0 = NONE;
-	params.m_screen_state.m_last_focused_item_order = NONE;
-	params.m_screen_state.m_last_focused_item_index = NONE;
-	params.m_load_function = nullptr; // stop warning of using uinitialized var
+	proc_ui_screen_load_cb_t load_proc = NULL;
+
+	c_screen_parameters params;
 
 	switch (DATUM_INDEX_TO_ABSOLUTE_INDEX(*pitem_index))
 	{
 	case _item_display_mode:
-		params.m_load_function = &c_screen_display_mode_menu::load;
+		load_proc = &c_screen_display_mode_menu::load;
 		break;
 	case _item_resolution:
-		params.m_load_function = &c_screen_resolution_menu::load;
+		load_proc = &c_screen_resolution_menu::load;
 		break;
 	case _item_vsync:
-		params.m_load_function = &c_screen_vsync_menu::load;
+		load_proc = &c_screen_vsync_menu::load;
 		break;
 	case _item_brightness_level:
-		params.m_load_function = &c_screen_brightness_level_menu::load;
+		load_proc = &c_screen_brightness_level_menu::load;
 		break;
 	case _item_gamma_setting:
-		params.m_load_function = &c_screen_gamma_menu::load;
+		load_proc = &c_screen_gamma_menu::load;
 		break;
 	case _item_anti_aliasing:
-		params.m_load_function = &c_screen_anti_aliasing_menu::load;
+		load_proc = &c_screen_anti_aliasing_menu::load;
 		break;
 	case _item_lod_setting:
-		params.m_load_function = &c_screen_lod_menu::load;
+		load_proc = &c_screen_lod_menu::load;
 		break;
 	case _item_safe_area:
-		params.m_load_function = &c_screen_safe_area_menu::load;
+		load_proc = &c_screen_safe_area_menu::load;
 		break;
 	case _item_splitscreen:
-		params.m_load_function = &c_screen_splitscreen_menu::load;
+		load_proc = &c_screen_splitscreen_menu::load;
 		break;
 	case _item_restore_defaults:
-		params.m_load_function = &c_screen_restore_video_defaults_setting_menu::load;
+		load_proc = &c_screen_restore_video_defaults_setting_menu::load;
 		break;
 	default:
 		unreachable();
 	}
 
-	if (params.m_load_function != nullptr)
-		params.m_load_function(&params);
+	params.initialize_default_user(FLAG(event->controller), _user_interface_channel_type_gameshell_dialog, _window_4, load_proc);
+
+	if (load_proc!=NULL)
+	{
+		params.execute_load_function();
+	}
+
+	return;
 }
 
 
@@ -290,7 +287,7 @@ const void* c_screen_video_settings::load_proc() const
 	return &c_screen_video_settings::load;
 }
 
-void* c_screen_video_settings::load(s_screen_parameters* parameters)
+void* c_screen_video_settings::load(c_screen_parameters* parameters)
 {
 	//return INVOKE(0x21EDC7, 0x0, c_screen_video_settings::load, parameters);
 
@@ -300,9 +297,10 @@ void* c_screen_video_settings::load(s_screen_parameters* parameters)
 	if (pool)
 	{
 		screen = new (pool) c_screen_video_settings(
-			parameters->m_channel_type,
-			parameters->m_window_index,
-			parameters->m_user_flags);
+			parameters->get_channel_type(),
+			parameters->get_window_index(),
+			parameters->get_user_flags()
+		);
 
 		screen->m_allocated = true;
 		user_interface_register_screen_to_channel(screen, parameters);

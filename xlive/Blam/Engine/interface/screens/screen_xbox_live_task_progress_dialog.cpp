@@ -64,7 +64,7 @@ bool c_screen_xbox_live_task_progress_dialog::handle_event(s_event_record* event
 	return false;
 }
 
-void c_screen_xbox_live_task_progress_dialog::initialize(s_screen_parameters* parameters)
+void c_screen_xbox_live_task_progress_dialog::initialize(c_screen_parameters* parameters)
 {
 	s_interface_expected_screen_layout layout;
 	csmemset(&layout, 0, sizeof(layout));
@@ -159,22 +159,17 @@ void c_screen_xbox_live_task_progress_dialog::add_task_ex(datum task_datum, e_co
 	//typedef void(__cdecl* c_screen_xbox_live_task_progress_dialog_t)(int arg_0, signed int local_player_index, void* update_function, int a4, int a5);
 	//INVOKE_TYPE(0x20C776, 0x0, c_screen_xbox_live_task_progress_dialog_t, -1, 0, update_function, 0, 0);
 	
-	s_screen_parameters params;
+	c_screen_xbox_live_task_progress_dialog* screen;
+	c_screen_parameters params;
 
-	if (controller_index >= k_number_of_controllers)
-		params.m_user_flags = NONE;
-	else
-		params.m_user_flags = FLAG(controller_index);
+	params.initialize_default_user(
+		(uint16)(controller_index < k_number_of_controllers ? FLAG(controller_index) : NONE),
+		_user_interface_channel_type_game_error,
+		_window_4,
+		c_screen_xbox_live_task_progress_dialog::load
+	);
 
-	params.m_context = nullptr;
-	params.m_screen_state.field_0 = NONE;
-	params.m_screen_state.m_last_focused_item_order = NONE;
-	params.m_screen_state.m_last_focused_item_index = NONE;
-	params.m_flags = NULL;
-	params.m_channel_type = _user_interface_channel_type_game_error;
-	params.m_window_index = _window_4;
-	params.m_load_function = c_screen_xbox_live_task_progress_dialog::load;
-	c_screen_xbox_live_task_progress_dialog* screen = (c_screen_xbox_live_task_progress_dialog*)params.m_load_function(&params);
+	screen = (c_screen_xbox_live_task_progress_dialog*)params.execute_load_function();
 	
 	if(screen)
 	{
@@ -183,15 +178,20 @@ void c_screen_xbox_live_task_progress_dialog::add_task_ex(datum task_datum, e_co
 		screen->set_close_function(close_function);
 		screen->m_data = data;
 	}
+
+	return;
 }
 
-
-void* c_screen_xbox_live_task_progress_dialog::load(s_screen_parameters* parameters)
+void* c_screen_xbox_live_task_progress_dialog::load(c_screen_parameters* parameters)
 {
 	c_screen_xbox_live_task_progress_dialog* screen = nullptr;
 	uint8* pool = ui_pool_allocate_space(sizeof(c_screen_xbox_live_task_progress_dialog), 0);
 	if (pool) {
-		screen = new (pool) c_screen_xbox_live_task_progress_dialog(parameters->m_channel_type, parameters->m_window_index, parameters->m_user_flags);
+		screen = new (pool) c_screen_xbox_live_task_progress_dialog(
+			parameters->get_channel_type(),
+			parameters->get_window_index(),
+			parameters->get_user_flags()
+		);
 		screen->m_allocated = true;
 	}
 	user_interface_register_screen_to_channel(screen, parameters);

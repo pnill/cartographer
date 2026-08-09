@@ -435,7 +435,7 @@ enum e_user_interface_channel_type
 
 /* typedefs */
 
-typedef void* (__cdecl* proc_ui_screen_load_cb_t)(struct s_screen_parameters*);
+typedef void* (__cdecl* proc_ui_screen_load_cb_t)(class c_screen_parameters*);
 
 /* structures */
 
@@ -455,8 +455,63 @@ struct s_screen_state
 	int32 m_last_focused_item_index;
 };
 
-struct s_screen_parameters
+class c_screen_parameters
 {
+public:
+	c_screen_parameters(void);
+
+	void initialize_default_user(
+		uint16 user_flags,
+		e_user_interface_channel_type channel_type,
+		e_user_interface_render_window window_index,
+		proc_ui_screen_load_cb_t load_cb);
+
+	void initialize_internal(
+		uint16 flags,
+		uint16 user_flags,
+		e_user_interface_channel_type channel_type,
+		e_user_interface_render_window window_index,
+		s_screen_state* screen_state,
+		proc_ui_screen_load_cb_t load_cb);
+
+	void* execute_load_function()
+	{
+		return m_load_function(this);
+	}
+
+	int16 get_user_flags(
+		void) const
+	{
+		return m_user_flags;
+	}
+
+	void set_user_flag(
+		uint8 bit)
+	{
+		SET_BIT(m_user_flags, bit, true);
+		return;
+	}
+
+	void set_user_flag_unsafe(
+		int16 flags)
+	{
+		m_user_flags = flags;
+		return;
+	}
+
+	e_user_interface_channel_type get_channel_type(
+		void) const
+	{
+		return m_channel_type;
+	}
+
+	e_user_interface_render_window get_window_index(
+		void) const
+	{
+		return m_window_index;
+	}
+
+private:
 	uint16 m_flags;
 	int16 m_user_flags;
 	e_user_interface_channel_type m_channel_type;
@@ -464,26 +519,8 @@ struct s_screen_parameters
 	void* m_context;
 	s_screen_state m_screen_state;
 	proc_ui_screen_load_cb_t m_load_function;
-
-	void data_new(uint16 flags, uint16 user_flags, e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, proc_ui_screen_load_cb_t load_cb)
-	{
-		m_flags = flags;
-		m_user_flags = user_flags;
-		m_channel_type = channel_type;
-		m_window_index = window_index;
-		m_screen_state.field_0 = NONE;
-		m_screen_state.m_last_focused_item_order = NONE;
-		m_screen_state.m_last_focused_item_index = NONE;
-		m_load_function = load_cb;
-	}
-
-	void* ui_screen_load_proc_exec()
-	{
-		return m_load_function(this);
-	}
 };
-ASSERT_STRUCT_SIZE(s_screen_parameters, 0x20);
-
+ASSERT_STRUCT_SIZE(c_screen_parameters, 0x20);
 
 /* prototypes */
 
@@ -502,7 +539,7 @@ int32 __cdecl user_interface_get_screen_tag_index_by_id(enum e_user_interface_sc
 bool __cdecl user_interface_in_screen(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, enum e_user_interface_screen_id screen_id);
 bool __cdecl user_interface_error_screen_is_active(e_user_interface_channel_type channel_index, e_user_interface_render_window window_index, e_ui_error_types error_code);
 
-void __cdecl screen_error_ok_dialog_show(e_user_interface_channel_type channel_type, e_ui_error_types ui_error_index, e_user_interface_render_window window_index, uint16 user_flags, void* ok_callback, void* fallback);
+void __cdecl screen_error_ok_dialog_show(e_user_interface_channel_type channel_type, e_ui_error_types ui_error_index, e_user_interface_render_window window_index, int16 user_flags, void* ok_callback, void* fallback);
 void __cdecl screen_error_ok_dialog_with_custom_text(e_user_interface_channel_type channel_type, e_ui_error_types ui_error_index, e_user_interface_render_window window_index, int16 user_flags, void* ok_callback, void* fallback, const wchar_t* custom_title, const wchar_t* custom_body);
 
 void __cdecl user_interface_error_ok_cancel_dialog_show_confirmation(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags, void* ok_callback_handle, e_ui_error_types error_type);

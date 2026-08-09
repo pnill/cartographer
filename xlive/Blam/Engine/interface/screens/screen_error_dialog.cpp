@@ -7,15 +7,17 @@
 
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
 
-decltype(c_screen_error_dialog_ok::show_dialog)* p_error_ok_dialog_show;
-decltype(c_screen_error_dialog_ok_cancel::show_dialog)* p_ok_cancel_dialog_show;
+static decltype(c_screen_error_dialog_ok::show_dialog)* p_error_ok_dialog_show;
+static decltype(c_screen_error_dialog_ok_cancel::show_dialog)* p_ok_cancel_dialog_show;
 
-void* __cdecl c_screen_error_dialog_ok::load_for_active_users(s_screen_parameters* parameters)
+void* __cdecl c_screen_error_dialog_ok::load_for_active_users(
+	c_screen_parameters* parameters)
 {
-	if ((parameters->m_user_flags & 0xFF) == (uint8)NONE)
+	if ((parameters->get_user_flags() & 0xFF) == (uint8)NONE)
 	{
-		parameters->m_user_flags = user_interface_controller_get_signed_in_controllers_mask() | FLAG(k_windows_device_controller_index);
+		parameters->set_user_flag_unsafe(user_interface_controller_get_signed_in_controllers_mask() | FLAG(k_windows_device_controller_index));
 	}
+
 	return INVOKE(0x20E032, 0x0, c_screen_error_dialog_ok::load_for_active_users, parameters);
 }
 

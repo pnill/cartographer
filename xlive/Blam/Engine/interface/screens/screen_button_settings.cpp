@@ -423,7 +423,7 @@ const void* c_screen_button_settings_menu::load_proc() const
 }
 
 
-void* c_screen_button_settings_menu::load(s_screen_parameters* parameters)
+void* c_screen_button_settings_menu::load(c_screen_parameters* parameters)
 {
 	//return INVOKE(0x255FA4, 0x0, c_screen_button_settings_menu::load, parameters);
 	c_screen_button_settings_menu* screen;
@@ -432,10 +432,11 @@ void* c_screen_button_settings_menu::load(s_screen_parameters* parameters)
 	if (pool)
 	{
 		screen = new (pool) c_screen_button_settings_menu(
-			parameters->m_channel_type,
-			parameters->m_window_index,
-			parameters->m_user_flags,
-			_screen_pp_button_settings);
+			parameters->get_channel_type(),
+			parameters->get_window_index(),
+			parameters->get_user_flags(),
+			_screen_pp_button_settings
+		);
 
 		screen->m_allocated = true;
 		screen->m_using_qtr_arrows = false;
@@ -449,7 +450,7 @@ void* c_screen_button_settings_menu::load(s_screen_parameters* parameters)
 	return screen;
 }
 
-void* c_screen_button_settings_menu::load_qtr(s_screen_parameters* parameters)
+void* c_screen_button_settings_menu::load_qtr(c_screen_parameters* parameters)
 {
 	//return INVOKE(0x259DC0, 0x0, c_screen_button_settings_menu::load_qtr, parameters);
 	c_screen_button_settings_menu* screen;
@@ -458,10 +459,11 @@ void* c_screen_button_settings_menu::load_qtr(s_screen_parameters* parameters)
 	if (pool)
 	{
 		screen = new (pool) c_screen_button_settings_menu(
-			parameters->m_channel_type,
-			parameters->m_window_index,
-			parameters->m_user_flags,
-			_screen_pp_buttons_qtr); //qtr screen is button_settings_ingame.wgit
+			parameters->get_channel_type(),
+			parameters->get_window_index(),
+			parameters->get_user_flags(),
+			_screen_pp_buttons_qtr			//qtr screen is button_settings_ingame.wgit
+		); 
 
 		screen->m_allocated = true;
 		screen->m_button_settings_list.set_using_qtr_screen(true);

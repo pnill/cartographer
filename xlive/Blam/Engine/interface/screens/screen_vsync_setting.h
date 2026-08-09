@@ -47,13 +47,13 @@ protected:
 	c_vsync_edit_list m_vsync_edit_list;
 
 public:
-	static void* load(s_screen_parameters* parameters);
+	static void* load(c_screen_parameters* parameters);
 	c_screen_vsync_menu(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, uint16 user_flags);
 
 	// c_screen_vsync_menu virtual functions
 
 	virtual ~c_screen_vsync_menu() = default;
-	virtual void initialize(s_screen_parameters* parameters) override;
+	virtual void initialize(c_screen_parameters* parameters) override;
 	virtual void post_initialize() override;
 	virtual const void* load_proc() const override;
 

@@ -179,9 +179,9 @@ public:
 		INVOKE_VFPTR_FN(_get_vfptr_table, 21, void(class_type::**)());
 	}
 
-	virtual void initialize(s_screen_parameters* parameters) override
+	virtual void initialize(c_screen_parameters* parameters) override
 	{
-		INVOKE_VFPTR_FN(_get_vfptr_table, 22, void(class_type::**)(s_screen_parameters*), parameters);
+		INVOKE_VFPTR_FN(_get_vfptr_table, 22, void(class_type::**)(c_screen_parameters*), parameters);
 	}
 
 	virtual void post_initialize() override
@@ -276,7 +276,7 @@ public:
 
 	c_brightness_level_edit_list m_list_widgets;
 	
-	static void* open_brightness_menu(s_screen_parameters* a1);
+	static void* open_brightness_menu(c_screen_parameters* a1);
 
 private:
 	// reserved name

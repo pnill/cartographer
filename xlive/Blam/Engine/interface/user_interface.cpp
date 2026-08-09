@@ -407,7 +407,50 @@ static void ui_test_error_code(e_ui_error_types error_id, bool use_cancel, bool 
 
 /* public code */
 
-bool __cdecl user_interface_automation_is_active(void)
+c_screen_parameters::c_screen_parameters(void)
+{
+	m_context = NULL;
+	return;
+}
+
+void c_screen_parameters::initialize_default_user(
+	uint16 user_flags,
+	e_user_interface_channel_type channel_type,
+	e_user_interface_render_window window_index,
+	proc_ui_screen_load_cb_t load_cb)
+{
+	initialize_internal(0, user_flags, channel_type, window_index, NULL, load_cb);
+	return;
+}
+
+void c_screen_parameters::initialize_internal(
+	uint16 flags,
+	uint16 user_flags,
+	e_user_interface_channel_type channel_type,
+	e_user_interface_render_window window_index,
+	s_screen_state* screen_state,
+	proc_ui_screen_load_cb_t load_cb)
+{
+	m_flags = flags;
+	m_user_flags = user_flags;
+	m_channel_type = channel_type;
+	m_window_index = window_index;
+	
+	if (screen_state)
+	{
+		csmemcpy(&m_screen_state, screen_state, sizeof(m_screen_state));
+	}
+	else
+	{
+		csmemset(&m_screen_state, NONE, sizeof(m_screen_state));
+	}
+	
+	m_load_function = load_cb;
+
+	return;
+}
+
+bool user_interface_automation_is_active(void)
 {
 	return false;
 }
@@ -466,7 +509,7 @@ void __cdecl screen_error_ok_dialog_show(
 	e_user_interface_channel_type channel_type,
 	e_ui_error_types ui_error_index,
 	e_user_interface_render_window window_index,
-	uint16 user_flags,
+	int16 user_flags,
 	void* ok_callback,
 	void* fallback)
 {
@@ -605,10 +648,15 @@ void user_interface_test_screen(
 void user_interface_test_transition_out_console_screen(void)
 {
 	if (user_interface_globals_get()->gameshell_channel[_window_4].active_or_incoming_screen_exists())
+	{
 		user_interface_globals_get()->gameshell_channel[_window_4].transition_out();
+	}
 
 	if (user_interface_globals_get()->gameshell_background_channel.active_or_incoming_screen_exists())
+	{
 		user_interface_globals_get()->gameshell_background_channel.transition_out();
+	}
+	
 	return;
 }
 
@@ -798,9 +846,8 @@ static s_user_interface_globals* user_interface_globals_get(void)
 static const char* user_interface_error_codes_get_name(
 	e_ui_error_types error_code)
 {
-	ASSERT(VALID_INDEX(error_code, k_ui_error_count));
+	ASSERT(VALID_INDEX(error_code, k_last_ui_error_code));
 	ASSERT(table[error_code].error_code == error_code);
-
 	return table[error_code].string;
 }
 
@@ -809,7 +856,11 @@ static void ui_test_error_code(
 	bool use_cancel,
 	bool confirmation)
 {
-	if (VALID_INDEX(error_id, k_ui_error_count))
+	if (error_id > k_last_ui_error_code)
+	{
+		error(_error_delayed, "error code must be between 0 & %d", (int32)k_last_ui_error_code);
+	}
+	else
 	{
 #ifdef TERMINAL_ENABLED
 		console_printf("error code #%d= '%s'", error_id, user_interface_error_codes_get_name(error_id));
@@ -820,7 +871,7 @@ static void ui_test_error_code(
 			user_interface_error_ok_cancel_dialog_show_confirmation(
 				_user_interface_channel_type_game_error,
 				_window_4,
-				(uint16)NONE,
+				NONE,
 				nullptr,
 				error_id);
 		}
@@ -838,12 +889,8 @@ static void ui_test_error_code(
 		}
 		else
 		{
-			screen_error_ok_dialog_show(_user_interface_channel_type_game_error, error_id, _window_4, (uint16)NONE, nullptr, nullptr);
+			screen_error_ok_dialog_show(_user_interface_channel_type_game_error, error_id, _window_4, NONE, nullptr, nullptr);
 		}
-	}
-	else
-	{
-		error(_error_delayed, "error code must be between 0 & %d", k_last_ui_error_code);
 	}
 
 	return;

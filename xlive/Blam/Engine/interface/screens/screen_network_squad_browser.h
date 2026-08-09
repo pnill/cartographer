@@ -5,9 +5,9 @@
 
 /* enums */
 
-enum e_screen_network_squad_browser_columns : uint32
+enum e_screen_network_squad_browser_columns
 {
-	_screen_network_squad_browser_column_favorite,
+	_screen_network_squad_browser_column_favorite = 0,
 	_screen_network_squad_browser_column_dedicated_server,
 	_screen_network_squad_browser_column_host_name,
 	_screen_network_squad_browser_column_map,
@@ -35,13 +35,13 @@ class c_network_squad_list : public c_list_widget
 {	
 public:
 	c_network_squad_list(uint16 user_flags);
-	virtual ~c_network_squad_list() = default;
+	virtual ~c_network_squad_list(void) = default;
 
-	virtual void pre_destroy() override;
-	virtual void update() override;
+	virtual void pre_destroy(void) override;
+	virtual void update(void) override;
 	virtual bool handle_event(s_event_record* event) override;
-	virtual c_list_item_widget* get_list_items() override;
-	virtual int32 get_list_items_count() override;
+	virtual c_list_item_widget* get_list_items(void) override;
+	virtual int32 get_list_items_count(void) override;
 	virtual void update_list_items(c_list_item_widget*, int32 skin_index) override;
 
 
@@ -87,8 +87,8 @@ class c_screen_network_squad_browser : c_screen_with_menu
 	int32 m_selected_column_index;
 	int32 field_1F08;
 
-	static c_screen_network_squad_browser* __cdecl load_network_browser(s_screen_parameters* parameters);
-	static c_screen_network_squad_browser* __cdecl load_live_browser(s_screen_parameters* parameters);
+	static c_screen_network_squad_browser* __cdecl load_network_browser(class c_screen_parameters* parameters);
+	static c_screen_network_squad_browser* __cdecl load_live_browser(class c_screen_parameters* parameters);
 
 public:
 	static void apply_patches(void);
@@ -98,6 +98,6 @@ public:
 
 	void build_players_list_fix(c_player_widget_representation* representations, int32 player_count);
 
-	static void* __cdecl load(s_screen_parameters* parameters);
+	static void* __cdecl load(class c_screen_parameters* parameters);
 };
 ASSERT_STRUCT_SIZE(c_screen_network_squad_browser, 0x1F0C);

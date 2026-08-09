@@ -6,7 +6,7 @@
 struct s_user_interface_widget_stack
 {
 	s_user_interface_widget_stack* old_stack_item;
-	s_screen_parameters parameters;
+	c_screen_parameters parameters;
 	int32 screen_menu_id;
 };
 ASSERT_STRUCT_SIZE(s_user_interface_widget_stack, 0x28);
@@ -28,7 +28,7 @@ public:
 
 	virtual ~c_channel_with_history();
 	virtual void dispose_screens() override;
-	virtual void register_incoming_screen(c_screen_widget* new_screen, s_screen_parameters* parameters) override;
+	virtual void register_incoming_screen(c_screen_widget* new_screen, c_screen_parameters* parameters) override;
 	virtual void  retreat_one_step() override;
 	virtual void construct_parameters_from_active_screen() override;
 	virtual void  load_screen_from_incoming_parameters() override;

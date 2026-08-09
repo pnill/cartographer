@@ -17,9 +17,7 @@ enum
 
 /* typedefs */
 
-typedef c_screen_network_squad_browser* (__cdecl* load_network_browser_t)(s_screen_parameters*);
-load_network_browser_t p_load_network_browser;
-load_network_browser_t p_load_live_browser;
+typedef c_screen_network_squad_browser* (__cdecl* load_network_browser_t)(c_screen_parameters*);
 
 /* structures */
 
@@ -43,6 +41,11 @@ static __declspec(naked) void jmp_populate_servers(void)
 
 static void screen_network_squad_browser_increase_server_limit_apply_patches(void);
 
+/* globals */
+
+static load_network_browser_t p_load_network_browser;
+static load_network_browser_t p_load_live_browser;
+
 /* public code */
 
 void c_screen_network_squad_browser::apply_patches(void)
@@ -56,18 +59,22 @@ void c_screen_network_squad_browser::apply_patches(void)
 	return;
 }
 
-void c_network_squad_list::sort_event(s_event_record* event, int32 selected_column_index)
+void c_network_squad_list::sort_event(
+	s_event_record* event, 
+	int32 selected_column_index)
 {
 	INVOKE_TYPE(0x218EE7, 0, void(__thiscall*)(c_network_squad_list*, s_event_record*, int32), this, event, selected_column_index);
 	return;
 }
 
-c_screen_network_squad_browser* c_screen_network_squad_browser::load_network_browser(s_screen_parameters* parameters)
+c_screen_network_squad_browser* c_screen_network_squad_browser::load_network_browser(
+	c_screen_parameters* parameters)
 {
 	return p_load_network_browser(parameters);
 }
 
-c_screen_network_squad_browser* c_screen_network_squad_browser::load_live_browser(s_screen_parameters* parameters)
+c_screen_network_squad_browser* c_screen_network_squad_browser::load_live_browser(
+	c_screen_parameters* parameters)
 {
 	c_screen_network_squad_browser* screen = p_load_live_browser(parameters);
 
@@ -106,7 +113,8 @@ void c_screen_network_squad_browser::build_players_list_fix(c_player_widget_repr
 
 #pragma endregion
 
-void* __cdecl c_screen_network_squad_browser::load(s_screen_parameters* parameters)
+void* __cdecl c_screen_network_squad_browser::load(
+	c_screen_parameters* parameters)
 {
 	return INVOKE(0x21A238, 0x0, c_screen_network_squad_browser::load, parameters);
 }

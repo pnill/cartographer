@@ -121,7 +121,7 @@ c_screen_vsync_menu::c_screen_vsync_menu(e_user_interface_channel_type channel_t
 {
 }
 
-void c_screen_vsync_menu::initialize(s_screen_parameters* parameters)
+void c_screen_vsync_menu::initialize(c_screen_parameters* parameters)
 {
 	c_screen_with_menu::initialize(parameters);
 
@@ -158,7 +158,7 @@ const void* c_screen_vsync_menu::load_proc() const
 	return &c_screen_vsync_menu::load;
 }
 
-void* c_screen_vsync_menu::load(s_screen_parameters* parameters)
+void* c_screen_vsync_menu::load(c_screen_parameters* parameters)
 {
 	c_screen_vsync_menu* screen;
 
@@ -166,9 +166,10 @@ void* c_screen_vsync_menu::load(s_screen_parameters* parameters)
 	if (pool)
 	{
 		screen = new (pool) c_screen_vsync_menu(
-			parameters->m_channel_type,
-			parameters->m_window_index,
-			parameters->m_user_flags);
+			parameters->get_channel_type(),
+			parameters->get_window_index(),
+			parameters->get_user_flags()
+		);
 
 		screen->m_allocated = true;
 		user_interface_register_screen_to_channel(screen, parameters);

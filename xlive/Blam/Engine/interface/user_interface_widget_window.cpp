@@ -268,9 +268,9 @@ void c_screen_widget::set_favourites_bitmap_visible(
 
 void user_interface_register_screen_to_channel(
 	c_screen_widget* new_screen,
-	s_screen_parameters* parameters)
+	c_screen_parameters* parameters)
 {
-	return INVOKE_TYPE(0x20B8C3, 0x0, void(__cdecl*)(c_screen_widget*, s_screen_parameters*), new_screen, parameters);
+	return INVOKE_TYPE(0x20B8C3, 0x0, void(__cdecl*)(c_screen_widget*, c_screen_parameters*), new_screen, parameters);
 }
 
 
@@ -308,8 +308,8 @@ c_user_interface_widget* c_screen_with_menu::sub_6121F6(
 }
 
 void c_screen_with_menu::initialize(
-	s_screen_parameters* parameters)
+	c_screen_parameters* parameters)
 {
-	INVOKE_TYPE(0x2111AB, 0x0, int(__thiscall*)(c_screen_with_menu*, s_screen_parameters*), this, parameters);
+	INVOKE_TYPE(0x2111AB, 0x0, int(__thiscall*)(c_screen_with_menu*, c_screen_parameters*), this, parameters);
 	return;
 }

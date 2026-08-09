@@ -209,101 +209,70 @@ void c_settings_list::handle_item_pressed_event(s_event_record* const& event, da
 	}
 }
 
-void c_settings_list::handle_item_player_profile(s_event_record* const& event)
+void c_settings_list::handle_item_player_profile(
+	s_event_record* const& event)
 {
-	s_screen_parameters params;
-	params.m_flags = 0;
-	params.m_window_index = _window_4;
-	params.m_context = NULL;
-	params.m_user_flags = FLAG(event->controller);
-	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
-	params.m_screen_state.field_0 = 0xFFFFFFFF;
-	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
-	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
-	params.m_load_function = c_screen_single_player_profile_select_fancy::load;
+	c_screen_parameters params;
 
-	params.m_load_function(&params);
+	params.initialize_default_user(FLAG(event->controller), _user_interface_channel_type_gameshell_screen, _window_4, c_screen_single_player_profile_select_fancy::load);
+	params.execute_load_function();
+	return;
 }
-void c_settings_list::handle_item_variant(s_event_record* const& event)
+
+void c_settings_list::handle_item_variant(
+	s_event_record* const& event)
 {
-	s_screen_parameters params;
-	params.m_flags = 0;
-	params.m_window_index = _window_4;
-	params.m_context = NULL;
-	params.m_user_flags = FLAG(event->controller);
-	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
-	params.m_screen_state.field_0 = 0xFFFFFFFF;
-	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
-	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
-	params.m_load_function = c_screen_game_engine_category::load_for_settings;
+	c_screen_parameters params;
 
-	params.m_load_function(&params);
+	params.initialize_default_user(FLAG(event->controller), _user_interface_channel_type_gameshell_screen, _window_4, c_screen_game_engine_category::load_for_settings);
+	params.execute_load_function();
+	return;
 }
-void c_settings_list::handle_item_video(s_event_record* const& event)
+
+void c_settings_list::handle_item_video(
+	s_event_record* const& event)
 {
-	s_screen_parameters params;
-	params.m_flags = 0;
-	params.m_window_index = _window_4;
-	params.m_context = NULL;
-	params.m_user_flags = FLAG(event->controller);
-	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
-	params.m_screen_state.field_0 = 0xFFFFFFFF;
-	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
-	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
-	params.m_load_function = c_screen_video_settings::load;
+	c_screen_parameters params;
 
-	params.m_load_function(&params);
+	params.initialize_default_user(FLAG(event->controller), _user_interface_channel_type_gameshell_screen, _window_4, c_screen_video_settings::load);
+	params.execute_load_function();
+	return;
 }
-void c_settings_list::handle_item_audio(s_event_record* const& event)
+
+void c_settings_list::handle_item_audio(
+	s_event_record* const& event)
 {
-	s_screen_parameters params;
-	params.m_flags = 0;
-	params.m_window_index = _window_4;
-	params.m_context = NULL;
-	params.m_user_flags = FLAG(event->controller);
-	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
-	params.m_screen_state.field_0 = 0xFFFFFFFF;
-	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
-	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
-	params.m_load_function = c_screen_audio_settings::load;
-
-	params.m_load_function(&params);
+	c_screen_parameters params;
+	
+	params.initialize_default_user(FLAG(event->controller), _user_interface_channel_type_gameshell_screen, _window_4, c_screen_audio_settings::load);
+	params.execute_load_function();
+	return;
 }
-void c_settings_list::handle_item_network(s_event_record* const& event)
+
+void c_settings_list::handle_item_network(
+	s_event_record* const& event)
 {
-	s_screen_parameters params;
-	params.m_flags = 0;
-	params.m_window_index = _window_4;
-	params.m_context = NULL;
-	params.m_user_flags = FLAG(event->controller);
-	params.m_channel_type = _user_interface_channel_type_gameshell_dialog;
-	params.m_screen_state.field_0 = 0xFFFFFFFF;
-	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
-	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
-	params.m_load_function = c_screen_network_adapter_menu::load;
+	c_screen_parameters params;
 
-	params.m_load_function(&params);
+	params.initialize_default_user(FLAG(event->controller), _user_interface_channel_type_gameshell_dialog, _window_4, c_screen_network_adapter_menu::load);
+	params.execute_load_function();
+	return;
 }
+
 void c_settings_list::handle_item_about(s_event_record* const& event)
 {
-	s_screen_parameters params;
-	params.m_flags = 0;
-	params.m_window_index = _window_4;
-	params.m_context = NULL;
-	params.m_user_flags = FLAG(event->controller);
-	params.m_channel_type = _user_interface_channel_type_gameshell_dialog;
-	params.m_screen_state.field_0 = 0xFFFFFFFF;
-	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
-	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
-	params.m_load_function = c_screen_about_dialog_menu::load;
+	c_screen_parameters params;
 
-	params.m_load_function(&params);
+	params.initialize_default_user(FLAG(event->controller), _user_interface_channel_type_gameshell_dialog, _window_4, c_screen_about_dialog_menu::load);
+	params.execute_load_function();
+	return;
 }
+
 void c_settings_list::handle_item_guide(s_event_record* const& event)
 {
 	ui_load_cartographer_guide_menu();
+	return;
 }
-
 
 
 //
@@ -365,7 +334,7 @@ const void* c_screen_settings::load_proc(void) const
 	return &c_screen_settings::load;
 }
 
-void* c_screen_settings::load(s_screen_parameters* parameters)
+void* c_screen_settings::load(c_screen_parameters* parameters)
 {
 	//return INVOKE(0xB071, 0x0, c_screen_settings::load, parameters);
 
@@ -375,9 +344,10 @@ void* c_screen_settings::load(s_screen_parameters* parameters)
 	if (pool)
 	{
 		screen = new (pool) c_screen_settings(
-			parameters->m_channel_type,
-			parameters->m_window_index,
-			parameters->m_user_flags);
+			parameters->get_channel_type(),
+			parameters->get_window_index(),
+			parameters->get_user_flags()
+		);
 
 		screen->m_allocated = true;
 

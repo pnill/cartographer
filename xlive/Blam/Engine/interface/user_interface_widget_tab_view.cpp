@@ -6,7 +6,7 @@ c_tab_view_widget::c_tab_view_widget(int16 user_flags):
 {
 	//return INVOKE_TYPE(0x220A3A, 0x0, c_tab_view_widget(*__thiscall*)(c_tab_view_widget*, __int16), this,a2);
 
-	this->field_70 = nullptr;
+	field_70 = nullptr;
 }
 
 void c_tab_view_widget::setup_children()
@@ -18,7 +18,7 @@ void c_tab_view_widget::setup_children()
 		field_70 = get_children();
 	}
 
-	this->setup_children();
+	setup_children();
 }
 
 bool c_tab_view_widget::handle_event(s_event_record* event)

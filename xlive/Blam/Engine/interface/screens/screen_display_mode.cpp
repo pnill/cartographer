@@ -109,9 +109,12 @@ void c_display_mode_edit_list::update_list_items(c_list_item_widget* item, int32
 void c_display_mode_edit_list::set_using_mp_screen(bool param)
 {
 	m_multiplayer_menu = param;
+	return;
 }
 
-void c_display_mode_edit_list::handle_item_pressed_event(s_event_record* const& event, datum* pitem_index)
+void c_display_mode_edit_list::handle_item_pressed_event(
+	s_event_record* const& event,
+	datum* pitem_index)
 {
 	int16 absolute_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(*pitem_index);
 	// ASSERT(absolute_index <= _rasterizer_settings_display_mode_last_user_selectable);
@@ -130,24 +133,17 @@ void c_display_mode_edit_list::handle_item_pressed_event(s_event_record* const& 
 		rasterizer_settings_process_display_changes(true, false); 
 		rasterizer_settings_update_window_position();
 
-		s_screen_parameters params;
-		params.m_flags = 0;
-		params.m_window_index = get_parent_render_window();
-		params.m_context = 0;
-		params.m_user_flags = FLAG(event->controller);
-		params.m_channel_type = get_parent_channel();
-		params.m_screen_state.field_0 = NONE;
-		params.m_screen_state.m_last_focused_item_order = NONE;
-		params.m_screen_state.m_last_focused_item_index = NONE;
-		params.m_load_function = &c_screen_confirm_resolution::load;
+		c_screen_parameters params;
 
-		if (params.m_load_function != nullptr)
-			params.m_load_function(&params);
+		params.initialize_default_user(FLAG(event->controller), get_parent_channel(), get_parent_render_window(), c_screen_confirm_resolution::load);
+		params.execute_load_function();
 	}
 	else
 	{
 		screen_error_ok_dialog_show(_user_interface_channel_type_game_error, _ui_error_no_fullscreen_res, _window_4, (uint16)NONE, nullptr, nullptr);
 	}
+
+	return;
 }
 
 
@@ -168,7 +164,7 @@ const void* c_screen_display_mode_menu::load_proc() const
 }
 
 
-void* __cdecl c_screen_display_mode_menu::load(s_screen_parameters* parameters)
+void* __cdecl c_screen_display_mode_menu::load(c_screen_parameters* parameters)
 {
 	//return INVOKE(0x2491D3, 0x0, c_screen_display_mode_menu::load, parameters);
 
@@ -178,9 +174,10 @@ void* __cdecl c_screen_display_mode_menu::load(s_screen_parameters* parameters)
 	if (pool)
 	{
 		screen = new (pool) c_screen_display_mode_menu(
-			parameters->m_channel_type,
-			parameters->m_window_index,
-			parameters->m_user_flags);
+			parameters->get_channel_type(),
+			parameters->get_window_index(),
+			parameters->get_user_flags()
+		);
 
 		screen->m_allocated = true;
 		user_interface_register_screen_to_channel(screen, parameters);
@@ -193,7 +190,7 @@ void* __cdecl c_screen_display_mode_menu::load(s_screen_parameters* parameters)
 	return screen;
 }
 
-void* __cdecl c_screen_display_mode_menu::load_mp(s_screen_parameters* parameters)
+void* __cdecl c_screen_display_mode_menu::load_mp(c_screen_parameters* parameters)
 {
 	//return INVOKE(0x258C02, 0x0, c_screen_display_mode_menu::load_mp, parameters);
 
@@ -203,9 +200,10 @@ void* __cdecl c_screen_display_mode_menu::load_mp(s_screen_parameters* parameter
 	if (pool)
 	{
 		screen = new (pool) c_screen_display_mode_menu(
-			parameters->m_channel_type,
-			parameters->m_window_index,
-			parameters->m_user_flags);
+			parameters->get_channel_type(),
+			parameters->get_window_index(),
+			parameters->get_user_flags()
+		);
 
 		screen->m_allocated = true;
 		screen->m_display_mode_edit_list.set_using_mp_screen(true);

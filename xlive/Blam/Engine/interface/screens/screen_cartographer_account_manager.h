@@ -106,8 +106,8 @@ public:
 	static void update_accounting_active_handle(bool active);
 	static void set_menu_open_context(e_cartographer_account_manager_screen_type screen_type);
 
-	static void* __cdecl load(s_screen_parameters* a1);
-	static void* __cdecl load_default_context(s_screen_parameters* a1);
+	static void* __cdecl load(c_screen_parameters* a1);
+	static void* __cdecl load_default_context(c_screen_parameters* a1);
 	static c_cartographer_account_manager_menu* load_for_account_create_context(void);
 	static c_cartographer_account_manager_menu* load_for_account_add_context(void);
 	static c_cartographer_account_manager_menu* load_for_account_list_context(void);
@@ -117,7 +117,7 @@ public:
 
 	virtual ~c_cartographer_account_manager_menu(void) = default;
 	virtual void pre_destroy(void) override;
-	virtual void initialize(s_screen_parameters* screen_parameters) override;
+	virtual void initialize(c_screen_parameters* screen_parameters) override;
 	virtual void post_initialize(void) override;
 	virtual const void* load_proc(void) const override;
 };

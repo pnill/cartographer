@@ -419,7 +419,7 @@ bool c_screen_4way_signin::handle_event(s_event_record* event)
 	return c_screen_widget::handle_event(event);
 }
 
-void c_screen_4way_signin::initialize(s_screen_parameters* parameters)
+void c_screen_4way_signin::initialize(c_screen_parameters* parameters)
 {
 	s_interface_expected_screen_layout layout;
 	csmemset(&layout, 0, sizeof(layout));
@@ -481,18 +481,11 @@ bool __cdecl user_interface_sign_out_controller_default_callback(e_controller_in
 }
 bool __cdecl user_interface_decline_invite_callback(e_controller_index controller_index)
 {
-	s_screen_parameters params;
-	params.m_flags = 0;
-	params.m_window_index = _window_4;
-	params.m_context = 0;
-	params.m_user_flags = FLAG(controller_index);
-	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
-	params.m_screen_state.field_0 = NONE;
-	params.m_screen_state.m_last_focused_item_order = NONE;
-	params.m_screen_state.m_last_focused_item_index = NONE;
-	params.m_load_function = c_screen_press_start_introduction::load;
+	c_screen_parameters params;
 
-	params.m_load_function(&params);
+	params.initialize_default_user(FLAG(controller_index), _user_interface_channel_type_gameshell_screen, _window_4, c_screen_press_start_introduction::load);
+	params.execute_load_function();
+
 	return true;
 }
 
@@ -503,18 +496,11 @@ bool c_screen_4way_signin::handle_controller_button_pressed_event(s_event_record
 	if (event->component == _controller_component_button_a ||
 		event->component == _controller_component_button_start)
 	{
-		s_screen_parameters params;
-		params.m_flags = 0;
-		params.m_window_index = _window_4;
-		params.m_context = 0;
-		params.m_user_flags = FLAG(event->controller);
-		params.m_channel_type = _user_interface_channel_type_gameshell_screen;
-		params.m_screen_state.field_0 = NONE;
-		params.m_screen_state.m_last_focused_item_order = NONE;
-		params.m_screen_state.m_last_focused_item_index = NONE;
-		params.m_load_function = nullptr;
+		proc_ui_screen_load_cb_t load_function = NULL;
 
-		switch (this->m_call_context)
+		c_screen_parameters params;
+		
+		switch (m_call_context)
 		{
 		case _4_way_signin_type_campaign:
 
@@ -536,10 +522,10 @@ bool c_screen_4way_signin::handle_controller_button_pressed_event(s_event_record
 			}
 			break;
 		case _4_way_signin_type_system_link:
-			params.m_load_function = c_screen_network_squad_browser::load;
+			load_function = c_screen_network_squad_browser::load;
 			break;
 		case _4_way_signin_type_xbox_live:
-			params.m_load_function = c_screen_bungie_news::load;
+			load_function = c_screen_bungie_news::load;
 			break;
 		case _4_way_signin_type_crossgame_invite:
 
@@ -550,8 +536,12 @@ bool c_screen_4way_signin::handle_controller_button_pressed_event(s_event_record
 			break;
 		}
 
-		if (params.m_load_function != nullptr)
-			params.m_load_function(&params);
+		params.initialize_default_user(FLAG(event->controller), _user_interface_channel_type_gameshell_screen, _window_4, load_function);
+
+		if (load_function!=NULL)
+		{
+			params.execute_load_function();
+		}
 
 	}
 	else if (event->component == _controller_component_button_b ||
@@ -701,7 +691,7 @@ void c_screen_4way_signin::update_button_key_texts()
 	this->post_initialize_button_keys();
 }
 
-void* c_screen_4way_signin::load(s_screen_parameters * parameters)
+void* c_screen_4way_signin::load(c_screen_parameters *parameters)
 {
 	c_screen_4way_signin* screen;
 
@@ -709,9 +699,10 @@ void* c_screen_4way_signin::load(s_screen_parameters * parameters)
 	if (pool)
 	{
 		screen = new (pool) c_screen_4way_signin(
-			parameters->m_channel_type,
-			parameters->m_window_index,
-			parameters->m_user_flags);
+			parameters->get_channel_type(),
+			parameters->get_window_index(),
+			parameters->get_user_flags()
+		);
 
 		screen->m_allocated = true;
 	}
@@ -723,35 +714,35 @@ void* c_screen_4way_signin::load(s_screen_parameters * parameters)
 	return screen;
 }
 
-void* c_screen_4way_signin::load_for_crossgame_invite(s_screen_parameters* parameters)
+void* c_screen_4way_signin::load_for_crossgame_invite(c_screen_parameters* parameters)
 {
 	c_screen_4way_signin* screen = (c_screen_4way_signin*)c_screen_4way_signin::load(parameters);
 	screen->m_call_context = _4_way_signin_type_crossgame_invite;
 	user_interface_register_screen_to_channel(screen, parameters);
 	return screen;
 }
-void* c_screen_4way_signin::load_for_xbox_live(s_screen_parameters* parameters)
+void* c_screen_4way_signin::load_for_xbox_live(c_screen_parameters* parameters)
 {
 	c_screen_4way_signin* screen = (c_screen_4way_signin*)c_screen_4way_signin::load(parameters);
 	screen->m_call_context = _4_way_signin_type_xbox_live;
 	user_interface_register_screen_to_channel(screen, parameters);
 	return screen;
 }
-void* c_screen_4way_signin::load_for_system_link(s_screen_parameters* parameters)
+void* c_screen_4way_signin::load_for_system_link(c_screen_parameters* parameters)
 {
 	c_screen_4way_signin* screen = (c_screen_4way_signin*)c_screen_4way_signin::load(parameters);
 	screen->m_call_context = _4_way_signin_type_system_link;
 	user_interface_register_screen_to_channel(screen, parameters);
 	return screen;
 }
-void* c_screen_4way_signin::load_for_splitscreen(s_screen_parameters* parameters)
+void* c_screen_4way_signin::load_for_splitscreen(c_screen_parameters* parameters)
 {
 	c_screen_4way_signin* screen = (c_screen_4way_signin*)c_screen_4way_signin::load(parameters);
 	screen->m_call_context = _4_way_signin_type_splitscreen;
 	user_interface_register_screen_to_channel(screen, parameters);
 	return screen;
 }
-void* c_screen_4way_signin::load_for_campaign(s_screen_parameters* parameters)
+void* c_screen_4way_signin::load_for_campaign(c_screen_parameters* parameters)
 {
 	c_screen_4way_signin* screen = (c_screen_4way_signin*)c_screen_4way_signin::load(parameters);
 	screen->m_call_context = _4_way_signin_type_campaign;
@@ -897,25 +888,22 @@ static void modify_controller_bitmap_for_split(c_bitmap_widget* signin_bitmap, c
 	return;
 }
 
-static void user_interface_recover_4way_screen(e_session_protocol protocol)
+static void user_interface_recover_4way_screen(
+	e_session_protocol protocol)
 {
-	s_screen_parameters params;
-	params.m_flags = 7; //retreating or recovering?
-	params.m_window_index = _window_4;
-	params.m_context = 0;
-	params.m_user_flags = user_interface_controller_get_signed_in_controllers_mask();
-	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
-	params.m_screen_state.field_0 = NONE;
-	params.m_screen_state.m_last_focused_item_order = NONE;
-	params.m_screen_state.m_last_focused_item_index = NONE;
-	params.m_load_function = &c_screen_4way_signin::load_for_splitscreen;
+	c_screen_parameters params;
 
-	if (session_protocol_has_coop(protocol))
-	{
-		params.m_load_function = &c_screen_4way_signin::load_for_campaign;
-	}
+	params.initialize_internal(
+		7,							//retreating or recovering?
+		user_interface_controller_get_signed_in_controllers_mask(),
+		_user_interface_channel_type_gameshell_screen,
+		_window_4,
+		NULL,
+		session_protocol_has_coop(protocol) ? c_screen_4way_signin::load_for_campaign : c_screen_4way_signin::load_for_splitscreen
+	);
 
-	params.m_load_function(&params);
+	params.execute_load_function();
+	return;
 }
 
 void user_interface_recover_4way_screen_pregame(e_session_protocol protocol, e_user_interface_screen_id screen_id)
@@ -981,20 +969,21 @@ void user_interface_recover_from_disconnection_patches()
 }
 
 //context is unused
-void screen_network_squad_browser_backout_to_4way_screen(uint8 context)
+void screen_network_squad_browser_backout_to_4way_screen(
+	uint8 context)
 {
-	s_screen_parameters params;
-	params.m_flags = 7; //retreating or recovering?
-	params.m_window_index = _window_4;
-	params.m_context = 0;
-	params.m_user_flags = user_interface_controller_get_signed_in_controllers_mask(); // orignally h2x uses the flags
-	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
-	params.m_screen_state.field_0 = NONE;
-	params.m_screen_state.m_last_focused_item_order = NONE;
-	params.m_screen_state.m_last_focused_item_index = NONE;
-	params.m_load_function = &c_screen_4way_signin::load_for_system_link;
+	c_screen_parameters params;
 
-	params.m_load_function(&params);
+	params.initialize_internal(
+		7,															//retreating or recovering?
+		user_interface_controller_get_signed_in_controllers_mask(),	// orignally h2x uses the flags
+		_user_interface_channel_type_gameshell_screen,
+		_window_4,
+		NULL,
+		c_screen_4way_signin::load_for_system_link
+	);
+	params.execute_load_function();
+	return;
 }
 
 void user_interface_backout_to_mainmenu_patches()
@@ -1004,6 +993,7 @@ void user_interface_backout_to_mainmenu_patches()
 	WriteValue<uint8>(Memory::GetAddress(0x21FD22) + 1, _screen_4way_join_screen); // inside c_screen_bungie_news::handle_event
 	PatchCall(Memory::GetAddress(0x219EA7), screen_network_squad_browser_backout_to_4way_screen);// replace call to user_interface_enter_game_shell
 	WriteValue(Memory::GetAddress(0x21FD3D) + 1, c_screen_4way_signin::load_for_xbox_live);// replace call to c_screen_main_menu::load
+	return;
 }
 
 void c_screen_4way_signin::apply_instance_patches()

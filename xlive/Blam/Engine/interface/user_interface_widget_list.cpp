@@ -10,16 +10,16 @@ c_list_widget::c_list_widget(uint16 user_flags)
 {
 	// INVOKE_TYPE(0x213B1C, 0x0, c_list_widget(*__thiscall*)(c_list_widget*, __int16), this, user_flags);
 
-	this->m_list_data = 0;
-	this->m_up_arrow_transition_time = 0;
-	this->m_down_arrow_transition_time = 0;
-	this->m_intro_delay_milliseconds = 0;
-	this->field_A2 = 0;
-	this->m_list_wraps = 0;
-	this->m_list_interactive = 0;
-	this->m_list_has_hidden_items = 0;
-	this->field_A6 = 0;
-	this->field_A7 = 1;
+	m_list_data = 0;
+	m_up_arrow_transition_time = 0;
+	m_down_arrow_transition_time = 0;
+	m_intro_delay_milliseconds = 0;
+	field_A2 = 0;
+	m_list_wraps = 0;
+	m_list_interactive = 0;
+	m_list_has_hidden_items = 0;
+	field_A6 = 0;
+	field_A7 = 1;
 }
 
 c_list_item_widget* c_list_widget::try_find_item_widget(uint32 idx)
@@ -42,7 +42,7 @@ void c_list_widget::update_list_items_from_mapping(c_list_item_widget* item, int
 	c_text_widget* item_text = item->try_find_text_widget(text_widget_idx);
 	if (item_text)
 	{
-		const s_list_item_datum* item_datum = (s_list_item_datum*)datum_try_and_get(this->m_list_data, item->get_last_data_index());
+		const s_list_item_datum* item_datum = (s_list_item_datum*)datum_try_and_get(m_list_data, item->get_last_data_index());
 		if (item_datum && total_mappings > 0)
 		{
 			int16 mapping_idx = 0;
@@ -65,7 +65,7 @@ void c_list_widget::update_list_items_from_mapping(c_list_item_widget* item, int
 	c_text_widget* item_text = item->try_find_text_widget(text_widget_idx);
 	if (item_text)
 	{
-		const s_list_item_datum* item_datum = (s_list_item_datum*)datum_try_and_get(this->m_list_data, item->get_last_data_index());
+		const s_list_item_datum* item_datum = (s_list_item_datum*)datum_try_and_get(m_list_data, item->get_last_data_index());
 		if (item_datum && total_mappings > 0)
 		{
 			int16 mapping_idx = 0;
@@ -139,7 +139,7 @@ void c_list_widget::render_widget(rectangle2d* viewport_bounds)
 int32 c_list_widget::get_intro_delay()
 {
 	//return INVOKE_TYPE(0xB69B, 0x0, int32(__thiscall*)(c_list_widget*), this);
-	return this->m_intro_delay_milliseconds;
+	return m_intro_delay_milliseconds;
 }
 
 bool c_list_widget::handle_event(s_event_record* event)

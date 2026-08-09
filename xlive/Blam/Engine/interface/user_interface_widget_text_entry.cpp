@@ -20,7 +20,7 @@ bool c_text_entry_widget::handle_event(s_event_record* event)
 c_user_interface_text* c_text_entry_widget::get_interface()
 {
 	//return INVOKE_TYPE(0x2237E4, 0x0, c_user_interface_text * (__thiscall*)(c_text_entry_widget*), this);
-	return &this->text_interface;
+	return &text_interface;
 }
 
 void c_text_entry_widget::setup_texts()

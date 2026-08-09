@@ -5,20 +5,20 @@
 c_text_widget::c_text_widget(int16 user_flags) :
 	c_user_interface_widget(_widget_type_text, user_flags)
 {
-	this->intro_animation_delay_ms = 0;
-	this->field_74 = 0;
+	intro_animation_delay_ms = 0;
+	field_74 = 0;
 }
 
 c_text_widget::c_text_widget(datum user_index) :
 	c_user_interface_widget(_widget_type_text, (user_index == NONE) ? 0 : FLAG(user_index))
 {
-	this->intro_animation_delay_ms = 0;
-	this->field_74 = 0;
+	intro_animation_delay_ms = 0;
+	field_74 = 0;
 }
 
 void c_text_widget::set_text(wchar_t const* text)
 {
-	this->get_interface()->set_text(text);
+	get_interface()->set_text(text);
 }
 
 void c_text_widget::set_text_from_string_id(string_id sid)
@@ -28,7 +28,7 @@ void c_text_widget::set_text_from_string_id(string_id sid)
 
 void c_text_widget::append_text(wchar_t const* text)
 {
-	this->get_interface()->append_text(text);
+	get_interface()->append_text(text);
 }
 
 void c_text_widget::append_text_from_string_id(string_id sid)

@@ -53,8 +53,8 @@ protected:
 	c_display_mode_edit_list m_display_mode_edit_list;
 
 public:
-	static void* __cdecl load(s_screen_parameters* parameters);
-	static void* __cdecl load_mp(s_screen_parameters* parameters);
+	static void* __cdecl load(c_screen_parameters* parameters);
+	static void* __cdecl load_mp(c_screen_parameters* parameters);
 
 	c_screen_display_mode_menu(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, uint16 user_flags);
 

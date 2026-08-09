@@ -7,7 +7,7 @@
 
 // typedef
 
-typedef void(__cdecl* t_screen_press_start_introduction_open)(s_screen_parameters* parameters);
+typedef void(__cdecl* t_screen_press_start_introduction_open)(c_screen_parameters* parameters);
 t_screen_press_start_introduction_open p_screen_press_start_introduction_open;
 
 c_screen_press_start_introduction::c_screen_press_start_introduction(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags) :
@@ -29,7 +29,7 @@ bool c_screen_press_start_introduction::handle_event(s_event_record* event)
 }
 
 CLASS_HOOK_DECLARE_LABEL(c_screen_press_start_introduction__initialize, c_screen_press_start_introduction::initialize);
-void c_screen_press_start_introduction::initialize(s_screen_parameters* parameters)
+void c_screen_press_start_introduction::initialize(c_screen_parameters* parameters)
 {
 	if (XUserSignedIn(0)) {
 		XUserSignOut(0);
@@ -37,7 +37,7 @@ void c_screen_press_start_introduction::initialize(s_screen_parameters* paramete
 	}
 	
 	//orignal c_screen_press_start_introduction::initialize
-	INVOKE_TYPE(0x23F180, 0x0, void(__thiscall*)(c_screen_press_start_introduction*, s_screen_parameters*), this, parameters);
+	INVOKE_TYPE(0x23F180, 0x0, void(__thiscall*)(c_screen_press_start_introduction*, c_screen_parameters*), this, parameters);
 }
 
 void c_screen_press_start_introduction::sub_60EBC2(int32 a1)
@@ -60,20 +60,23 @@ void c_screen_press_start_introduction::handle_item_pressed_event(
 	return;
 }
 
-void* c_screen_press_start_introduction::load(s_screen_parameters* parameters)
+void* c_screen_press_start_introduction::load(
+	c_screen_parameters* parameters)
 {
 	//return p_screen_press_start_introduction_open(parameters);
 
 	c_screen_press_start_introduction* screen;
 
-	parameters->m_flags |= 4u;
+	parameters->set_user_flag(2);
+
 	void* pool = ui_pool_allocate_space(sizeof(c_screen_press_start_introduction), 0);
 	if (pool)
 	{
 		screen = new (pool) c_screen_press_start_introduction(
-			parameters->m_channel_type,
-			parameters->m_window_index,
-			parameters->m_user_flags);
+			parameters->get_channel_type(),
+			parameters->get_window_index(),
+			parameters->get_user_flags()
+		);
 
 		screen->m_allocated = true;
 		user_interface_register_screen_to_channel(screen, parameters);

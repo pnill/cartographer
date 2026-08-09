@@ -4,5 +4,5 @@
 class c_screen_audio_settings
 {
 public:
-	static void* __cdecl load(s_screen_parameters* parameters);
+	static void* __cdecl load(c_screen_parameters* parameters);
 };

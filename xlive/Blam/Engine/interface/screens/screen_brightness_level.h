@@ -4,6 +4,6 @@
 class c_screen_brightness_level_menu
 {
 public:
-	static void* __cdecl load(s_screen_parameters* parameters);
-	static void* __cdecl load_mp(s_screen_parameters* parameters);
+	static void* __cdecl load(class c_screen_parameters* parameters);
+	static void* __cdecl load_mp(class c_screen_parameters* parameters);
 };

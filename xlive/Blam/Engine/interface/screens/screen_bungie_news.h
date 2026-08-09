@@ -1,8 +1,9 @@
 #pragma once
-#include "interface/user_interface.h"
+
+/* classes */
 
 class c_screen_bungie_news
 {
 public:
-	static void* __cdecl load(s_screen_parameters* parameters);
+	static void* __cdecl load(class c_screen_parameters* parameters);
 };

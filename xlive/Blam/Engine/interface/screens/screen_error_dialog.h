@@ -13,7 +13,7 @@ public:
 		void* ok_callback,
 		void* fallback
 	);
-	static void* __cdecl load_for_active_users(struct s_screen_parameters* parameters);
+	static void* __cdecl load_for_active_users(class c_screen_parameters* parameters);
 	static void apply_patches();
 };
 

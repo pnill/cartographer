@@ -10,7 +10,7 @@ void c_player_widget::setup_children()
 {
 	//return INVOKE_TYPE(0x220441, 0x0, int32(__thiscall*)(c_player_widget*), this);
 	c_user_interface_widget::setup_children();
-	this->m_visible = false;
+	m_visible = false;
 }
 
 

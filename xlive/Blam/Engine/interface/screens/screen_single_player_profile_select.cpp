@@ -152,7 +152,7 @@ void c_player_profile_list::apply_instance_patches(void)
 	return;
 }
 
-void* c_screen_single_player_profile_select_fancy::load(s_screen_parameters* parameters)
+void* c_screen_single_player_profile_select_fancy::load(c_screen_parameters* parameters)
 {
 	return INVOKE(0x21EF9C, 0x0, c_screen_single_player_profile_select_fancy::load, parameters);
 }
