@@ -17,7 +17,7 @@ void __cdecl predicted_resources_precache(int32 cluster_index)
 
 bool __cdecl render_visibility_check_location_cluster_active(s_location* location)
 {
-	return INVOKE(0x19447C, 0, render_visibility_check_location_cluster_active, location);
+	return INVOKE(0x19447C, 0x180490, render_visibility_check_location_cluster_active, location);
 }
 
 void render_view_visibility_compute_to_usercall(int32 user_index)

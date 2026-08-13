@@ -575,6 +575,8 @@ static void h2mod_apply_hooks(void)
 	players_apply_patches();
 	objects_apply_patches();
 
+	particle_update_apply_patches();
+
 	c_character_physics_mode_melee_datum::apply_hooks();
 	character_physics_mode_ground_apply_patches();
 	
@@ -675,7 +677,6 @@ static void h2mod_apply_hooks(void)
 
 		cinematics_apply_patches();
 		game_state_procs_apply_patches();
-		apply_particle_update_patches();
 		apply_dead_camera_patches();
 		liquid_apply_patches();
 		contrails_apply_patches();

@@ -23,7 +23,7 @@ void particle_update(real32 delta)
 	}
 }
 
-void apply_particle_update_patches()
+void particle_update_apply_patches()
 {
 	apply_particle_system_patches();
 

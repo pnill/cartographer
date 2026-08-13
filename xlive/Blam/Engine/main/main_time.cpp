@@ -199,9 +199,9 @@ real32 __cdecl main_time_update(void)
 			// if there's game tick leftover time (i.e the actual game tick update executed faster than the actual engine's fixed time step)
 			// FIXED by interpolation: 
 			// limit the framerate to get back in sync with the renderer to prevent ghosting and jagged movement
-			while (dt_sec < game_time_get_max_frame_time())
+			while (dt_sec < game_tick_length())
 			{
-				real32 fMsSleep = (real32)(game_time_get_max_frame_time() - dt_sec) * 1000.f;
+				real32 fMsSleep = (real32)(game_tick_length() - dt_sec) * 1000.f;
 
 				// to reduce stuttering, spend some of the time to sleep by CPU spinning,
 				// Sleep is not precise since Windows is not a RTOS

@@ -1,4 +1,4 @@
 #pragma once
 
-void apply_particle_update_patches();
+void particle_update_apply_patches();
 

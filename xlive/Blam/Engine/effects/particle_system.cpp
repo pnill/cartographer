@@ -14,7 +14,7 @@ real32 particle_system_accumulated_time[k_max_particle_systems];
 
 c_particle_system_definition* c_particle_system::get_definition() const
 {
-	return INVOKE_TYPE(0xC3CE9, 0x0, c_particle_system_definition*(__thiscall*)(const c_particle_system*), this);
+	return INVOKE_TYPE(0xC3CE9, 0xB0BD4, c_particle_system_definition*(__thiscall*)(const c_particle_system*), this);
 }
 
 data_array* get_particle_system_table()
@@ -49,12 +49,12 @@ datum particle_system_get_by_ptr(c_particle_system* particle_system)
 
 void c_particle_system::destroy_children()
 {
-	return INVOKE_TYPE(0xC37DE, 0x0, void(__thiscall*)(c_particle_system*), this);
+	return INVOKE_TYPE(0xC37DE, 0xB06C9, void(__thiscall*)(c_particle_system*), this);
 }
 
 void c_particle_system::update_colors(bool v_mirrored_or_one_shot, bool one_shot, pixel32 color, pixel32 color_2)
 {
-	return INVOKE_TYPE(0xC381F, 0, void(__thiscall *)(c_particle_system*, bool, bool, pixel32, pixel32), this, v_mirrored_or_one_shot, one_shot, color, color_2);
+	return INVOKE_TYPE(0xC381F, 0xB070A, void(__thiscall *)(c_particle_system*, bool, bool, pixel32, pixel32), this, v_mirrored_or_one_shot, one_shot, color, color_2);
 }
 
 int32 c_particle_system::get_particle_count() const
@@ -78,28 +78,7 @@ int32 c_particle_system::get_particle_count() const
 
 void c_particle_system::change_parent_effect(datum* datum_1, datum* datum_2)
 {
-	return INVOKE_TYPE(0xC35F7, 0, void(__thiscall*)(c_particle_system*, datum*, datum*), this, datum_1, datum_2);
-}
-
-typedef void(__thiscall* t_c_particle_system__update_position)(c_particle_system* particle_system, s_particle_system_update* particle_system_update, const real_matrix4x3* matrix, bool a4);
-t_c_particle_system__update_position p_update_position;
-
-CLASS_HOOK_DECLARE_LABEL(c_particle_system__update_position, c_particle_system::update_position);
-void __thiscall c_particle_system::update_position(
-	s_particle_system_update* particle_system_update,
-	const real_matrix4x3* matrix,
-	bool a4)
-{
-	// the index is updated in the original code, so get it early
-	//c_particle_system_definition* particle_system_def = this->get_definition();
-	//datum location_index = particle_system_update->particle_system_location_index;
-	
-	p_update_position(this, particle_system_update, matrix, a4);
-}
-
-__declspec(naked) void jmp_c_particle_system_update_position()
-{
-	CLASS_HOOK_JMP(c_particle_system__update_position, c_particle_system::update_position);
+	return INVOKE_TYPE(0xC35F7, 0xB04E2, void(__thiscall*)(c_particle_system*, datum*, datum*), this, datum_1, datum_2);
 }
 
 typedef bool(__stdcall* c_particle_system_frame_advance_t)(c_particle_system* thisx, real32 dt);
@@ -276,10 +255,8 @@ void __cdecl particle_system_remove_from_effects_cache(datum effect_index, datum
 
 void apply_particle_system_patches()
 {
-	p_c_particle_system_frame_advance = (c_particle_system_frame_advance_t)DetourClassFunc(Memory::GetAddress<uint8*>(0xC43F9), (uint8*)c_particle_system::frame_advance, 10);
-	p_c_particle_system__restart = (t_c_particle_system__update_location_time)DetourClassFunc(Memory::GetAddress<uint8*>(0xC3E32), (uint8*)c_particle_system::restart, 11);
-
-	DETOUR_ATTACH(p_update_position, Memory::GetAddress<t_c_particle_system__update_position>(0xC376A), jmp_c_particle_system_update_position);
+	p_c_particle_system_frame_advance = (c_particle_system_frame_advance_t)DetourClassFunc(Memory::GetAddress<uint8*>(0xC43F9, 0xB12E4), (uint8*)c_particle_system::frame_advance, 10);
+	p_c_particle_system__restart = (t_c_particle_system__update_location_time)DetourClassFunc(Memory::GetAddress<uint8*>(0xC3E32, 0xB0D1D), (uint8*)c_particle_system::restart, 11);
 
 	// TODO fixme info in particle emitter
 	// allow world coordinate system particles to be updated
