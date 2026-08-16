@@ -1,15 +1,9 @@
 #pragma once
-#include "interface/user_interface.h"
 #include "interface/user_interface_widget_list.h"
 #include "interface/user_interface_widget_list_item.h"
 #include "interface/user_interface_widget_window.h"
 
-
-/* macro defines */
-
 /* constants */
-
-/* enums */
 
 enum
 {
@@ -23,9 +17,9 @@ class c_video_settings_list : public c_list_widget
 {
 protected:
 	c_list_item_widget m_list_items[k_no_of_visible_items_for_video_settings];
-	c_slot2<c_video_settings_list, s_event_record*, datum> m_slot;
+	c_slot2<c_video_settings_list, struct s_event_record*, datum> m_slot;
 
-	void handle_item_pressed_event(s_event_record* const& event, datum* pitem_index);
+	void handle_item_pressed_event(struct s_event_record* const& event, datum* pitem_index);
 
 
 public:

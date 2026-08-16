@@ -1,13 +1,31 @@
 #pragma once
+#include "animation_constants.h"
 #include "animation_id.h"
-
-#include "cache/cache_files.h"
 
 #include "tag_files/tag_block.h"
 
+/* constants */
+
+/* macros */
+
+#define animation_definition_get(index)	((class c_model_animation_graph*)tag_get(k_model_animation_graph_id, (index)))
+
+/* enums */
+
+enum e_inheritance_flags : uint8
+{
+	_inheritance_flag_inherit_root_translation_scale_only = FLAG(0),
+	_inheritance_flag_inherit_for_use_on_player = FLAG(1)
+};
 
 
-#define k_max_nodes_per_animation = 255
+enum e_function_controls : int16
+{
+	_function_control_frame = 0,
+	_function_control_scale = 1,
+};
+
+/* structures */
 
 struct s_additional_node_data
 {
@@ -31,12 +49,6 @@ struct inherited_animation_node_map_flag_block
 	uint32 local_node_flags;
 };
 ASSERT_STRUCT_SIZE(inherited_animation_node_map_flag_block, 4);
-
-enum e_inheritance_flags : uint8
-{
-	_inheritance_flag_inherit_root_translation_scale_only = FLAG(0),
-	_inheritance_flag_inherit_for_use_on_player = FLAG(1)
-};
 
 struct s_animation_inheritence
 {
@@ -511,12 +523,6 @@ struct c_vehicle_suspension
 };
 ASSERT_STRUCT_SIZE(c_vehicle_suspension, 40);
 
-enum e_function_controls : int16
-{
-	_function_control_frame = 0,
-	_function_control_scale = 1,
-};
-
 struct s_object_overlay
 {
 	string_id label;
@@ -561,13 +567,13 @@ class c_model_animation_graph
 public:
 	static const c_model_animation_graph* get(datum tag_index)
 	{
-		return (const c_model_animation_graph*)tag_get_fast(tag_index);
+		return animation_definition_get(tag_index);
 	}
 
 	int32 find_node(const string_id string) const;
 	int32 find_node_with_flags(const e_node_model_flags flags) const;
 
-	const c_model_animation_graph* get_writable(datum tag_datum_index) const;
+	c_model_animation_graph* get_writable(datum tag_datum_index) const;
 	const animation_graph_node* get_node(uint8 node_index) const;
 	int16 get_node_count(void) const;
 };

@@ -59,18 +59,25 @@ uint16 c_tag_injection_table::get_entry_count(void) const
 	return m_entry_count;
 }
 
-uint16 c_tag_injection_table::get_entry_count_by_type(e_tag_group type) const
+uint16 c_tag_injection_table::get_entry_count_by_type(
+	tag_group type) const
 {
 	uint16 result = 0;
 
-	for (uint16 i = 0; i < this->m_entry_count; ++i)
-		if (this->m_table[i].type.group == type)
+	for (uint16 i = 0; i < m_entry_count; ++i)
+	{
+		if (m_table[i].type == type)
+		{
 			++result;
+		}
+	}
 
 	return result;
 }
 
-s_tag_injecting_table_entry* c_tag_injection_table::init_entry(datum cache_index, e_tag_group type)
+s_tag_injecting_table_entry* c_tag_injection_table::init_entry(
+	datum cache_index,
+	tag_group type)
 {
 	if (m_entry_count >= m_table_size)
 	{
@@ -80,7 +87,7 @@ s_tag_injecting_table_entry* c_tag_injection_table::init_entry(datum cache_index
 	s_tag_injecting_table_entry* result = &m_table[m_entry_count];
 	result->cache_index = cache_index;
 	result->injected_index = k_first_injected_datum + m_entry_count;
-	result->type = { type };
+	result->type = type;
 	result->is_initialized = true;
 	result->is_injected = false;
 	result->loaded_data = new c_xml_definition_loader();
@@ -109,17 +116,21 @@ s_tag_injecting_table_entry* c_tag_injection_table::get_entry_by_injected_index(
 	return get_entry(DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index) - k_first_injected_datum);
 }
 
-void c_tag_injection_table::get_entries_by_type(e_tag_group type, s_tag_injecting_table_entry* out_results)
+void c_tag_injection_table::get_entries_by_type(
+	tag_group type,
+	s_tag_injecting_table_entry* out_results)
 {
 	int32 out_index = 0;
-	for (uint16 i = 0; i < this->m_entry_count; ++i)
-		if (this->m_table[i].type.group == type)
-		{	
-			s_tag_injecting_table_entry* out = &out_results[out_index++];
-			s_tag_injecting_table_entry* in = &this->m_table[i];
 
-			*out = *in;
+	for (uint16 i = 0; i < m_entry_count; ++i)
+	{
+		if (m_table[i].type == type)
+		{
+			out_results[out_index++] = m_table[i];
 		}
+	}
+
+	return;
 }
 
 bool c_tag_injection_table::has_entry_by_cache_index(datum datum_index) const

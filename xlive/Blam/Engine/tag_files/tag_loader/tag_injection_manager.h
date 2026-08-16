@@ -16,7 +16,7 @@ enum
 
 struct s_tag_injection_string_container
 {
-	struct s_unicode_string_list_reference* unic_str;
+	struct s_language_pack_offsets* unic_str;
 	struct s_string_reference* references;
 	uint32 strings_count;
 	uint32 first_string_offset;
@@ -47,14 +47,14 @@ public:
 	bool get_active_map_verified(void) const;
 	void close_active_map(void);
 	void reset(void);
-	datum get_tag_datum_by_name(e_tag_group group, const char* tag_name) const;
-	void get_name_by_tag_datum(e_tag_group group, datum cache_datum, char* out_name) const;
+	datum get_tag_datum_by_name(tag_group group, const char* tag_name) const;
+	void get_name_by_tag_datum(tag_group group, datum cache_datum, char* out_name) const;
 
 	bool initialize_agent(tag_group group);
 	c_xml_definition_agent* get_agent(tag_group type);
 
-	datum load_tag(e_tag_group group, const char* tag_name, bool load_dependencies);
-	datum load_tag(e_tag_group group, datum cache_datum, bool load_dependencies);
+	datum load_tag(tag_group group, char const* tag_name, bool load_dependencies);
+	datum load_tag(tag_group group, datum cache_datum, bool load_dependencies);
 	static void load_tag_internal(c_tag_injecting_manager* manager, tag_group group, datum cache_datum, bool load_dependencies);
 	static void load_dependencies(c_tag_injecting_manager* manager, const s_tag_injecting_table_entry* new_entry);
 
@@ -89,6 +89,6 @@ private:
 	tag_group get_tag_group_by_datum(datum cache_datum) const;
 
 	void load_raw_data_from_cache(datum injected_index) const;
-	static void apply_definition_fixup(e_tag_group group, datum injected_index);
+	static void apply_definition_fixup(tag_group group, datum injected_index);
 	static void initialize_shader_template(datum injected_datum);
 };

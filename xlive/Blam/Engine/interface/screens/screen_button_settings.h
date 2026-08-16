@@ -1,12 +1,14 @@
-#include "interface/user_interface.h"
 #include "interface/user_interface_widget_list.h"
 #include "interface/user_interface_widget_list_item.h"
 #include "interface/user_interface_widget_window.h"
 
 
-/* macro defines */
+/* constants */
 
-#define k_no_of_visible_items_for_button_settings 4+1
+enum
+{
+	k_no_of_visible_items_for_button_settings = 4 + 1
+};
 
 /* classes */
 
@@ -41,11 +43,11 @@ protected:
 	bool m_using_qtr_arrows;
 
 public:
-	static void* load(c_screen_parameters* parameters);
-	static void* load_qtr(c_screen_parameters* parameters);
-	static void apply_patches_on_ui_map_load();
-	static void apply_patches_on_mp_map_load();
-	static void apply_instance_patches();
+	static void* load(class c_screen_parameters* parameters);
+	static void* load_qtr(class c_screen_parameters* parameters);
+	static void apply_patches_on_ui_map_load(void);
+	static void apply_patches_on_mp_map_load(void);
+	static void apply_instance_patches(void);
 	c_screen_button_settings_menu(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags, e_user_interface_screen_id screen_id);
 
 	// c_screen_button_settings_menu virtual functions

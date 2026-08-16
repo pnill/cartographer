@@ -1,8 +1,9 @@
 #pragma once
-#include "interface/user_interface.h"
+
+/* classes */
 
 class c_screen_game_engine_category
 {
 public:
-	static void* load_for_settings(c_screen_parameters* parameters);
+	static void* load_for_settings(class c_screen_parameters* parameters);
 };

@@ -1,10 +1,17 @@
 #pragma once
-#include "math/function_definitions.h"
-
-#include "tag_files/tag_block.h"
 
 /* constants */
-#define k_maximum_reflections_per_lens_flare 32
+
+enum
+{
+	LENS_FLARE_DEFINITION_TAG = 'lens',
+	LENS_FLARE_DEFINITION_VERSION = 2,
+	k_maximum_reflections_per_lens_flare = 32,
+};
+
+/* macros */
+
+#define lens_flare_definition_get(index)	((struct s_lens_flare_definition*)tag_get(LENS_FLARE_DEFINITION_TAG, (index)))
 
 /* enums */
 
@@ -127,15 +134,15 @@ struct s_lens_flare_definition
 
 	e_lens_falloff_function falloff;
 	int16 pad2;
-	tag_block<s_lens_flare_reflection> reflections;
+	s_tag_block reflections;			// s_lens_flare_reflection
 	
 	// Explaination("ANIMATION", "")
 
 	e_lens_flare_animation_flags animation_flags;
 	int16 pad3;
 
-	tag_block<c_function_definition> brightness;
-	tag_block<c_function_definition> color;
-	tag_block<c_function_definition> rotation;  
+	s_tag_block brightness;	// c_function_definition
+	s_tag_block color;		// c_function_definition
+	s_tag_block rotation;	// c_function_definition
 };
 ASSERT_STRUCT_SIZE(s_lens_flare_definition, 100);

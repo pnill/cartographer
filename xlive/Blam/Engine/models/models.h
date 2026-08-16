@@ -493,6 +493,7 @@ struct s_scenario_load_parameters
 	int8 pad[32];
 };
 
+// TODO: move to model_definitions.h
 struct s_model_definition
 {
 	// Explaination("MODEL", "")

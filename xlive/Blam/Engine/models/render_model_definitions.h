@@ -6,6 +6,20 @@
 #include "structures/structures.h"
 #include "tag_files/tag_import_definitions.h"
 
+/* constants */
+
+enum
+{
+	RENDER_MODEL_DEFINITION_TAG = 'mode',
+	RENDER_MODEL_DEFINITION_VERSION = 5,		// TODO: verify
+};
+
+/* macros */
+
+#define render_model_definition_get(index)	((struct render_model_definition*)tag_get(RENDER_MODEL_DEFINITION_TAG, (index)))
+
+/* enums */
+
 enum e_render_model_definition_flags : int16
 {
 	_render_model_definition_force_third_person_bit = FLAG(0),

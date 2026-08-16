@@ -2,7 +2,6 @@
 
 // miscellaneous cartographer menus
 
-#include "interface/user_interface.h"
 #include "interface/user_interface_widget_list.h"
 #include "interface/user_interface_widget_list_item.h"
 #include "interface/user_interface_widget_window.h"
@@ -35,9 +34,9 @@ class c_cartographer_guide_edit_list : public c_list_widget
 {
 protected:
 	c_list_item_widget m_list_item_widgets[k_no_of_visible_items_for_cartographer_guide_list];
-	c_slot2<c_cartographer_guide_edit_list, s_event_record*, int32> m_slot_2;
+	c_slot2<c_cartographer_guide_edit_list, struct s_event_record*, int32> m_slot_2;
 
-	void handle_item_pressed_event(s_event_record* const& event, int32* pitem_index);
+	void handle_item_pressed_event(struct s_event_record* const& event, int32* pitem_index);
 public:
 	c_cartographer_guide_edit_list(uint16 _flags);
 
@@ -71,9 +70,9 @@ class c_cartographer_credits_edit_list : public c_list_widget
 {
 protected:
 	c_list_item_widget m_list_item_widgets[k_no_of_visible_items_for_cartographer_credits_list];
-	c_slot2<c_cartographer_credits_edit_list, s_event_record*, int32> m_slot_2;
+	c_slot2<c_cartographer_credits_edit_list, struct s_event_record*, int32> m_slot_2;
 
-	void handle_item_pressed_event(s_event_record* const& event, int32* pitem_index);
+	void handle_item_pressed_event(struct s_event_record* const& event, int32* pitem_index);
 
 public:
 	c_cartographer_credits_edit_list(uint16 _flags);
@@ -107,11 +106,11 @@ class c_cartographer_update_edit_list : public c_list_widget
 {
 protected:
 	c_list_item_widget m_list_item_widgets[k_no_of_visible_items_for_cartographer_update_list];
-	c_slot2<c_cartographer_update_edit_list, s_event_record*, int32> m_slot_2;
+	c_slot2<c_cartographer_update_edit_list, struct s_event_record*, int32> m_slot_2;
 	int32 m_update_status;
 	bool m_keep_screen_open;
 
-	void handle_item_pressed_event(s_event_record* const& event, int32* pitem_index);
+	void handle_item_pressed_event(struct s_event_record* const& event, int32* pitem_index);
 
 public:
 	c_cartographer_update_edit_list(uint16 _flags);
@@ -151,9 +150,9 @@ class c_cartographer_update_notice_edit_list : public c_list_widget
 {
 protected:
 	c_list_item_widget m_list_item_widgets[k_no_of_visible_items_for_cartographer_update_notice_list];
-	c_slot2<c_cartographer_update_notice_edit_list, s_event_record*, int32> m_slot_2;
+	c_slot2<c_cartographer_update_notice_edit_list, struct  s_event_record*, int32> m_slot_2;
 
-	void handle_item_pressed_event(s_event_record* const& event, int32* pitem_index);
+	void handle_item_pressed_event(struct s_event_record* const& event, int32* pitem_index);
 
 public:
 	c_cartographer_update_notice_edit_list(uint16 _flags);
@@ -173,13 +172,13 @@ protected:
 	c_cartographer_update_notice_edit_list m_update_notice_edit_list;
 public:
 	c_cartographer_update_notice_menu(e_user_interface_channel_type _ui_channel, e_user_interface_render_window _window_index, uint16 _flags);
-	static void* load(c_screen_parameters* parameters);
+	static void* load(class c_screen_parameters* parameters);
 
 	// c_cartographer_update_notice_menu virtual functions.
 
 	virtual ~c_cartographer_update_notice_menu() = default;
 	virtual const void* load_proc(void) const override;
-	virtual void initialize(c_screen_parameters* screen_parameters) override;
+	virtual void initialize(class c_screen_parameters* screen_parameters) override;
 };
 
 //public code

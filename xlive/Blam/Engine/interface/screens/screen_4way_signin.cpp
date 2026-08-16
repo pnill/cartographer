@@ -20,6 +20,7 @@
 #include "interface/user_interface_networking.h"
 #include "interface/user_interface_player_widget.h"
 #include "interface/user_interface_screen_widget_definition.h"
+#include "interface/user_interface_shared_globals.h"
 #include "networking/online/online_account_xbox.h"
 #include "shell/shell.h"
 
@@ -29,7 +30,6 @@
 
 enum e_4way_signin_main_text_blocks
 {
-
 	_4way_signin_main_pane_0_text_player0_profile_name = 0,
 	_4way_signin_main_pane_0_text_player0_insert_controller,
 	_4way_signin_main_pane_0_text_player1_profile_name,
@@ -122,6 +122,9 @@ struct s_screen_4way_items
 };
 
 /* constants */
+
+static char const* k_main_widget_tag_path = "ui\\screens\\game_shell\\4way_multiplayer_signin\\4way_signin_main";
+static char const* k_player_skins_tag_path = "ui\\player_skins\\player_skin_signin";
 
 static const s_screen_4way_items k_4way_screen_items[k_number_of_controllers]
 {
@@ -243,10 +246,14 @@ static void user_interface_recover_4way_screen(e_session_protocol protocol);
 
 /* public code */
 
-c_screen_4way_signin::c_screen_4way_signin(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags) :
+c_screen_4way_signin::c_screen_4way_signin(
+	e_user_interface_channel_type channel_type,
+	e_user_interface_render_window window_index,
+	int16 user_flags) :
 	c_screen_widget(_screen_4way_join_screen, channel_type, window_index, user_flags)
 {
 	m_call_context = _4_way_signin_type_splitscreen;
+	return;
 }
 
 void c_screen_4way_signin::update(void)
@@ -465,7 +472,8 @@ const void* c_screen_4way_signin::load_proc(void) const
 	return result;
 }
 
-bool __cdecl user_interface_mainmenu_sign_out_controller_callback(e_controller_index controller_index)
+bool __cdecl user_interface_mainmenu_sign_out_controller_callback(
+	e_controller_index controller_index)
 {
 	//return INVOKE(0xA421, 0x0, user_interface_mainmenu_sign_out_controller_callback, controller_index);
 	user_interface_controller_sign_out(controller_index);
@@ -474,13 +482,15 @@ bool __cdecl user_interface_mainmenu_sign_out_controller_callback(e_controller_i
 	return true;
 
 }
-bool __cdecl user_interface_sign_out_controller_default_callback(e_controller_index controller_index)
+bool __cdecl user_interface_sign_out_controller_default_callback(
+	e_controller_index controller_index)
 {
 	user_interface_controller_sign_out(controller_index);
 
 	return true;
 }
-bool __cdecl user_interface_decline_invite_callback(e_controller_index controller_index)
+bool __cdecl user_interface_decline_invite_callback(
+	e_controller_index controller_index)
 {
 	c_screen_parameters params;
 
@@ -490,7 +500,8 @@ bool __cdecl user_interface_decline_invite_callback(e_controller_index controlle
 	return true;
 }
 
-bool c_screen_4way_signin::handle_controller_button_pressed_event(s_event_record* event)
+bool c_screen_4way_signin::handle_controller_button_pressed_event(
+	s_event_record* event)
 {
 	bool sucess = true;
 
@@ -599,7 +610,8 @@ bool c_screen_4way_signin::handle_controller_button_pressed_event(s_event_record
 	return sucess;
 }
 
-bool c_screen_4way_signin::handle_invalid_controller_event(s_event_record* event) const
+bool c_screen_4way_signin::handle_invalid_controller_event(
+	s_event_record* event) const
 {
 	if (event->component == _controller_component_button_a
 		|| event->component == _controller_component_button_start)
@@ -622,6 +634,7 @@ bool c_screen_4way_signin::handle_invalid_controller_event(s_event_record* event
 			user_interface_decline_invite_callback,
 			_ui_confirm_decline_crossgame_invite);
 	}
+
 	return true;
 }
 
@@ -650,7 +663,8 @@ bool c_screen_4way_signin::handle_automation_event(
 	return result;
 }
 
-bool c_screen_4way_signin::handle_split_input_event(s_event_record* event)
+bool c_screen_4way_signin::handle_split_input_event(
+	s_event_record* event)
 {
 	if (event->component == _controller_component_button_x
 		&& !input_windows_processing_device_change()
@@ -680,7 +694,7 @@ bool c_screen_4way_signin::handle_split_input_event(s_event_record* event)
 	return false;
 }
 
-void c_screen_4way_signin::update_button_key_texts()
+void c_screen_4way_signin::update_button_key_texts(void)
 {
 	//initialize default button key text from tag
 	this->initialize_button_keys_text(false);
@@ -689,10 +703,13 @@ void c_screen_4way_signin::update_button_key_texts()
 	{
 		add_button_key_split_input(this->get_screen_button_key_text());
 	}
+
 	this->post_initialize_button_keys();
+	return;
 }
 
-void* c_screen_4way_signin::load(c_screen_parameters *parameters)
+void* c_screen_4way_signin::load(
+	c_screen_parameters *parameters)
 {
 	c_screen_4way_signin* screen;
 
@@ -715,35 +732,44 @@ void* c_screen_4way_signin::load(c_screen_parameters *parameters)
 	return screen;
 }
 
-void* c_screen_4way_signin::load_for_crossgame_invite(c_screen_parameters* parameters)
+void* c_screen_4way_signin::load_for_crossgame_invite(
+	c_screen_parameters* parameters)
 {
 	c_screen_4way_signin* screen = (c_screen_4way_signin*)c_screen_4way_signin::load(parameters);
 	screen->m_call_context = _4_way_signin_type_crossgame_invite;
 	user_interface_register_screen_to_channel(screen, parameters);
 	return screen;
 }
-void* c_screen_4way_signin::load_for_xbox_live(c_screen_parameters* parameters)
+
+void* c_screen_4way_signin::load_for_xbox_live(
+	c_screen_parameters* parameters)
 {
 	c_screen_4way_signin* screen = (c_screen_4way_signin*)c_screen_4way_signin::load(parameters);
 	screen->m_call_context = _4_way_signin_type_xbox_live;
 	user_interface_register_screen_to_channel(screen, parameters);
 	return screen;
 }
-void* c_screen_4way_signin::load_for_system_link(c_screen_parameters* parameters)
+
+void* c_screen_4way_signin::load_for_system_link(
+	c_screen_parameters* parameters)
 {
 	c_screen_4way_signin* screen = (c_screen_4way_signin*)c_screen_4way_signin::load(parameters);
 	screen->m_call_context = _4_way_signin_type_system_link;
 	user_interface_register_screen_to_channel(screen, parameters);
 	return screen;
 }
-void* c_screen_4way_signin::load_for_splitscreen(c_screen_parameters* parameters)
+
+void* c_screen_4way_signin::load_for_splitscreen(
+	c_screen_parameters* parameters)
 {
 	c_screen_4way_signin* screen = (c_screen_4way_signin*)c_screen_4way_signin::load(parameters);
 	screen->m_call_context = _4_way_signin_type_splitscreen;
 	user_interface_register_screen_to_channel(screen, parameters);
 	return screen;
 }
-void* c_screen_4way_signin::load_for_campaign(c_screen_parameters* parameters)
+
+void* c_screen_4way_signin::load_for_campaign(
+	c_screen_parameters* parameters)
 {
 	c_screen_4way_signin* screen = (c_screen_4way_signin*)c_screen_4way_signin::load(parameters);
 	screen->m_call_context = _4_way_signin_type_campaign;
@@ -751,14 +777,12 @@ void* c_screen_4way_signin::load_for_campaign(c_screen_parameters* parameters)
 	return screen;
 }
 
-void c_screen_4way_signin::apply_patches_on_map_load()
+void c_screen_4way_signin::apply_patches_on_map_load(void)
 {
-	const char* main_widget_tag_path = "ui\\screens\\game_shell\\4way_multiplayer_signin\\4way_signin_main";
-	const char* player_skins_tag_path = "ui\\player_skins\\player_skin_signin";
 	const int16 scale_factor = 2;
 
-	datum main_widget_datum_index = tag_loaded(_tag_group_user_interface_screen_widget_definition, main_widget_tag_path);
-	datum player_skins_datum_index = tag_loaded(_tag_group_user_interface_list_skin_definition, player_skins_tag_path);
+	datum main_widget_datum_index = tag_loaded(_tag_group_user_interface_screen_widget_definition, k_main_widget_tag_path);
+	datum player_skins_datum_index = tag_loaded(_tag_group_user_interface_list_skin_definition, k_player_skins_tag_path);
 
 	if (main_widget_datum_index == NONE || player_skins_datum_index == NONE)
 	{
@@ -766,16 +790,18 @@ void c_screen_4way_signin::apply_patches_on_map_load()
 		return;
 	}
 
-	s_user_interface_screen_widget_definition* main_widget_tag = (s_user_interface_screen_widget_definition*)tag_get_fast(main_widget_datum_index);
-	s_window_pane_reference* base_pane = main_widget_tag->panes[0];
+	s_user_interface_screen_widget_definition const* main_widget_tag = user_interface_screen_widget_definition_get(main_widget_datum_index);
+	s_window_pane_reference const* base_pane = TAG_BLOCK_GET_ELEMENT(&main_widget_tag->panes, 0, s_window_pane_reference);
 
 	if (base_pane->bitmap_blocks.count > 0)
 	{
 		for (uint8 itr = 0; itr < base_pane->bitmap_blocks.count; itr++)
 		{
 			point2d bitmap_pos = k_bitmap_positions[itr];
+			s_bitmap_block_reference* reference = TAG_BLOCK_GET_ELEMENT(&base_pane->bitmap_blocks, itr, s_bitmap_block_reference);
+
 			point2d_scale(&bitmap_pos, scale_factor);
-			base_pane->bitmap_blocks[itr]->topleft = bitmap_pos;
+			reference->topleft = bitmap_pos;
 		}
 	}
 
@@ -784,8 +810,10 @@ void c_screen_4way_signin::apply_patches_on_map_load()
 		for (uint8 itr = 0; itr < base_pane->text_blocks.count; itr++)
 		{
 			rectangle2d og = k_text_bounds[itr];
+			s_text_block_reference* reference = TAG_BLOCK_GET_ELEMENT(&base_pane->text_blocks, itr, s_text_block_reference);
+
 			rectangle2d_scale(&og, scale_factor);
-			base_pane->text_blocks[itr]->text_bounds = og;
+			reference->text_bounds = og;
 		}
 	}
 
@@ -794,16 +822,18 @@ void c_screen_4way_signin::apply_patches_on_map_load()
 		for (uint8 itr = 0; itr < base_pane->model_scene_blocks.count; itr++)
 		{
 			rectangle2d og = k_model_viewports[itr];
+			s_ui_model_scene_reference* reference = TAG_BLOCK_GET_ELEMENT(&base_pane->model_scene_blocks, itr, s_ui_model_scene_reference);
+
 			rectangle2d_scale(&og, scale_factor);
-			base_pane->model_scene_blocks[itr]->ui_viewport = og;
+			reference->ui_viewport = og;
 		}
 	}
 
 	if (base_pane->player_blocks.count > 0)
 	{
-		s_player_block_reference* players = base_pane->player_blocks[0];
+		s_player_block_reference* players = TAG_BLOCK_GET_ELEMENT(&base_pane->player_blocks, 0, s_player_block_reference);
 
-		point2d og_pos = { -107 , 59 };
+		point2d og_pos = { -107, 59 };
 		point2d_scale(&og_pos, scale_factor);
 		players->bottomleft = og_pos;
 		players->row_height = -177 * scale_factor;
@@ -812,7 +842,7 @@ void c_screen_4way_signin::apply_patches_on_map_load()
 	}
 
 	//hacky wacky until skin tag definitions are added
-	void* player_skins_signin_tag = tag_get_fast(player_skins_datum_index);
+	void* player_skins_signin_tag = tag_get(_tag_group_user_interface_list_skin_definition, player_skins_datum_index);
 	tag_block<s_hud_block_reference> hud_block = *reinterpret_cast<tag_block<s_hud_block_reference>*>((char*)(player_skins_signin_tag)+0x2C);
 
 
@@ -833,24 +863,30 @@ void c_screen_4way_signin::apply_patches_on_map_load()
 	}
 
 	edit_profile_bitmap_datum = tag_loaded(_tag_group_bitmap, "ui\\screens\\game_shell\\settings_screen\\player_profile\\edit_profile");
-}
 
-static void add_button_key_split_input(c_text_widget* button_key_text)
-{
-	ASSERT(button_key_text);
-
-	wchar_t temp[512], old[512];
-	ustrncpy(old, button_key_text->get_interface()->get_raw_string(), NUMBEROF(old));
-
-	const wchar_t* split_text = !input_windows_has_split_device_active() ? L"%c ADD SPLIT " : L"%c REMOVE SPLIT ";
-	usnprintf(temp, NUMBEROF(temp), split_text, _unicode_private_font_icon_x_button);
-
-	button_key_text->set_text(temp);
-	button_key_text->append_text(old);
 	return;
 }
 
-static void modify_controller_bitmap_for_split(c_bitmap_widget* signin_bitmap, c_text_widget* join_text)
+static void add_button_key_split_input(
+	c_text_widget* button_key_text)
+{
+	c_maximum_interface_text new_text;
+
+	ASSERT(button_key_text);
+
+	new_text.print(
+		!input_windows_has_split_device_active() ? L"%c ADD SPLIT %ws" : L"%c REMOVE SPLIT %ws",
+		_unicode_private_font_icon_x_button,
+		button_key_text->get_interface()->get_raw_string()
+	);
+
+	button_key_text->set_text(new_text.get_string());
+	return;
+}
+
+static void modify_controller_bitmap_for_split(
+	c_bitmap_widget* signin_bitmap,
+	c_text_widget* join_text)
 {
 	ASSERT(signin_bitmap);
 	ASSERT(join_text);
@@ -862,7 +898,7 @@ static void modify_controller_bitmap_for_split(c_bitmap_widget* signin_bitmap, c
 			bitmap_data* bitmap_block = bitmap_group_get_bitmap(edit_profile_bitmap_datum, _edit_profile_bitmap_keyboard);
 			signin_bitmap->assign_new_bitmap_block(bitmap_block);
 
-			const real_vector2d new_scale = { 0.6796875f,0.5546875f }; //downscaled to match target , then upscaled to 2
+			const real_vector2d new_scale = { 0.6796875f, 0.5546875f }; // downscaled to match target , then upscaled to 2
 			signin_bitmap->set_render_scale(&new_scale);
 
 			rectangle2d bounds;
@@ -878,7 +914,7 @@ static void modify_controller_bitmap_for_split(c_bitmap_widget* signin_bitmap, c
 	}
 	else
 	{
-		const real_vector2d default_scale = { 1.0f,1.0f };
+		const real_vector2d default_scale = { 1.f, 1.f };
 		signin_bitmap->set_render_scale(&default_scale);
 
 		// if we unasign current bitmap data and call get_current_bitmap_data() , it will return tag data
@@ -907,18 +943,20 @@ static void user_interface_recover_4way_screen(
 	return;
 }
 
-void user_interface_recover_4way_screen_pregame(e_session_protocol protocol, e_user_interface_screen_id screen_id)
+void user_interface_recover_4way_screen_pregame(
+	e_session_protocol protocol,
+	e_user_interface_screen_id screen_id)
 {
 	if (screen_id == _screen_4way_join_screen)
 	{
-		//simply return if we are already in the 4way screen
-		return;
+		// Do nothing if we are already in the 4way screen
 	}
 	else if (screen_id == _screen_multiplayer_pregame_lobby)
 	{
 		user_interface_recover_4way_screen(protocol);
 	}
-
+	
+	return;
 }
 
 __declspec(naked) void jmp_to_recover_4way_for_splitscreen_for_network_pregame()
@@ -999,10 +1037,11 @@ void user_interface_backout_to_mainmenu_patches()
 
 void c_screen_4way_signin::apply_instance_patches()
 {
-	if (shell_is_dedicated_server())
-		return;
+	if (!shell_is_dedicated_server())
+	{
+		user_interface_recover_from_disconnection_patches();
+		user_interface_backout_to_mainmenu_patches();
+	}
 
-	user_interface_recover_from_disconnection_patches();
-	user_interface_backout_to_mainmenu_patches();
+	return;
 }
-	

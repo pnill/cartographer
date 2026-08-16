@@ -2,8 +2,10 @@
 #include "game_globals.h"
 
 #include "cache/cache_files.h"
+#include "camera/camera_track_definition.h"
 #include "main/level_definitions.h"
 #include "models/models.h"
+#include "models/model_definitions.h"
 #include "scenario/scenario.h"
 #include "scenario/scenario_definitions.h"
 #include "tag_files/tag_loader/tag_injection.h"
@@ -65,9 +67,10 @@ s_game_globals* scenario_get_game_globals(void)
 
 s_camera_track_definition* game_globals_get_default_camera_track(void)
 {
-	s_game_globals* game_globals = scenario_get_game_globals();
+	s_game_globals const* game_globals = scenario_get_game_globals();
+	s_game_globals_camera const* global_camera = TAG_BLOCK_GET_ELEMENT(&game_globals->camera, 0, s_game_globals_camera);
 
-	return (s_camera_track_definition*)tag_get_fast(TAG_BLOCK_GET_ELEMENT(&game_globals->camera, 0, s_game_globals_camera)->default_unit_camera_track.index);
+	return camera_track_definition_get(global_camera->default_unit_camera_track.index);
 }
 
 void scenario_set_game_globals(s_game_globals* globals)
@@ -185,18 +188,19 @@ static void game_globals_prepare_flood_representation(s_game_globals_custom_repr
 
 static void game_globals_prepare_lmao_representation(s_game_globals_custom_representation_result* result)
 {
+	// Create copy of default variant for chief and add lmao object to head
+	unit_definition const* mp_chief_unit = unit_definition_get(game_globals_get_representation(_character_type_spartan)->third_person_unit.index);
+
 	result->success = false;
 	result->fallback_character_type = _character_type_spartan;
 
-	// Create copy of default variant for chief and add lmao object to head
-	unit_definition* mp_chief_unit = (unit_definition*)tag_get_fast(game_globals_get_representation(_character_type_spartan)->third_person_unit.index);
-	datum mode_chief_mp_datum = mp_chief_unit->object.model.index;
-	if (mode_chief_mp_datum != NONE)
+	if (mp_chief_unit->object.model.index != NONE)
 	{
 		// Copy the variant
-		s_model_definition* mode_chief_mp = (s_model_definition*)tag_get_fast(mode_chief_mp_datum);
+		s_model_definition* mode_chief_mp = model_definition_get(mp_chief_unit->object.model.index);
 		s_model_variant* base_variant = TAG_BLOCK_GET_ELEMENT(&mode_chief_mp->variants, 0, s_model_variant);
 		s_model_variant* new_variant = (s_model_variant*)tag_injection_extend_block(&mode_chief_mp->variants, sizeof(s_model_variant), 1);
+
 		new_variant->name = (string_id)0xABABABA;
 		new_variant->dialogue.group = base_variant->dialogue.group;
 		new_variant->dialogue.index = base_variant->dialogue.index;
@@ -237,7 +241,7 @@ static void game_globals_prepare_lmao_representation(s_game_globals_custom_repre
 			tag_injection_inject();
 			s_model_variant_object* new_object = (s_model_variant_object*)tag_injection_extend_block(&new_variant->objects, new_variant->objects.type_size(), 1);
 			new_object->parent_marker = _string_id_head;
-			new_object->child_object.group.group = _tag_group_scenery;
+			new_object->child_object.group = _tag_group_scenery;
 			new_object->child_object.index = lmao_datum;
 
 		}

@@ -6,6 +6,7 @@
 #include "cache/cache_files.h"
 #include "memory/bitstream.h"
 #include "models/models.h"
+#include "models/model_definitions.h"
 #include "objects/objects.h"
 #include "objects/object_definition.h"
 
@@ -31,17 +32,17 @@ void __stdcall c_simulation_object_entity_definition__object_build_creation_data
 bool simulation_object_variant_should_sync(s_simulation_object_creation_data* creation_data)
 {
 	bool sync_variant = creation_data->model_variant_index != NONE;
-	object_definition* object_def = (object_definition*)tag_get_fast(creation_data->object_definition_index);
-	const datum model_tag_index = object_def->object.model.index;
+	object_definition const* object_definition = object_definition_get(creation_data->object_definition_index);
+	const datum model_tag_index = object_definition->object.model.index;
 
 	if (model_tag_index != NONE && sync_variant)
 	{
-		s_model_definition* model_definition = (s_model_definition*)tag_get_fast(model_tag_index);
+		s_model_definition* model_definition = model_definition_get(model_tag_index);
 
 		// Confirm that the "default" variant is not the one we are trying to sync
 		const s_model_variant* variant = TAG_BLOCK_GET_ELEMENT(&model_definition->variants, creation_data->model_variant_index, s_model_variant);
 
-		sync_variant = variant->name != object_def->object.default_model_variant;
+		sync_variant = variant->name != object_definition->object.default_model_variant;
 	}
 
 	return sync_variant;
@@ -130,11 +131,12 @@ bool __stdcall c_simulation_object_entity_definition__object_setup_placement_dat
 		// Set variant of the object
 		if (object_creation_data->model_variant_index != NONE && object_creation_data->object_definition_index != NONE)
 		{
-			object_definition* object_def = (object_definition*)tag_get_fast(object_creation_data->object_definition_index);
-			const datum object_model_index = object_def->object.model.index;
+			object_definition* object_definition = object_definition_get(object_creation_data->object_definition_index);
+			const datum object_model_index = object_definition->object.model.index;
+			
 			if (object_model_index != NONE)
 			{
-				s_model_definition* model_def = (s_model_definition*)tag_get_fast(object_model_index);
+				s_model_definition* model_def = model_definition_get(object_model_index);
 				if (object_creation_data->model_variant_index < model_def->variants.count)
 				{
 					const s_model_variant* variant = TAG_BLOCK_GET_ELEMENT(&model_def->variants, object_creation_data->model_variant_index, s_model_variant);

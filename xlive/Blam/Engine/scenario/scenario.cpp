@@ -152,7 +152,7 @@ static void __cdecl scenario_tags_postprocess(void)
 	for (datum i = tag_iterator_next(&itr); i != NONE; i = tag_iterator_next(&itr))
 	{
 		tag_group group = tag_instance_get(i)->group_tag;
-		switch (group.group)
+		switch (group)
 		{
 		case _tag_group_biped:
 			biped_definitions_fixup(i);

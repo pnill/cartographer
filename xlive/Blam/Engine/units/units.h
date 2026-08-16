@@ -10,6 +10,11 @@ enum
 	MAXIMUM_NUMBER_OF_UNIT_CAMERA_TRACKS = 2,
 };
 
+/* macros */
+
+#define unit_get(index)			((struct unit_datum*)object_get_and_verify_type((index), _object_mask_unit))
+#define unit_try_and_get(index) ((struct unit_datum*)object_try_and_get_and_verify_type((index), _object_mask_unit))
+
 /* enums */
 
 enum
@@ -247,8 +252,3 @@ bool unit_does_not_show_readied_weapon(datum unit_index);
 void unit_set_desired_grenade_type(datum unit_index, int16 grenade_type);
 
 void unit_add_grenade_type_to_inventory(datum unit_index, int16 grenade_type, int16 grenade_count);
-
-/* macros */
-
-#define unit_get(index) ((unit_datum*)object_get_and_verify_type((index), _object_mask_unit))
-#define unit_try_and_get(index) ((unit_datum*)object_try_and_get_and_verify_type((index), _object_mask_unit))

@@ -1,5 +1,22 @@
 #pragma once
 
+/* constants */
+
+enum
+{
+	k_user_interface_widget_shared_globals_tag = 'wigl',
+	k_user_interface_widget_shared_globals_version = 1,	// TODO: confirm
+	k_user_interface_widget_globals_tag = 'wgtz',
+	k_user_interface_widget_globals_version = 3,		// TODO: confirm
+	k_maximum_number_of_screen_widgets = 256
+};
+
+/* macros */
+
+#define user_interface_tag_globals_get(index)	((struct s_user_interface_tag_globals *)tag_get(k_user_interface_widget_globals_tag, (index)))
+
+/* structures */
+
 struct s_user_interface_tag_globals
 {
 	// Explaination("Shared Globals", "This is a reference to the ui shared globals tag")

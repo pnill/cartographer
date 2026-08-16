@@ -197,28 +197,37 @@ void H2MOD::disable_score_announcer_sounds(uint32 sound_flags)
 {
 	if (sound_flags)
 	{
-		const datum multiplayerGlobalsTagIndex = tag_loaded(_tag_group_multiplayer_globals, "multiplayer\\multiplayer_globals");
-		if (multiplayerGlobalsTagIndex != NONE)
+		const datum multiplayer_globals_index = tag_loaded(_tag_group_multiplayer_globals, "multiplayer\\multiplayer_globals");
+		if (multiplayer_globals_index != NONE)
 		{
-			s_multiplayer_globals_definition* multiplayer_globals = (s_multiplayer_globals_definition*)tag_get_fast(multiplayerGlobalsTagIndex);
+			s_multiplayer_globals_definition const* multiplayer_globals = multiplayer_globals_definition_get(multiplayer_globals_index);
+
 			if (multiplayer_globals->runtime.count)
 			{
-				auto* runtime_tag_block_data = multiplayer_globals->runtime[0];
+				s_multiplayer_runtime_globals_definition* runtime_tag_block_data = TAG_BLOCK_GET_ELEMENT(
+						&multiplayer_globals->runtime,
+						0, 
+						s_multiplayer_runtime_globals_definition
+				);
 
 				if (sound_flags & FLAG(_sound_type_slayer))
 				{
-					tag_block<s_multiplayer_event_response_definition>* slayer_events = &runtime_tag_block_data->events[_multiplayer_event_response_game_type_slayer];
-					slayer_events->count = 0;
-					slayer_events->data = 0;
+					runtime_tag_block_data->events[_multiplayer_event_response_game_type_slayer].count = 0;
+					runtime_tag_block_data->events[_multiplayer_event_response_game_type_slayer].data = NULL;
 				}
 
 				if (sound_flags & ALL_SOUNDS_NO_SLAYER) // check if there is any point in running the code below
 				{
-					tag_block<s_multiplayer_event_response_definition>* general_events = &runtime_tag_block_data->events[_multiplayer_event_response_game_type_general];
-					for (int i = 0; i < general_events->count; i++)
+					for (int32 i = 0; i < runtime_tag_block_data->events->count; ++i)
 					{
-						s_multiplayer_event_response_definition* general_event = (*general_events)[i];
+						s_multiplayer_event_response_definition* general_event = TAG_BLOCK_GET_ELEMENT(
+							&runtime_tag_block_data->events[_multiplayer_event_response_game_type_general],
+							i,
+							s_multiplayer_event_response_definition
+						);
+
 						const e_multiplayer_event_response_event event = general_event->event;
+
 						if (
 							(sound_flags & FLAG(_sound_type_gained_the_lead) && (event == _multiplayer_event_response_general_gained_lead || event == _multiplayer_event_response_general_gained_team_lead))
 							|| (sound_flags & FLAG(_sound_type_team_change) && event == _multiplayer_event_response_general_player_changed_team)

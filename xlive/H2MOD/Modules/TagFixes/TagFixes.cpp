@@ -31,7 +31,7 @@ namespace TagFixes
 
 			while (tag_iterator_next(&iterator) != NONE)
 			{
-				s_shader_definition* shader = (s_shader_definition*)tag_get_fast(iterator.current_tag_index);
+				s_shader_definition* shader = shader_definition_get(iterator.current_tag_index);
 				shader->shader_lod_bias = _shader_lod_bias_never;
 			}
 		}
@@ -43,7 +43,7 @@ namespace TagFixes
 
 			while (tag_iterator_next(&iterator) != NONE)
 			{
-				light_definition* light = (light_definition*)tag_get_fast(iterator.current_tag_index);
+				light_definition* light = light_definition_get(iterator.current_tag_index);
 				// Disabled since it caused issues where certain lights wouldnt render randomly
 				// TODO figure out why it does this at some other point in time
 				// light->flags.set(_light_definition_light_framerate_killer, true);
@@ -59,9 +59,10 @@ namespace TagFixes
 
 			while (tag_iterator_next(&iterator) != NONE)
 			{
-				biped_definition* biped = (biped_definition*)tag_get_fast(iterator.current_tag_index);
-				biped->object.abs_acceleration.lower *= 2.f;
-				biped->object.abs_acceleration.upper *= 2.f;
+				struct biped_definition* biped_definition = biped_definition_get(iterator.current_tag_index);
+
+				biped_definition->object.abs_acceleration.lower *= 2.f;
+				biped_definition->object.abs_acceleration.upper *= 2.f;
 			}
 		}
 	}

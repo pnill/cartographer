@@ -2588,11 +2588,7 @@ enum string_id : int32
 
 /* structures */
 
-union tag_group 
-{
-	e_tag_group group;
-	char string[4];
-};
+typedef uint32 tag_group;
 
 struct s_tag_group_link
 {
@@ -2621,7 +2617,7 @@ extern const char* global_tag_group_names[];
 
 s_tag_group_link* tag_group_get_link_set(tag_group group);
 
-tag_group tag_group_get_name(tag_group group);
+char* tag_to_string(uint32 t, char* s);
 
 int32 tag_group_get_as_index(tag_group group);
 

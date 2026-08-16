@@ -67,13 +67,13 @@ int32 __cdecl weapon_get_rounds_available(datum weapon_index, int32 magazine_ind
 static void weapon_barrel_idle(uint32 weapon_index, uint16 barrel_index)
 {
 	weapon_datum* weapon = (weapon_datum*)object_get(weapon_index);
-	weapon_definition* weapon_def = (weapon_definition*)tag_get_fast(weapon->definition_index);
+	struct weapon_definition* weapon_definition = weapon_definition_get(weapon->definition_index);
 
 	ASSERT(weapon);
-	ASSERT(weapon_def);
+	ASSERT(weapon_definition);
 
 	weapon_barrel* weapon_barrel = &weapon->weapon.barrels[barrel_index];
-	weapon_barrel_definition* barrel_def = TAG_BLOCK_GET_ELEMENT(&weapon_def->weapon.barrels, barrel_index, weapon_barrel_definition);
+	weapon_barrel_definition* barrel_def = TAG_BLOCK_GET_ELEMENT(&weapon_definition->weapon.barrels, barrel_index, weapon_barrel_definition);
 
 	weapon_barrel->firing_idle_ticks = 0;
 	weapon_barrel->fire_count = 0;
@@ -93,7 +93,7 @@ static void weapon_barrel_idle(uint32 weapon_index, uint16 barrel_index)
 static void weapon_take_inventory_rounds(datum weapon_index, int32 magazine_index, int32 round_count)
 {
 	weapon_datum* weapon = weapon_get(weapon_index);
-	weapon_definition* weapon_def = (weapon_definition*)tag_get_fast(weapon->definition_index);
+	struct weapon_definition* weapon_definition = weapon_definition_get(weapon->definition_index);
 
 	int32 available_rounds = weapon_get_rounds_available(weapon_index, magazine_index, false);
 
@@ -106,7 +106,7 @@ static void weapon_take_inventory_rounds(datum weapon_index, int32 magazine_inde
 	if (available_rounds >= round_count)
 	{
 		int32 rounds_total = 0;
-		if (magazine_index >= 0 && magazine_index < weapon_def->weapon.magazines.count)
+		if (magazine_index >= 0 && magazine_index < weapon_definition->weapon.magazines.count)
 		{
 			int32 max_rounds = weapon->weapon.magazines[magazine_index].rounds_inventory;
 

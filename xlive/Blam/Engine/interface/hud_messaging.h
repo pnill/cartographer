@@ -1,5 +1,15 @@
 #pragma once
-#include "tag_files/tag_block.h"
+
+/* constants */
+
+enum
+{
+	HUD_MESSAGE_TEXT_TAG = 'hmt ',
+};
+
+/* macros */
+
+#define hud_state_messages_get(index)	((struct hud_state_messages*)tag_get(HUD_MESSAGE_TEXT_TAG, (index)))
 
 /* structures */
 
@@ -23,8 +33,8 @@ struct hud_state_message_definition
 struct hud_state_messages
 {
 	tag_data text_data;
-	tag_block<hud_state_message_element> message_elements;
-	tag_block<hud_state_message_definition> messages;
+	s_tag_block message_elements;	// hud_state_message_element
+	s_tag_block messages;			// hud_state_message_definition
 	int8 pad[84];
 };
 ASSERT_STRUCT_SIZE(hud_state_messages, 108);

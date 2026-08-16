@@ -11,12 +11,12 @@
 #include "main/interpolator.h"
 #include "math/matrix_math.h"
 #include "models/models.h"
+#include "models/model_definitions.h"
 #include "models/render_model_definitions.h"
 #include "render/render_cameras.h"
 #include "render/render.h"
 #include "saved_games/game_variant.h"
 #include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
-
 #include "units/units.h"
 
 /* constants */
@@ -25,10 +25,6 @@ enum
 {
 	k_fp_needler_animation_max_rounds_loaded = 44
 };
-
-/* globals */
-
-bool g_show_first_person = true;
 
 /* prototypes */
 
@@ -72,7 +68,11 @@ static void first_person_weapon_apply_ik(int32 user_index, s_first_person_model_
 
 // Grab the weapon offset from the cartographer config from the current weapon index
 // If the weapon doesn't exist then use the default weapon offset from the weapon tag
-static const real_point3d* first_person_weapons_get_weapon_offset(datum user_index, const struct weapon_definition* weapon_definition, const weapon_datum* weapon);
+static const real_point3d* first_person_weapons_get_weapon_offset(datum user_index, struct weapon_definition const* weapon_definition, weapon_datum const* weapon);
+
+/* globals */
+
+static bool g_show_first_person = true;
 
 /* public code */
 
@@ -99,7 +99,11 @@ void __cdecl first_person_weapons_update(void)
 	return;
 }
 
-int32 __cdecl first_person_weapon_build_models(int32 user_index, datum unit_index, int32 maximum_model_count, s_first_person_model_data* fp_model_data)
+int32 __cdecl first_person_weapon_build_models(
+	int32 user_index,
+	datum unit_index,
+	int32 maximum_model_count,
+	s_first_person_model_data* fp_model_data)
 {
 	int32 model_count = 0;
 	
@@ -135,12 +139,12 @@ int32 __cdecl first_person_weapon_build_models(int32 user_index, datum unit_inde
 					int32 node_count = 0;
 					const real_matrix4x3* node_matrices = NULL;
 					const object_datum* object = object_get(unit_index);
-					const object_definition* object_def = (object_definition*)tag_get_fast(object->definition_index);
+					const object_definition* object_def = object_definition_get(object->definition_index);
 
 					const datum object_model_index = object_def->object.model.index;
 					if (object_model_index != NONE)
 					{
-						const s_model_definition* model = (s_model_definition*)tag_get_fast(object_model_index);
+						const s_model_definition* model = model_definition_get(object_model_index);
 						if (model->animation_graph.index != NONE)
 						{
 							unit_model_index = model->render_model.index;
@@ -175,8 +179,8 @@ int32 __cdecl first_person_weapon_build_models(int32 user_index, datum unit_inde
 							&& TEST_BIT(weapon_data->flags, 2)
 							&& fp_hands_index != NONE)
 						{
-							weapon_datum* weapon = weapon_get(weapon_data->weapon_index);
-							weapon_definition* weapon_def = (weapon_definition*)tag_get_fast(weapon->definition_index);
+							weapon_datum const* weapon = weapon_get(weapon_data->weapon_index);
+							weapon_definition const* weapon_def = weapon_definition_get(weapon->definition_index);
 							weapon_first_person_interface_definition const* interface_def = first_person_interface_definition_get(
 								weapon_def, 
 								first_person_data->character_type
@@ -210,8 +214,8 @@ int32 __cdecl first_person_weapon_build_models(int32 user_index, datum unit_inde
 						first_person_weapon_data* weapon_data = first_person_weapon_data_get(weapon_slot, first_person_data);
 						if (TEST_BIT(weapon_data->flags, 0) && weapon_data->weapon_index != NONE)
 						{
-							weapon_datum* weapon = weapon_get(weapon_data->weapon_index);
-							weapon_definition* weapon_def = (weapon_definition*)tag_get_fast(weapon->definition_index);
+							weapon_datum const* weapon = weapon_get(weapon_data->weapon_index);
+							weapon_definition const* weapon_def = weapon_definition_get(weapon->definition_index);
 							weapon_first_person_interface_definition const* interface_def = first_person_interface_definition_get(
 								weapon_def,
 								first_person_data->character_type
@@ -257,8 +261,8 @@ int32 __cdecl first_person_weapon_build_models(int32 user_index, datum unit_inde
 
 					if (model_count < maximum_model_count && fp_body_index != NONE && unit_model_index != NONE && node_matrices)
 					{
-						const render_model_definition* body_render_model = (render_model_definition*)tag_get_fast(fp_body_index);
-						const render_model_definition* unit_render_model = (render_model_definition*)tag_get_fast(unit_model_index);
+						render_model_definition const* body_render_model = render_model_definition_get(fp_body_index);
+						render_model_definition const* unit_render_model = render_model_definition_get(unit_model_index);
 						if (body_render_model->nodes.count == unit_render_model->nodes.count
 							&& body_render_model->node_list_checksum == unit_render_model->node_list_checksum)
 						{
@@ -345,8 +349,8 @@ real_matrix4x3* first_person_weapon_get_relative_node_matrix_interpolated(int32 
 		if (TEST_BIT(weapon_data->flags, 0)
 			&& weapon_data->weapon_index != NONE)
 		{
-			weapon_datum* weapon = weapon_get(weapon_data->weapon_index);
-			weapon_definition* weapon_def = (weapon_definition*)tag_get_fast(weapon->definition_index);
+			weapon_datum const* weapon = weapon_get(weapon_data->weapon_index);
+			weapon_definition const* weapon_def = weapon_definition_get(weapon->definition_index);
 			weapon_first_person_interface_definition const* interface_def = first_person_interface_definition_get(
 				weapon_def,
 				first_person_data->character_type
@@ -439,13 +443,11 @@ static void __cdecl first_person_weapon_build_node_matrices(int32 user_index, in
 	const datum weapon_index = weapon_data->weapon_index;
 	if (weapon_index != NONE)
 	{
-		s_game_globals* game_globals = scenario_get_game_globals();
-
+		s_game_globals const* game_globals = scenario_get_game_globals();
 		s_game_globals_player_representation const* player_representation = TAG_BLOCK_GET_ELEMENT(&game_globals->player_representation, fp_data->character_type, s_game_globals_player_representation);
-
-		const weapon_datum* weapon = weapon_get(weapon_index);
-
-		struct weapon_definition* weapon_definition = (struct weapon_definition*)tag_get_fast(weapon->definition_index);
+		weapon_datum const* weapon = weapon_get(weapon_index);
+		struct weapon_definition const* weapon_definition = weapon_definition_get(weapon->definition_index);
+		
 		ASSERT(weapon_definition);
 
 		weapon_first_person_interface_definition const* first_person_weapon_interface = first_person_interface_definition_get(
@@ -454,10 +456,10 @@ static void __cdecl first_person_weapon_build_node_matrices(int32 user_index, in
 		);
 		ASSERT(first_person_weapon_interface);
 
-		render_model_definition* weapon_model = (render_model_definition*)tag_get_fast(first_person_weapon_interface->model.index);
+		render_model_definition* weapon_model = render_model_definition_get(first_person_weapon_interface->model.index);
 
 		ASSERT(player_representation);
-		render_model_definition* hands_model = (render_model_definition*)tag_get_fast(player_representation->first_person_hands.index);
+		render_model_definition* hands_model = render_model_definition_get(player_representation->first_person_hands.index);
 
 		// Validation asserts
 		ASSERT(TEST_BIT(weapon_data->flags, _weapon_node_table_valid_bit));
@@ -838,16 +840,18 @@ static void __cdecl first_person_weapon_build_node_matrices(int32 user_index, in
 	return;
 }
 
-static void first_person_weapon_build_model_nodes_from_remapping_table(datum render_model_tag_index,
+static void first_person_weapon_build_model_nodes_from_remapping_table(
+	datum render_model_tag_index,
 	int32 max_node_count,
 	real_matrix4x3* camera_matrix,
 	real_matrix4x3* fp_model_nodes,
 	real_matrix4x3* node_matrices,
 	int32* node_remapping_table)
 {
-	render_model_definition* model = (render_model_definition*)tag_get_fast(render_model_tag_index);
+	render_model_definition const* model = render_model_definition_get(render_model_tag_index);
 	int32 model_node_count = model->nodes.count;
 	int32 node_count = model_node_count;
+	
 	if (model_node_count > max_node_count)
 	{
 		node_count = max_node_count;
@@ -944,8 +948,8 @@ static void first_person_weapon_apply_ik(int32 user_index, s_first_person_model_
 						{
 							s_game_globals_player_representation const* player_rep = TAG_BLOCK_GET_ELEMENT(&globals->player_representation, fp_data->character_type, s_game_globals_player_representation);
 							datum fp_hands_model_index = player_rep->first_person_hands.index;
-							const weapon_datum* weapon = weapon_get(fp_data->weapon[k_first_person_primary_weapon].weapon_index);
-							const weapon_definition* weapon_def = (weapon_definition*)tag_get_fast(weapon->definition_index);
+							weapon_datum const* weapon = weapon_get(fp_data->weapon[k_first_person_primary_weapon].weapon_index);
+							weapon_definition const* weapon_def = weapon_definition_get(weapon->definition_index);
 							weapon_first_person_interface_definition const* interface_def = first_person_interface_definition_get(
 								weapon_def,
 								fp_data->character_type
@@ -959,8 +963,8 @@ static void first_person_weapon_apply_ik(int32 user_index, s_first_person_model_
 								int32 fp_weapon_marker_group_index = render_model_find_marker_group_by_name(fp_weapon_model_index, iterator.attach_to_marker);
 								if (fp_hands_marker_group_index != NONE && fp_weapon_marker_group_index != NONE)
 								{
-									const render_model_definition* fp_hands_model = (render_model_definition*)tag_get_fast(fp_hands_model_index);
-									const render_model_definition* fp_weapon_model = (render_model_definition*)tag_get_fast(fp_weapon_model_index);
+									const render_model_definition* fp_hands_model = render_model_definition_get(fp_hands_model_index);
+									const render_model_definition* fp_weapon_model = render_model_definition_get(fp_weapon_model_index);
 
 									const render_model_marker_group* fp_hands_marker_group = fp_hands_model->marker_groups[fp_hands_marker_group_index];
 									const render_model_marker_group* fp_weapon_marker_group = fp_weapon_model->marker_groups[fp_weapon_marker_group_index];
@@ -995,7 +999,10 @@ static void first_person_weapon_apply_ik(int32 user_index, s_first_person_model_
 	return;
 }
 
-static const real_point3d* first_person_weapons_get_weapon_offset(datum user_index, const struct weapon_definition* weapon_definition, const weapon_datum* weapon)
+static const real_point3d* first_person_weapons_get_weapon_offset(
+	datum user_index,
+	struct weapon_definition const* weapon_definition,
+	weapon_datum const* weapon)
 {
 	ASSERT(weapon_definition);
 	ASSERT(weapon);
