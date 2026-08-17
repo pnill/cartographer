@@ -117,7 +117,7 @@ public:
 
 	virtual ~c_cartographer_account_manager_menu(void) = default;
 	virtual void pre_destroy(void) override;
-	virtual void initialize(c_screen_parameters* screen_parameters) override;
+	virtual void initialize(c_screen_parameters const* parameters) override;
 	virtual void post_initialize(void) override;
 	virtual const void* load_proc(void) const override;
 };

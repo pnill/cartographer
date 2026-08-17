@@ -594,9 +594,9 @@ void c_cartographer_account_manager_menu::pre_destroy()
 }
 
 // c_screen_with_menu specific interface
-void c_cartographer_account_manager_menu::initialize(c_screen_parameters* screen_parameters)
+void c_cartographer_account_manager_menu::initialize(c_screen_parameters const* parameters)
 {
-	c_screen_with_menu::initialize(screen_parameters);
+	c_screen_with_menu::initialize(parameters);
 
 	const wchar_t* header_text = NULL;
 	const wchar_t* subheader_text = NULL;

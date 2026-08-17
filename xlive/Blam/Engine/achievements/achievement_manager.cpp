@@ -15,6 +15,13 @@ void c_achievement_manager::start_upload(void)
 	return;
 }
 
+void c_achievement_manager::submit_event(
+	int32* event)
+{
+	INVOKE_TYPE(0x4B553, 0x0, void(__thiscall*)(c_achievement_manager*, int32*), this, event);
+	return;
+}
+
 void c_achievement_manager::handle_live_signin_notification(
 	bool signed_in)
 {
