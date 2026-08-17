@@ -178,7 +178,7 @@ public:
 
 	virtual ~c_cartographer_update_notice_menu() = default;
 	virtual const void* load_proc(void) const override;
-	virtual void initialize(class c_screen_parameters* screen_parameters) override;
+	virtual void initialize(class c_screen_parameters const* screen_parameters) override;
 };
 
 //public code
