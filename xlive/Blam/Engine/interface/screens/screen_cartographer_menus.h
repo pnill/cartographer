@@ -59,7 +59,7 @@ public:
 	// c_cartographer_guide_menu virtual functions
 
 	virtual ~c_cartographer_guide_menu() = default;
-	virtual void initialize(c_screen_parameters* screen_parameters) override;
+	virtual void initialize(c_screen_parameters const* parameters) override;
 	virtual const void* load_proc(void) const override;
 };
 
@@ -96,7 +96,7 @@ public:
 
 	virtual ~c_cartographer_credits_menu() = default;
 	virtual const void* load_proc(void) const override;
-	virtual void initialize(c_screen_parameters* screen_parameters) override;
+	virtual void initialize(c_screen_parameters const* parameters) override;
 };
 
 
@@ -141,7 +141,7 @@ public:
 	virtual ~c_cartographer_update_menu() = default;
 	virtual void update() override;
 	virtual const void* load_proc(void) const override;
-	virtual void initialize(c_screen_parameters* screen_parameters) override;
+	virtual void initialize(c_screen_parameters const* parameters) override;
 };
 
 // update notice

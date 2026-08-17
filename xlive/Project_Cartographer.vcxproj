@@ -1305,6 +1305,7 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_variant_game_engine_type.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_video_settings.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_vsync_setting.cpp" />
+    <ClCompile Include="Blam\Engine\interface\signal_slot.cpp" />
     <ClCompile Include="Blam\Engine\interface\terminal.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_bitmap_block.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_channel.cpp" />
@@ -1760,6 +1761,7 @@
     <ClInclude Include="Blam\Engine\interface\user_interface_networking.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_single_player_profile_select.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_network_search.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_objectives.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_player_widget.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_shared_globals.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_text.h" />
