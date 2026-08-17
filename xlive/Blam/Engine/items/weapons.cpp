@@ -2,17 +2,27 @@
 #include "weapons.h"
 
 #include "weapon_definitions.h"
+
 #include "cache/cache_files.h"
 #include "game/game.h"
+#include "game/game_time.h"
 #include "objects/damage_reporting.h"
 #include "saved_games/game_variant.h"
 #include "shell/shell.h"
 #include "units/units.h"
 
+#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
+
+/* constants */
+
+// unit_handle_message_from_weapon arms the timer with game_seconds_to_ticks_round(0.3f).
+#define k_dual_wield_fire_timer_seconds 0.3f
+
 /* prototypes */
 
 static void weapon_barrel_idle(uint32 weapon_index, uint16 barrel_index);
 static void weapon_take_inventory_rounds(datum weapon_index, int32 magazine_index, int32 round_count);
+
 static __declspec(naked) void weapon_barrel_idle_usercall_to_rewritten()
 {
 	__asm
@@ -34,16 +44,60 @@ static __declspec(naked) void weapon_barrel_idle_usercall_to_rewritten()
 	}
 }
 
-
 /* public code */
 
-void weapons_apply_patches()
+void weapons_apply_patches(void)
 {
 	PatchCall(Memory::GetAddress(0x15C60C, 0x1408CC), weapon_barrel_idle_usercall_to_rewritten);
 	PatchCall(Memory::GetAddress(0x1611AD, 0x14546D), weapon_barrel_idle_usercall_to_rewritten);
 	PatchCall(Memory::GetAddress(0x162B38, 0x146DF8), weapon_barrel_idle_usercall_to_rewritten);
 
 	PatchCall(Memory::GetAddress(0x15FB9D, 0x143E5D), weapon_take_inventory_rounds);
+
+    // Replace call to "deterministic" version so we don't desync in synchronous networking
+    PatchCall(Memory::GetAddress(0x160534, 0x13BE4E), weapon_send_message_to_unit_deterministic);
+    return;
+}
+
+void __cdecl weapon_send_message_to_unit(
+	int32 weapon_index,
+	e_unit_messages unit_message)
+{
+	INVOKE(0x15A88E, 0x13EB4E, weapon_send_message_to_unit, weapon_index, unit_message);
+	return;
+}
+
+void __cdecl weapon_send_message_to_unit_deterministic(
+	int32 weapon_index,
+	e_unit_messages unit_message)
+{
+	// Messages 1-4 are the "barrel fired" family that retail uses to arm the dual-wield timers.
+	if (IN_RANGE(unit_message, _unit_message_weapon_primary_fire, _unit_message_weapon_secondary_misfire))
+	{
+		weapon_datum const* weapon = weapon_get(weapon_index);
+		const datum unit_index = weapon->item.inventory_owner_unit_index;
+
+		if (unit_index != NONE)
+		{
+			unit_datum* unit = unit_get(unit_index);
+			const int8 fire_timer_ticks = (int8)game_seconds_to_ticks_round(k_dual_wield_fire_timer_seconds);
+
+			// Retail selects the byte by testing the firing weapon against the unit's current slot:
+			// the held/primary weapon arms primary_fire_timer, the off-hand arms secondary.
+			if (unit_inventory_get_weapon(unit_index, unit->unit.weapon_index) != weapon_index)
+			{
+				unit->unit.secondary_fire_timer = fire_timer_ticks;
+			}
+			else
+			{
+				unit->unit.primary_fire_timer = fire_timer_ticks;
+			}
+		}
+	}
+
+	weapon_send_message_to_unit(weapon_index, unit_message);
+
+	return;
 }
 
 int32 __cdecl weapon_get_rounds_total(datum object_index, int32 magazine_index, bool a3)
@@ -84,10 +138,16 @@ static void weapon_barrel_idle(uint32 weapon_index, uint16 barrel_index)
 	bool force_idle = false;
 
 	if (game_is_multiplayer() && variant)
+	{
 		force_idle = barrel_def->damage_effect_reporting_type == _damage_reporting_type_battle_rifle && variant->cartographer_settings.flags.test(_cartographer_variant_disable_dub_shot);
+	}
 
 	if (!barrel_def->flags.test(_weapon_barrel_definition_dont_clear_fire_bit_after_recovering) || force_idle)
+	{
 		weapon_barrel->flags.set(_weapon_barrel_fire_bit, false);
+	}
+
+	return;
 }
 
 static void weapon_take_inventory_rounds(datum weapon_index, int32 magazine_index, int32 round_count)
@@ -100,8 +160,12 @@ static void weapon_take_inventory_rounds(datum weapon_index, int32 magazine_inde
 	s_game_variant* variant = get_game_variant();
 
 	if (game_is_multiplayer() && variant)
+	{
 		if (variant->cartographer_settings.flags.test(_cartographer_variant_infinite_ammo))
+		{
 			return;
+		}
+	}
 
 	if (available_rounds >= round_count)
 	{
@@ -115,7 +179,9 @@ static void weapon_take_inventory_rounds(datum weapon_index, int32 magazine_inde
 			weapon->weapon.magazines[magazine_index].rounds_inventory = (int16)(max_rounds - rounds_total);
 
 			if (rounds_total > 0)
+			{
 				object_wake(weapon_index);
+			}
 		}
 
 		// if the desired round count has not been reached check other weapons in the unit's inventory for any matching weapons
@@ -142,7 +208,9 @@ static void weapon_take_inventory_rounds(datum weapon_index, int32 magazine_inde
 							rounds_total += rounds_taken;
 
 							if (rounds_total < round_count)
+							{
 								break;
+							}
 						}
 					}
 				}
