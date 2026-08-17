@@ -11,8 +11,6 @@
 #include "shell/shell.h"
 #include "units/units.h"
 
-#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
-
 /* constants */
 
 // unit_handle_message_from_weapon arms the timer with game_seconds_to_ticks_round(0.3f).
@@ -54,9 +52,9 @@ void weapons_apply_patches(void)
 
 	PatchCall(Memory::GetAddress(0x15FB9D, 0x143E5D), weapon_take_inventory_rounds);
 
-    // Replace call to "deterministic" version so we don't desync in synchronous networking
-    PatchCall(Memory::GetAddress(0x160534, 0x13BE4E), weapon_send_message_to_unit_deterministic);
-    return;
+	// Replace call to "deterministic" version so we don't desync in synchronous networking
+	PatchCall(Memory::GetAddress(0x160534, 0x13BE4E), weapon_send_message_to_unit_deterministic);
+	return;
 }
 
 void __cdecl weapon_send_message_to_unit(

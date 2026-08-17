@@ -634,6 +634,7 @@ static void h2mod_apply_hooks(void)
 	network_globals_apply_patches();
 	network_transport_apply_patches();
 	network_session_apply_patches();
+	network_session_interface_patches();
 	bitstream_serialization_apply_patches();
 	game_life_cycle_apply_patches();
 
