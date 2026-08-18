@@ -338,6 +338,20 @@ void errors_initialize(void)
 	
 	error_globals.delayed = true;
 
+	// Added code to initialize subdirectories for multiple game instances
+	{
+		uint32 instance_number = shell_get_instance_num();
+		if (instance_number > 1)
+		{
+			char instance_number_string[16];
+
+			if (_itoa_s(instance_number, instance_number_string, 10) == ERROR_SUCCESS)
+			{
+				errors_set_log_subdirectory(instance_number_string);
+			}
+		}
+	}
+
 	return;
 }
 
