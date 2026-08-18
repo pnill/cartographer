@@ -11,10 +11,13 @@ void weapon_definitions_apply_patches(void)
 	return;
 }
 
-weapon_first_person_interface_definition* first_person_interface_definition_get(const weapon_definition* definition, int8 character_type)
+weapon_first_person_interface_definition const* first_person_interface_definition_get(
+	weapon_definition const* definition,
+	int8 character_type)
 {
-	weapon_first_person_interface_definition* result = NULL;
+	weapon_first_person_interface_definition const* result = NULL;
 	int32 index = 0;
+
 	switch (character_type)
 	{
 	case _character_type_masterchief:
@@ -29,20 +32,17 @@ weapon_first_person_interface_definition* first_person_interface_definition_get(
 	default:
 		break;
 	}
+
 	int32 block_count = definition->weapon.player_interface.first_person.count;
-	if (index >= block_count && block_count > 0)
+
+	if (index < block_count)
 	{
-		if (definition->weapon.player_interface.first_person.data != NONE)
-		{
-			result = definition->weapon.player_interface.first_person[0];
-		}
+		result = definition->weapon.player_interface.first_person[index];
 	}
-	else
+	else if (block_count > 0)
 	{
-		if (definition->weapon.player_interface.first_person.data != NONE)
-		{
-			result = definition->weapon.player_interface.first_person[index];
-		}
+		result = definition->weapon.player_interface.first_person[0];
 	}
+
 	return result;
 }

@@ -175,7 +175,10 @@ int32 __cdecl first_person_weapon_build_models(int32 user_index, datum unit_inde
 						{
 							weapon_datum* weapon = weapon_get(weapon_data->weapon_index);
 							weapon_definition* weapon_def = (weapon_definition*)tag_get_fast(weapon->definition_index);
-							weapon_first_person_interface_definition* interface_def = first_person_interface_definition_get(weapon_def, first_person_data->character_type);
+							weapon_first_person_interface_definition const* interface_def = first_person_interface_definition_get(
+								weapon_def, 
+								first_person_data->character_type
+							);
 							datum weapon_animations_index = (interface_def ? interface_def->animations.index : NONE);
 
 							real_matrix4x3* model_nodes;
@@ -207,10 +210,14 @@ int32 __cdecl first_person_weapon_build_models(int32 user_index, datum unit_inde
 						{
 							weapon_datum* weapon = weapon_get(weapon_data->weapon_index);
 							weapon_definition* weapon_def = (weapon_definition*)tag_get_fast(weapon->definition_index);
-							weapon_first_person_interface_definition* interface_def = first_person_interface_definition_get(weapon_def, first_person_data->character_type);
+							weapon_first_person_interface_definition const* interface_def = first_person_interface_definition_get(
+								weapon_def,
+								first_person_data->character_type
+							);
 
 							datum weapon_model_index;
 							datum weapon_animations_index;
+
 							if (interface_def)
 							{
 								weapon_model_index = interface_def->model.index;
@@ -338,7 +345,10 @@ real_matrix4x3* first_person_weapon_get_relative_node_matrix_interpolated(int32 
 		{
 			weapon_datum* weapon = weapon_get(weapon_data->weapon_index);
 			weapon_definition* weapon_def = (weapon_definition*)tag_get_fast(weapon->definition_index);
-			weapon_first_person_interface_definition* interface_def = first_person_interface_definition_get(weapon_def, first_person_data->character_type);
+			weapon_first_person_interface_definition const* interface_def = first_person_interface_definition_get(
+				weapon_def,
+				first_person_data->character_type
+			);
 			datum weapon_animations_index = (interface_def ? interface_def->animations.index : NONE);
 
 			// ### FIXME either make use across the entire code of the intermediate buffer
@@ -436,7 +446,10 @@ static void __cdecl first_person_weapon_build_node_matrices(int32 user_index, in
 		struct weapon_definition* weapon_definition = (struct weapon_definition*)tag_get_fast(weapon->definition_index);
 		ASSERT(weapon_definition);
 
-		weapon_first_person_interface_definition* first_person_weapon_interface = first_person_interface_definition_get(weapon_definition, (e_character_type)fp_data->character_type);
+		weapon_first_person_interface_definition const* first_person_weapon_interface = first_person_interface_definition_get(
+			weapon_definition,
+			fp_data->character_type
+		);
 		ASSERT(first_person_weapon_interface);
 
 		render_model_definition* weapon_model = (render_model_definition*)tag_get_fast(first_person_weapon_interface->model.index);
@@ -931,7 +944,10 @@ static void first_person_weapon_apply_ik(int32 user_index, s_first_person_model_
 							datum fp_hands_model_index = player_rep->first_person_hands.index;
 							const weapon_datum* weapon = weapon_get(fp_data->weapon[k_first_person_primary_weapon].weapon_index);
 							const weapon_definition* weapon_def = (weapon_definition*)tag_get_fast(weapon->definition_index);
-							weapon_first_person_interface_definition* interface_def = first_person_interface_definition_get(weapon_def, fp_data->character_type);
+							weapon_first_person_interface_definition const* interface_def = first_person_interface_definition_get(
+								weapon_def,
+								fp_data->character_type
+							);
 
 							datum fp_weapon_model_index = (interface_def ? interface_def->model.index : NONE);
 
