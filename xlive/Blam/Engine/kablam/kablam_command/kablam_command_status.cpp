@@ -7,7 +7,9 @@
 
 #include "xlive_result_codes.h"
 
-static const wchar_t* const k_status_result_code_strings[k_status_result_code_count]
+/* constants */
+
+static wchar_t const* const k_status_result_code_strings[k_status_result_code_count]
 {
 	L"offline - initializing",
 	L"offline - product key required",
@@ -31,17 +33,22 @@ static const wchar_t* const k_status_result_code_strings[k_status_result_code_co
 	L"online - postgame carnage report",
 };
 
-void kablam_command_status::execute_rpc_command()
+/* public code */
+
+void kablam_command_status::execute_rpc_command(void)
 {
 	kablam_command_status_rpc(&this->response);
+	return;
 }
 
-void kablam_command_status::print_help_text()
+void kablam_command_status::print_help_text(void)
 {
 	kablam_command_print_help_text(kablam_string_help_status_desc, kablam_string_help_status_usage);
+	return;
 }
 
-void kablam_command_status::parse_response(kablam_command* in_command)
+void kablam_command_status::parse_response(
+	kablam_command* in_command)
 {
 	kablam_command_status* command = (kablam_command_status*)in_command;
 
@@ -177,7 +184,7 @@ void kablam_command_status::parse_response(kablam_command* in_command)
 			int32 minutes = time_in_game_seconds % 3600 / 60;
 			int32 seconds = time_in_game_seconds - 60 * (minutes + 60 * hours);
 
-			const wchar_t* prefix = (command->response.game_time_remaining <= 0) ? L"Time remaining:" : L"Time elapsed:";
+			wchar_t const* prefix = (command->response.game_time_remaining <= 0) ? L"Time remaining:" : L"Time elapsed:";
 
 			wprintf(L"%ws %02d:%02d:%02d\r\n", prefix, hours, minutes, seconds);
 		}
@@ -237,9 +244,14 @@ void kablam_command_status::parse_response(kablam_command* in_command)
 		unreachable();
 		break;
 	}
+
+	return;
 }
 
-kablam_command* kablam_command_status::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_status::create_instance(
+	wchar_t const* const* arguments,
+	uint32 argument_count,
+	kablam_string* out_message)
 {
 	UNREFERENCED_PARAMETER(arguments);
 	UNREFERENCED_PARAMETER(argument_count);
@@ -255,9 +267,10 @@ kablam_command* kablam_command_status::create_instance(const wchar_t* const* arg
 	else
 	{
 		result = new kablam_command_status();
-		result->type = _kablam_command_status;
-		result->valid = true;
+		result->set_type(_kablam_command_status);
+		result->set_valid(true);
 		memset(&result->response, 0, sizeof(kablam_command_status_result));
 	}
+
 	return result;
 }

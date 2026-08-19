@@ -15,7 +15,7 @@ do													\
 class kablam_string
 {
 	HANDLE m_string_handle;
-	const wchar_t* m_string;
+	wchar_t const* m_string;
 	bool m_string_found;
 	bool m_string_is_resource_handle;
 
@@ -23,7 +23,7 @@ public:
 	kablam_string();
 	kablam_string(int32 string_id);
 	errno_t load(int32 string_id);
-	const wchar_t* get() const;
+	wchar_t const* get() const;
 	void free();
 	static short* load_resource(int32 string_id, WORD language);
 };

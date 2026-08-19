@@ -5,18 +5,22 @@
 
 #include "kablam_strings.h"
 
+/* public code */
 
-void kablam_command_skip::execute_rpc_command()
+void kablam_command_skip::execute_rpc_command(void)
 {
 	kablam_command_skip_rpc(&this->result);
+	return;
 }
 
-void kablam_command_skip::print_help_text()
+void kablam_command_skip::print_help_text(void)
 {
 	kablam_command_print_help_text(kablam_string_help_skip_desc, kablam_string_help_skip_usage);
+	return;
 }
 
-void kablam_command_skip::parse_response(kablam_command* in_command)
+void kablam_command_skip::parse_response(
+	kablam_command* in_command)
 {
 	kablam_command_skip* command = (kablam_command_skip*)in_command;
 
@@ -52,9 +56,14 @@ void kablam_command_skip::parse_response(kablam_command* in_command)
 
 		wprintf(L"\r\n");
 	}
+
+	return;
 }
 
-kablam_command* kablam_command_skip::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_skip::create_instance(
+	wchar_t const* const* arguments,
+	uint32 argument_count,
+	kablam_string* out_message)
 {
 	UNREFERENCED_PARAMETER(arguments);
 
@@ -69,9 +78,10 @@ kablam_command* kablam_command_skip::create_instance(const wchar_t* const* argum
 	else
 	{
 		result = new kablam_command_skip();
-		result->type = _kablam_command_skip;
-		result->valid = true;
+		result->set_type(_kablam_command_skip);
+		result->set_valid(true);
 		memset(&result->result, 0, sizeof(kablam_command_skip_result));
 	}
+
 	return result;
 }

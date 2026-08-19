@@ -5,17 +5,22 @@
 
 #include "kablam_strings.h"
 
-void kablam_command_playing::execute_rpc_command()
+/* public code */
+
+void kablam_command_playing::execute_rpc_command(void)
 {
 	kablam_command_playing_rpc(&this->response);
+	return;
 }
 
-void kablam_command_playing::print_help_text()
+void kablam_command_playing::print_help_text(void)
 {
 	kablam_command_print_help_text(kablam_string_help_playing_desc, kablam_string_help_playing_usage);
+	return;
 }
 
-void kablam_command_playing::parse_response(kablam_command* in_command)
+void kablam_command_playing::parse_response(
+	kablam_command* in_command)
 {
 	kablam_command_playing* command = (kablam_command_playing*)in_command;
 
@@ -58,9 +63,14 @@ void kablam_command_playing::parse_response(kablam_command* in_command)
 
 		line_label.free();
 	}
+
+	return;
 }
 
-kablam_command* kablam_command_playing::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_playing::create_instance(
+	wchar_t const* const* arguments,
+	uint32 argument_count,
+	kablam_string* out_message)
 {
 	UNREFERENCED_PARAMETER(arguments);
 
@@ -76,10 +86,11 @@ kablam_command* kablam_command_playing::create_instance(const wchar_t* const* ar
 	{
 		result = new kablam_command_playing();
 
-		result->type = _kablam_command_playing;
-		result->valid = true;
+		result->set_type(_kablam_command_playing);
+		result->set_valid(true);
 
 		memset(&result->response, 0, sizeof(kablam_command_play_result));
 	}
+
 	return result;
 }

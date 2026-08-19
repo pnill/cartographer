@@ -5,18 +5,22 @@
 
 #include "kablam_strings.h"
 
-void kablam_command_play::execute_rpc_command()
+/* public code */
+
+void kablam_command_play::execute_rpc_command(void)
 {
 	kablam_command_play_rpc(this->file_path, &this->response);
 	return;
 }
 
-void kablam_command_play::print_help_text()
+void kablam_command_play::print_help_text(void)
 {
 	kablam_command_print_help_text(kablam_string_help_play_desc, kablam_string_help_play_usage);
+	return;
 }
 
-void kablam_command_play::parse_response(kablam_command* in_command)
+void kablam_command_play::parse_response(
+	kablam_command* in_command)
 {
 	kablam_command_play* command = (kablam_command_play*)in_command;
 
@@ -26,20 +30,19 @@ void kablam_command_play::parse_response(kablam_command* in_command)
 	{
 		switch (command->response.error_code)
 		{
-
-			case _play_error_file_not_found:
-				response_string_id = kablam_string_err_file_not_found;
-				break;
-			case _play_error_file_open_access_denied:
-				response_string_id = kablam_string_err_file_open_access_denied;
-				break;
-			case _play_error_playlist_no_valid_matches:
-				response_string_id = kablam_string_err_playlist_no_valid_matches;
-				break;
-			default:
-			case _play_error_playlist_read_failed:
-				response_string_id = kablam_string_err_playlist_read_failed;
-				break;
+		case _play_error_file_not_found:
+			response_string_id = kablam_string_err_file_not_found;
+			break;
+		case _play_error_file_open_access_denied:
+			response_string_id = kablam_string_err_file_open_access_denied;
+			break;
+		case _play_error_playlist_no_valid_matches:
+			response_string_id = kablam_string_err_playlist_no_valid_matches;
+			break;
+		default:
+		case _play_error_playlist_read_failed:
+			response_string_id = kablam_string_err_playlist_read_failed;
+			break;
 		}
 	}
 	else
@@ -75,9 +78,11 @@ void kablam_command_play::parse_response(kablam_command* in_command)
 
 		line_label.free();
 	}
+
+	return;
 }
 
-kablam_command* kablam_command_play::create_instance(const wchar_t *const *arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_play::create_instance(wchar_t const *const *arguments, uint32 argument_count, kablam_string* out_message)
 {
 	kablam_command_play* result = NULL;
 	
@@ -95,8 +100,8 @@ kablam_command* kablam_command_play::create_instance(const wchar_t *const *argum
 	{
 		result = new kablam_command_play();
 
-		result->type = _kablam_command_play;
-		result->valid = true;
+		result->set_type(_kablam_command_play);
+		result->set_valid(true);
 
 		wcsncpy_s(result->file_path, NUMBEROF(result->file_path), arguments[1], _TRUNCATE);
 		memset(&result->response, 0, sizeof(kablam_command_play_result));

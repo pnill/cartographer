@@ -5,17 +5,22 @@
 
 #include "kablam_strings.h"
 
-void kablam_command_sendmsg::execute_rpc_command()
+/* public code */
+
+void kablam_command_sendmsg::execute_rpc_command(void)
 {
 	kablam_command_send_message_rpc(this->message, &this->result_code);
+	return;
 }
 
-void kablam_command_sendmsg::print_help_text()
+void kablam_command_sendmsg::print_help_text(void)
 {
 	kablam_command_print_help_text(kablam_string_help_sendmsg_desc, kablam_string_help_sendmsg_usage);
+	return;
 }
 
-void kablam_command_sendmsg::parse_response(kablam_command* in_command)
+void kablam_command_sendmsg::parse_response(
+	kablam_command* in_command)
 {
 	kablam_command_sendmsg* command = (kablam_command_sendmsg*)in_command;
 
@@ -40,9 +45,13 @@ void kablam_command_sendmsg::parse_response(kablam_command* in_command)
 	}
 
 	kablam_string_quick_wprintf(L"%s", response_string_id);
+	return;
 }
 
-kablam_command* kablam_command_sendmsg::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_sendmsg::create_instance(
+	wchar_t const* const* arguments,
+	uint32 argument_count,
+	kablam_string* out_message)
 {
 	kablam_command_sendmsg* result = nullptr;
 
@@ -64,8 +73,8 @@ kablam_command* kablam_command_sendmsg::create_instance(const wchar_t* const* ar
 	{
 		result = new kablam_command_sendmsg();
 
-		result->type = _kablam_command_send_message;
-		result->valid = true;
+		result->set_type(_kablam_command_send_message);
+		result->set_valid(true);
 		result->result_code = _send_message_result_code_sent;
 		wcsncpy_s(result->message, NUMBEROF(result->message) - 1, arguments[1], _TRUNCATE);
 	}

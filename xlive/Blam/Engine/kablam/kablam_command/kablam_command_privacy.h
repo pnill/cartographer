@@ -1,15 +1,17 @@
 #pragma once
 #include "kablam_command.h"
 
+/* classes */
+
 class kablam_command_privacy : public kablam_command
 {
 public:
 	e_kablam_command_privacy_type privacy_mode;
 	e_kablam_command_privacy_result_code result_code;
 
-	void execute_rpc_command() override;
+	void execute_rpc_command(void) override;
 
-	static void print_help_text();
+	static void print_help_text(void);
 	static void parse_response(kablam_command* in_command);
-	static kablam_command* create_instance(const wchar_t* const* arguments, uint32 argument_count, class kablam_string* out_message);
+	static kablam_command* create_instance(wchar_t const* const* arguments, uint32 argument_count, class kablam_string* out_message);
 };

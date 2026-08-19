@@ -18,7 +18,7 @@ static wchar_t g_kablam_shell_command_line[SHORT_MAX + 1]{};
 
 static wchar_t* g_kablam_shell_arguments[kablam_shell_max_arguments]{};
 
-static int g_kablam_shell_arguments_count = 0;
+static int32 g_kablam_shell_arguments_count = 0;
 
 static bool g_kablam_shell_failed_to_read_input = false;
 
@@ -27,26 +27,28 @@ bool g_instance_is_lan = false;
 
 /* public code */
 
-void kablam_shell_initialize()
+void kablam_shell_initialize(void)
 {
 	wcsncpy_s(g_kablam_shell_command_line, NUMBEROF(g_kablam_shell_command_line)-1, GetCommandLineW(), UINT_MAX);
     kablam_shell_parse_command_line();
     return;
 }
 
-bool kablam_shell_argument_exists(const wchar_t* argument)
+bool kablam_shell_argument_exists(
+    wchar_t const* argument)
 {
     return kablam_shell_argument_get_index(argument) != -1;
 }
 
-int kablam_shell_argument_get_index(const wchar_t* argument)
+int32 kablam_shell_argument_get_index(
+    wchar_t const* argument)
 {
     if (g_kablam_shell_arguments_count <= 1 || argument == nullptr)
         return -1;
 
     for (int i = 1; i < g_kablam_shell_arguments_count; ++i)
     {
-        const wchar_t* current_argument = g_kablam_shell_arguments[i];
+        wchar_t const* current_argument = g_kablam_shell_arguments[i];
         if (current_argument != nullptr && _wcsicmp(current_argument, argument) == 0)
             return i;
     }
@@ -54,41 +56,54 @@ int kablam_shell_argument_get_index(const wchar_t* argument)
     return -1;
 }
 
-wchar_t* kablam_shell_argument_get_value(const wchar_t* argument)
+wchar_t* kablam_shell_argument_get_value(
+    wchar_t const* argument)
 {
-    if (!argument || g_kablam_shell_arguments_count <= 1)
-        return nullptr;
+    wchar_t* result = nullptr;
 
-    size_t argument_length = wcslen(argument);
-
-    for (int i = 1; i < g_kablam_shell_arguments_count; ++i)
+    if (argument && g_kablam_shell_arguments_count > 1)
     {
-        wchar_t* current_argument = g_kablam_shell_arguments[i];
+        size_t argument_length = wcslen(argument);
 
-        if (!current_argument)
-            continue;
-
-        if (_wcsnicmp(current_argument, argument, argument_length) == 0)
+        for (int i = 1; i < g_kablam_shell_arguments_count; ++i)
         {
-            return current_argument + argument_length;
+            wchar_t* current_argument = g_kablam_shell_arguments[i];
+
+            if (!current_argument)
+            {
+                continue;
+            }
+
+            if (_wcsnicmp(current_argument, argument, argument_length) == 0)
+            {
+                result = current_argument + argument_length;
+                break;
+            }
         }
     }
 
-    return nullptr;
+    return result;
 }
 
-bool kablam_shell_read_input(wchar_t* out_buffer, size_t max_read_size)
+bool kablam_shell_read_input(
+    wchar_t* out_buffer,
+    size_t max_read_size)
 {
-    if (g_kablam_shell_failed_to_read_input)
-        return false;
+    bool result = false;
 
-    if (_getws_s(out_buffer, max_read_size))
+    if (!g_kablam_shell_failed_to_read_input)
     {
-        return (wcslen(out_buffer) < max_read_size - 1);
+        if (_getws_s(out_buffer, max_read_size))
+        {
+            result = (wcslen(out_buffer) < max_read_size - 1);
+        }
+        else
+        {
+            g_kablam_shell_failed_to_read_input = true;
+        }
     }
 
-	g_kablam_shell_failed_to_read_input = true;
-    return false;
+    return result;
 }
 
 bool kablam_shell_read_input_failed(void)

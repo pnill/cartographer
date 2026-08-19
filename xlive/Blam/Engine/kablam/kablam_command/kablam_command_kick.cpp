@@ -5,19 +5,22 @@
 
 #include "kablam_strings.h"
 
+/* public code */
 
-
-void kablam_command_kick::execute_rpc_command()
+void kablam_command_kick::execute_rpc_command(void)
 {
 	kablam_command_kick_rpc(this->gamertag, &this->result_code);
+	return;
 }
 
-void kablam_command_kick::print_help_text()
+void kablam_command_kick::print_help_text(void)
 {
 	kablam_command_print_help_text(kablam_string_help_kick_desc, kablam_string_help_kick_usage);
+	return;
 }
 
-void kablam_command_kick::parse_response(kablam_command* in_command)
+void kablam_command_kick::parse_response(
+	kablam_command* in_command)
 {
 	kablam_command_kick* command = (kablam_command_kick*)in_command;
 
@@ -42,7 +45,10 @@ void kablam_command_kick::parse_response(kablam_command* in_command)
 	return;
 }
 
-kablam_command* kablam_command_kick::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_kick::create_instance(
+	wchar_t const* const* arguments,
+	uint32 argument_count,
+	kablam_string* out_message)
 {
 	out_message->free();
 
@@ -66,8 +72,8 @@ kablam_command* kablam_command_kick::create_instance(const wchar_t* const* argum
 		return nullptr;
 	}
 
-	instance->type = _kablam_command_kick;
-	instance->valid = true;
+	instance->set_type(_kablam_command_kick);
+	instance->set_valid(true);
 
 	wcsncpy_s(instance->gamertag, 32, arguments[1], _TRUNCATE);
 

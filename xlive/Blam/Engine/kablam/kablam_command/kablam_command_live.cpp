@@ -8,36 +8,40 @@
 
 #include "kablam_rpc/kablam_commands_h.h"
 
-void kablam_command_live::execute_rpc_command()
+void kablam_command_live::execute_rpc_command(void)
 {
-	switch (this->type)
+	switch (type())
 	{
-		case _kablam_command_live_key:
-			((kablam_command_live_key*)this)->execute_rpc_command();
-			break;
-		case _kablam_command_live_signin:
-			((kablam_command_live_signin*)this)->execute_rpc_command();
-			break;
-		case _kablam_command_live_auto_signin:
-			((kablam_command_live_auto_signin*)this)->execute_rpc_command();
-			break;
-		case _kablam_command_live_signout:
-			((kablam_command_live_signout*)this)->execute_rpc_command();
-			break;
-		default:
-			assert(false && "unknown command type reached");
-			break;
+	case _kablam_command_live_key:
+		((kablam_command_live_key*)this)->execute_rpc_command();
+		break;
+	case _kablam_command_live_signin:
+		((kablam_command_live_signin*)this)->execute_rpc_command();
+		break;
+	case _kablam_command_live_auto_signin:
+		((kablam_command_live_auto_signin*)this)->execute_rpc_command();
+		break;
+	case _kablam_command_live_signout:
+		((kablam_command_live_signout*)this)->execute_rpc_command();
+		break;
+	default:
+		assert(false && "unknown command type reached");
+		break;
 	}
+
+	return;
 }
 
-void kablam_command_live::print_help_text()
+void kablam_command_live::print_help_text(void)
 {
 	kablam_command_print_help_text(kablam_string_help_live_desc, kablam_string_help_live_usage);
+	return;
 }
 
-void kablam_command_live::parse_response(kablam_command* in_command)
+void kablam_command_live::parse_response(
+	kablam_command* in_command)
 {
-	switch (in_command->type)
+	switch (in_command->type())
 	{
 	case _kablam_command_live_key:
 		((kablam_command_live_key*)in_command)->parse_response(in_command);
@@ -55,9 +59,14 @@ void kablam_command_live::parse_response(kablam_command* in_command)
 		assert(false && "unknown command type reached");
 		break;
 	}
+
+	return;
 }
 
-kablam_command* kablam_command_live::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_live::create_instance(
+	wchar_t const* const* arguments,
+	uint32 argument_count,
+	kablam_string* out_message)
 {
 	kablam_command* result = nullptr;
 
@@ -99,12 +108,13 @@ kablam_command* kablam_command_live::create_instance(const wchar_t* const* argum
 	return result;
 }
 
-void kablam_command_live_key::execute_rpc_command()
+void kablam_command_live_key::execute_rpc_command(void)
 {
 	kablam_command_live_activate_rpc(this->live_key, &this->result_code);
 }
 
-void kablam_command_live_key::parse_response(kablam_command* in_command)
+void kablam_command_live_key::parse_response(
+	kablam_command* in_command)
 {
 	kablam_command_live_key* command = (kablam_command_live_key*)in_command;
 
@@ -126,9 +136,13 @@ void kablam_command_live_key::parse_response(kablam_command* in_command)
 	}
 
 	kablam_string_quick_wprintf(L"%ws", response_string_id);
+	return;
 }
 
-kablam_command* kablam_command_live_key::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_live_key::create_instance(
+	wchar_t const* const* arguments,
+	uint32 argument_count,
+	kablam_string* out_message)
 {
 	kablam_command_live_key* result = nullptr;
 
@@ -145,8 +159,8 @@ kablam_command* kablam_command_live_key::create_instance(const wchar_t* const* a
 	else
 	{
 		result = new kablam_command_live_key();
-		result->type = _kablam_command_live_key;
-		result->valid = true;
+		result->set_type(_kablam_command_live_key);
+		result->set_valid(true);
 
 		if (wcsncpy_s(result->live_key, NUMBEROF(result->live_key), arguments[2], _TRUNCATE))
 		{
@@ -154,7 +168,7 @@ kablam_command* kablam_command_live_key::create_instance(const wchar_t* const* a
 		}
 		else
 		{
-			const wchar_t* live_key = result->live_key;
+			wchar_t const* live_key = result->live_key;
 			const size_t length = wcslen(live_key);
 			
 			bool format_ok = (length == 29);
@@ -179,12 +193,13 @@ kablam_command* kablam_command_live_key::create_instance(const wchar_t* const* a
 	return result;
 }
 
-void kablam_command_live_signin::execute_rpc_command()
+void kablam_command_live_signin::execute_rpc_command(void)
 {
 	kablam_command_live_signin_rpc(this->username, this->password, &this->result_code);
 }
 
-void kablam_command_live_signin::parse_response(kablam_command* in_command)
+void kablam_command_live_signin::parse_response(
+	kablam_command* in_command)
 {
 	kablam_command_live_signin* command = (kablam_command_live_signin*)in_command;
 
@@ -203,9 +218,13 @@ void kablam_command_live_signin::parse_response(kablam_command* in_command)
 	}
 
 	kablam_string_quick_wprintf(L"%ws", response_string_id);
+	return;
 }
 
-kablam_command* kablam_command_live_signin::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_live_signin::create_instance(
+	wchar_t const* const* arguments,
+	uint32 argument_count,
+	kablam_string* out_message)
 {
 	kablam_command_live_signin* result = nullptr;
 
@@ -255,8 +274,8 @@ kablam_command* kablam_command_live_signin::create_instance(const wchar_t* const
 		{
 			result = new kablam_command_live_signin();
 
-			result->type = _kablam_command_live_signin;
-			result->valid = true;
+			result->set_type(_kablam_command_live_signin);
+			result->set_valid(true);
 			result->result_code = _live_signin_result_code_success;
 
 			wcsncpy_s(result->username, NUMBEROF(result->username), arguments[2], _TRUNCATE);
@@ -267,12 +286,14 @@ kablam_command* kablam_command_live_signin::create_instance(const wchar_t* const
 	return result;
 }
 
-void kablam_command_live_auto_signin::execute_rpc_command()
+void kablam_command_live_auto_signin::execute_rpc_command(void)
 {
 	kablam_command_live_auto_signin_rpc(this->username, this->password, &this->result_code, (uint32*)&this->xlive_login_result);
+	return;
 }
 
-void kablam_command_live_auto_signin::parse_response(kablam_command* in_command)
+void kablam_command_live_auto_signin::parse_response(
+	kablam_command* in_command)
 {
 	kablam_command_live_auto_signin* command = (kablam_command_live_auto_signin*)in_command;
 
@@ -299,9 +320,14 @@ void kablam_command_live_auto_signin::parse_response(kablam_command* in_command)
 	{
 		wprintf(L" (0x%08x)", command->xlive_login_result);
 	}
+
+	return;
 }
 
-kablam_command* kablam_command_live_auto_signin::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_live_auto_signin::create_instance(
+	wchar_t const* const* arguments,
+	uint32 argument_count,
+	kablam_string* out_message)
 {
 	kablam_command_live_auto_signin* result = nullptr;
 
@@ -354,8 +380,8 @@ kablam_command* kablam_command_live_auto_signin::create_instance(const wchar_t* 
 		{
 			result = new kablam_command_live_auto_signin();
 
-			result->type = _kablam_command_live_signin;
-			result->valid = true;
+			result->set_type(_kablam_command_live_signin);
+			result->set_valid(true);
 			result->result_code = _live_auto_signin_response_code_auto_signin_enabled;
 			result->xlive_login_result = XLIVE_S_OK;
 
@@ -367,12 +393,14 @@ kablam_command* kablam_command_live_auto_signin::create_instance(const wchar_t* 
 	return result;
 }
 
-void kablam_command_live_signout::execute_rpc_command()
+void kablam_command_live_signout::execute_rpc_command(void)
 {
 	kablam_command_live_signout_rpc(&this->result_code);
+	return;
 }
 
-void kablam_command_live_signout::parse_response(kablam_command* in_command)
+void kablam_command_live_signout::parse_response(
+	kablam_command* in_command)
 {
 	kablam_command_live_signout* command = (kablam_command_live_signout*)in_command;
 
@@ -394,9 +422,13 @@ void kablam_command_live_signout::parse_response(kablam_command* in_command)
 	}
 
 	kablam_string_quick_wprintf(L"%ws", response_string_id);
+	return;
 }
 
-kablam_command* kablam_command_live_signout::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_live_signout::create_instance(
+	wchar_t const* const* arguments,
+	uint32 argument_count,
+	kablam_string* out_message)
 {
 	UNREFERENCED_PARAMETER(arguments);
 	UNREFERENCED_PARAMETER(argument_count);

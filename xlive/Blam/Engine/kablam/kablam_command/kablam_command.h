@@ -49,16 +49,25 @@ enum e_kablam_command_type
 class kablam_command
 {
 public:
-	e_kablam_command_type type;
-	bool valid;
+	virtual void execute_rpc_command(void) = 0;
+	virtual ~kablam_command(void) = default;
 
-	virtual void execute_rpc_command() = 0;
-	virtual ~kablam_command() = default;
+	e_kablam_command_type type(void) const { return m_type; }
+	void set_type(e_kablam_command_type type) { m_type = type; }
+
+	bool valid(void) const { return m_valid; }
+	void set_valid(bool valid) { m_valid = valid;  }
+
+
+
+private:
+	e_kablam_command_type m_type;
+	bool m_valid;
 };
 
 class kablam_command_dynamic_array : public kablam_command
 {
 public:
-	uint32 entry_count;
-	void* entry_buffer;
+	uint32 m_entry_count;
+	void* m_entry_buffer;
 };

@@ -5,32 +5,43 @@
 
 #include "kablam_strings.h"
 
-static const wchar_t* const k_kablam_command_privacy_mode_strings[k_kablam_command_privacy_type_count]
+/* constants */
+
+static wchar_t const* const k_kablam_command_privacy_mode_strings[k_kablam_command_privacy_type_count]
 {
 	L"open",
 	L"gold",
 	L"vip"
 };
 
-void kablam_command_privacy::execute_rpc_command()
-{
-	if (this->type == _kablam_command_privacy_get)
-		kablam_command_get_privacy_rpc(&this->privacy_mode, &this->result_code);
+/* public code */
 
-	if (this->type == _kablam_command_privacy_set)
+void kablam_command_privacy::execute_rpc_command(void)
+{
+	if (type() == _kablam_command_privacy_get)
+	{
+		kablam_command_get_privacy_rpc(&this->privacy_mode, &this->result_code);
+	}
+	else if (type() == _kablam_command_privacy_set)
+	{
 		kablam_command_set_privacy_rpc(this->privacy_mode, &this->result_code);
+	}
+
+	return;
 }
 
-void kablam_command_privacy::print_help_text()
+void kablam_command_privacy::print_help_text(void)
 {
 	kablam_command_print_help_text(kablam_string_help_privacy_desc, kablam_string_help_privacy_usage);
+	return;
 }
 
-void kablam_command_privacy::parse_response(kablam_command* in_command)
+void kablam_command_privacy::parse_response(
+	kablam_command* in_command)
 {
 	kablam_command_privacy* command = (kablam_command_privacy*)in_command;
 
-	if (command->type == _kablam_command_privacy_get)
+	if (command->type() == _kablam_command_privacy_get)
 	{
 
 		int32 response_string_id = 0;
@@ -59,7 +70,7 @@ void kablam_command_privacy::parse_response(kablam_command* in_command)
 		kablam_string_quick_wprintf(L"%ws", response_string_id);
 	}
 
-	if (command->type == _kablam_command_privacy_set)
+	if (command->type() == _kablam_command_privacy_set)
 	{
 		kablam_string response_string;
 		response_string.load(command->result_code == _privacy_result_code_live_only ? kablam_string_err_command_live_only : kablam_string_info_privacy_changed);
@@ -68,9 +79,14 @@ void kablam_command_privacy::parse_response(kablam_command* in_command)
 
 		response_string.free();
 	}
+
+	return;
 }
 
-kablam_command* kablam_command_privacy::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_privacy::create_instance(
+	wchar_t const* const* arguments,
+	uint32 argument_count,
+	kablam_string* out_message)
 {
 	kablam_command_privacy* result = nullptr;
 
@@ -83,17 +99,17 @@ kablam_command* kablam_command_privacy::create_instance(const wchar_t* const* ar
 	else
 	{
 		result = new kablam_command_privacy();
-		result->valid = true;
+		result->set_valid(true);
 
 		if (argument_count == 1)
 		{
-			result->type = _kablam_command_privacy_get;
+			result->set_type(_kablam_command_privacy_get);
 			result->privacy_mode = _kablam_command_privacy_none;
 			result->result_code = _privacy_result_code_success;
 		}
 		else
 		{
-			result->type = _kablam_command_privacy_set;
+			result->set_type(_kablam_command_privacy_set);
 			result->privacy_mode = _kablam_command_privacy_none;
 			result->result_code = _privacy_result_code_success;
 

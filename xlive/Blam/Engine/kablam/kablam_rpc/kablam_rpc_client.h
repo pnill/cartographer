@@ -9,12 +9,12 @@ public:
 	wchar_t m_rpc_endpoint[27]{};
 	RPC_WSTR m_rpc_binding_string{};
 
-	void build_instance_endpoint(const wchar_t* instance_name);
+	void build_instance_endpoint(wchar_t const* instance_name);
 	RPC_STATUS build_binding_string_local(void);
-	RPC_STATUS set_auth_info_local(const wchar_t* instance_username);
+	RPC_STATUS set_auth_info_local(wchar_t const* instance_username);
 
 public:
-	bool connect_local(const wchar_t* instance_name, const wchar_t* instance_username, struct kablam_rpc_service_version_info* out_version_info);
+	bool connect_local(wchar_t const* instance_name, wchar_t const* instance_username, struct kablam_rpc_service_version_info* out_version_info);
 	//bool connect_tcp_ip(wchar_t* host, wchar_t* port, wchar_t* username, wchar_t* password, kablam_rpc_service_version_info* out_version_info);
 
 	void disconnect_local(void);

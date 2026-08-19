@@ -5,25 +5,34 @@
 
 #include "kablam_strings.h"
 
-void kablam_command_name::execute_rpc_command()
-{
-	if (this->type == _kablam_command_set_name)
-		kablam_command_set_name_rpc(this->name, &this->result_code);
+/* public code */
 
-	if (this->type == _kablam_command_get_name)
+void kablam_command_name::execute_rpc_command(void)
+{
+	if (type() == _kablam_command_set_name)
+	{
+		kablam_command_set_name_rpc(this->name, &this->result_code);
+	}
+	else if (type() == _kablam_command_get_name)
+	{
 		kablam_command_get_name_rpc(&this->result_code, 16, this->name);
+	}
+
+	return;
 }
 
-void kablam_command_name::print_help_text()
+void kablam_command_name::print_help_text(void)
 {
 	kablam_command_print_help_text(kablam_string_help_name_desc, kablam_string_help_name_usage);
+	return;
 }
 
-void kablam_command_name::parse_response(kablam_command* in_command)
+void kablam_command_name::parse_response(
+	kablam_command* in_command)
 {
 	kablam_command_name* command = (kablam_command_name*)in_command;
 
-	if (command->type == _kablam_command_get_name)
+	if (command->type() == _kablam_command_get_name)
 	{
 		if (!command->result_code)
 		{
@@ -44,7 +53,7 @@ void kablam_command_name::parse_response(kablam_command* in_command)
 		}
 	}
 
-	if (command->type == _kablam_command_set_name)
+	if (command->type() == _kablam_command_set_name)
 	{
 		int32 result_string_id;
 		switch (command->result_code)
@@ -65,10 +74,15 @@ void kablam_command_name::parse_response(kablam_command* in_command)
 
 		kablam_string_quick_wprintf(L"%s", result_string_id);
 	}
+
+	return;
 }
 
 
-kablam_command* kablam_command_name::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_name::create_instance(
+	wchar_t const* const* arguments,
+	uint32 argument_count,
+	kablam_string* out_message)
 {
 	kablam_command_name* result = nullptr;
 
@@ -81,18 +95,19 @@ kablam_command* kablam_command_name::create_instance(const wchar_t* const* argum
 	else
 	{
 		result = new kablam_command_name();
-		result->valid = true;
+		result->set_valid(true);
 
 		if (argument_count == 1)
 		{
-			result->type = _kablam_command_get_name;
+			result->set_type(_kablam_command_get_name);
 			memset(result->name, 0, 16);
 		}
 		else
 		{
-			result->type = _kablam_command_set_name;
+			result->set_type(_kablam_command_set_name);
 			wcsncpy_s(result->name, NUMBEROF(result->name), arguments[1], _TRUNCATE);
 		}
 	}
+
 	return result;
 }

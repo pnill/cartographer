@@ -7,68 +7,77 @@
 
 #include <time.h>
 
-void kablam_command_ban::execute_rpc_command()
+/* public code */
+
+void kablam_command_ban::execute_rpc_command(void)
 {
-	switch (this->type)
+	switch (type())
 	{
-		case _kablam_command_ban_ip:
-			((kablam_command_ban_ip*)this)->execute_rpc_command();
-			break;
-		case _kablam_command_ban_nic:
-			((kablam_command_ban_nic*)this)->execute_rpc_command();
-			break;
-		case _kablam_command_ban_gamer:
-			((kablam_command_ban_gamer*)this)->execute_rpc_command();
-			break;
-		case _kablam_command_get_ban_ip:
-			((kablam_command_ban_get_ip*)this)->execute_rpc_command();
-			break;
-		case _kablam_command_get_ban_nic:
-			((kablam_command_ban_get_nic*)this)->execute_rpc_command();
-			break;
-		case _kablam_command_get_ban_gamer:
-			((kablam_command_ban_get_gamer*)this)->execute_rpc_command();
-			break;
-		default:
-			assert(false && "unknown command type reached");
-			break;
+	case _kablam_command_ban_ip:
+		((kablam_command_ban_ip*)this)->execute_rpc_command();
+		break;
+	case _kablam_command_ban_nic:
+		((kablam_command_ban_nic*)this)->execute_rpc_command();
+		break;
+	case _kablam_command_ban_gamer:
+		((kablam_command_ban_gamer*)this)->execute_rpc_command();
+		break;
+	case _kablam_command_get_ban_ip:
+		((kablam_command_ban_get_ip*)this)->execute_rpc_command();
+		break;
+	case _kablam_command_get_ban_nic:
+		((kablam_command_ban_get_nic*)this)->execute_rpc_command();
+		break;
+	case _kablam_command_get_ban_gamer:
+		((kablam_command_ban_get_gamer*)this)->execute_rpc_command();
+		break;
+	default:
+		assert(false && "unknown command type reached");
+		break;
 	}
+
+	return;
 }
 
-void kablam_command_ban::print_help_text()
+void kablam_command_ban::print_help_text(void)
 {
 	kablam_command_print_help_text(kablam_string_help_ban_desc, kablam_string_help_ban_usage);
+	return;
 }
 
-void kablam_command_ban::parse_response(kablam_command* in_command)
+void kablam_command_ban::parse_response(
+	kablam_command* in_command)
 {
-	switch (in_command->type)
+	switch (in_command->type())
 	{
-		case _kablam_command_ban_ip:
-			((kablam_command_ban_ip*)in_command)->parse_response(in_command);
-			break;
-		case _kablam_command_ban_nic:
-			((kablam_command_ban_nic*)in_command)->parse_response(in_command);
-			break;
-		case _kablam_command_ban_gamer:
-			((kablam_command_ban_gamer*)in_command)->parse_response(in_command);
-			break;
-		case _kablam_command_get_ban_ip:
-			((kablam_command_ban_get_ip*)in_command)->parse_response(in_command);
-			break;
-		case _kablam_command_get_ban_nic:
-			((kablam_command_ban_get_nic*)in_command)->parse_response(in_command);
-			break;
-		case _kablam_command_get_ban_gamer:
-			((kablam_command_ban_get_gamer*)in_command)->parse_response(in_command);
-			break;
-		default:
-			assert(false && "unknown command type reached");
-			break;
+	case _kablam_command_ban_ip:
+		((kablam_command_ban_ip*)in_command)->parse_response(in_command);
+		break;
+	case _kablam_command_ban_nic:
+		((kablam_command_ban_nic*)in_command)->parse_response(in_command);
+		break;
+	case _kablam_command_ban_gamer:
+		((kablam_command_ban_gamer*)in_command)->parse_response(in_command);
+		break;
+	case _kablam_command_get_ban_ip:
+		((kablam_command_ban_get_ip*)in_command)->parse_response(in_command);
+		break;
+	case _kablam_command_get_ban_nic:
+		((kablam_command_ban_get_nic*)in_command)->parse_response(in_command);
+		break;
+	case _kablam_command_get_ban_gamer:
+		((kablam_command_ban_get_gamer*)in_command)->parse_response(in_command);
+		break;
+	default:
+		assert(false && "unknown command type reached");
+		break;
 	}
 }
 
-kablam_command* kablam_command_ban::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_ban::create_instance(
+	wchar_t const* const* arguments,
+	uint32 argument_count,
+	kablam_string* out_message)
 {
 	kablam_command* result = nullptr;
 	if (argument_count < 2)
@@ -114,12 +123,14 @@ kablam_command* kablam_command_ban::create_instance(const wchar_t* const* argume
 	return result;
 }
 
-void kablam_command_ban_ip::execute_rpc_command()
+void kablam_command_ban_ip::execute_rpc_command(void)
 {
 	kablam_command_ban_ip_rpc(this->ipv4_subnet.ipv4_address, this->ipv4_subnet.cidr, this->duration, &this->result_code);
+	return;
 }
 
-void kablam_command_ban_ip::parse_response(kablam_command* in_command)
+void kablam_command_ban_ip::parse_response(
+	kablam_command* in_command)
 {
 	kablam_command_ban_ip* command = (kablam_command_ban_ip*)in_command;
 
@@ -147,7 +158,10 @@ void kablam_command_ban_ip::parse_response(kablam_command* in_command)
 	return;
 }
 
-kablam_command* kablam_command_ban_ip::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_ban_ip::create_instance(
+	wchar_t const* const* arguments,
+	uint32 argument_count,
+	kablam_string* out_message)
 {
 	kablam_command_ban_ip* result = nullptr;
 	
@@ -177,8 +191,8 @@ kablam_command* kablam_command_ban_ip::create_instance(const wchar_t* const* arg
 	{
 		result = new kablam_command_ban_ip();
 
-		result->type = _kablam_command_ban_ip;
-		result->valid = true;
+		result->set_type(_kablam_command_ban_ip);
+		result->set_valid(true);
 
 		result->ipv4_subnet.ipv4_address = ip_addr;
 		result->ipv4_subnet.cidr = cidr;
@@ -188,12 +202,14 @@ kablam_command* kablam_command_ban_ip::create_instance(const wchar_t* const* arg
 	return result;
 }
 
-void kablam_command_ban_nic::execute_rpc_command()
+void kablam_command_ban_nic::execute_rpc_command(void)
 {
 	kablam_command_ban_nic_rpc(&this->mac_address, this->duration, &this->result_code);
+	return;
 }
 
-void kablam_command_ban_nic::parse_response(kablam_command* in_command)
+void kablam_command_ban_nic::parse_response(
+	kablam_command* in_command)
 {
 	kablam_command_ban_nic* command = (kablam_command_ban_nic*)in_command;
 
@@ -220,7 +236,10 @@ void kablam_command_ban_nic::parse_response(kablam_command* in_command)
 	kablam_string_quick_wprintf(L"%ws", response_string_id);
 }
 
-kablam_command* kablam_command_ban_nic::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_ban_nic::create_instance(
+	wchar_t const* const* arguments,
+	uint32 argument_count,
+	kablam_string* out_message)
 {
 	out_message->free();
 
@@ -254,8 +273,8 @@ kablam_command* kablam_command_ban_nic::create_instance(const wchar_t* const* ar
 
 	kablam_command_ban_nic* instance = new kablam_command_ban_nic();
 
-	instance->type = _kablam_command_ban_nic;
-	instance->valid = true;
+	instance->set_type(_kablam_command_ban_nic);
+	instance->set_valid(true);
 
 	memcpy(&instance->mac_address, &mac_address, sizeof(s_mac_address));
 	instance->duration = duration;
@@ -264,12 +283,14 @@ kablam_command* kablam_command_ban_nic::create_instance(const wchar_t* const* ar
 	return instance;
 }
 
-void kablam_command_ban_gamer::execute_rpc_command()
+void kablam_command_ban_gamer::execute_rpc_command(void)
 {
 	kablam_command_ban_gamer_rpc(this->gamertag, this->duration, &this->result_code);
+	return;
 }
 
-void kablam_command_ban_gamer::parse_response(kablam_command* in_command)
+void kablam_command_ban_gamer::parse_response(
+	kablam_command* in_command)
 {
 	kablam_command_ban_gamer* command = (kablam_command_ban_gamer*)in_command;
 
@@ -296,7 +317,10 @@ void kablam_command_ban_gamer::parse_response(kablam_command* in_command)
 	kablam_string_quick_wprintf(L"%ws", response_string_id);
 }
 
-kablam_command* kablam_command_ban_gamer::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_ban_gamer::create_instance(
+	wchar_t const* const* arguments,
+	uint32 argument_count,
+	kablam_string* out_message)
 {
 	kablam_command_ban_gamer* result = nullptr;
 
@@ -323,8 +347,8 @@ kablam_command* kablam_command_ban_gamer::create_instance(const wchar_t* const* 
 	{
 		result = new kablam_command_ban_gamer();
 
-		result->type = _kablam_command_ban_gamer;
-		result->valid = true;
+		result->set_type(_kablam_command_ban_gamer);
+		result->set_valid(true);
 
 		wcsncpy_s(result->gamertag, NUMBEROF(result->gamertag), arguments[2], _TRUNCATE);
 		result->duration = duration;
@@ -334,29 +358,32 @@ kablam_command* kablam_command_ban_gamer::create_instance(const wchar_t* const* 
 	return result;
 }
 
-void kablam_command_ban_get_ip::execute_rpc_command()
+void kablam_command_ban_get_ip::execute_rpc_command(void)
 {
 	int32 returned_entry_size = 0;
 
-	kablam_command_get_ban_ip_rpc(&this->entry_count, &returned_entry_size, ((s_exipration_entry_ipv4_subnet**)&this->entry_buffer));
+	kablam_command_get_ban_ip_rpc(&this->m_entry_count, &returned_entry_size, ((s_exipration_entry_ipv4_subnet**)&this->m_entry_buffer));
 
-	if (!returned_entry_size && this->entry_buffer)
+	if (!returned_entry_size && this->m_entry_buffer)
 	{
-		free(this->entry_buffer);
-		this->entry_buffer = nullptr;
+		free(this->m_entry_buffer);
+		this->m_entry_buffer = nullptr;
 	}
+
+	return;
 }
 
-void kablam_command_ban_get_ip::parse_response(kablam_command* in_command)
+void kablam_command_ban_get_ip::parse_response(
+	kablam_command* in_command)
 {
 	kablam_command_ban_get_ip* command = (kablam_command_ban_get_ip*)in_command;
-	if (command->entry_count)
+	if (command->m_entry_count)
 	{
-		if (command->entry_buffer)
+		if (command->m_entry_buffer)
 		{
-			for (uint32 i = 0; i < command->entry_count; ++i)
+			for (uint32 i = 0; i < command->m_entry_count; ++i)
 			{
-				s_exipration_entry_ipv4_subnet* entry = &((s_exipration_entry_ipv4_subnet*)command->entry_buffer)[i];
+				s_exipration_entry_ipv4_subnet* entry = &((s_exipration_entry_ipv4_subnet*)command->m_entry_buffer)[i];
 
 				wprintf(L"%d.%d.%d.%d", 
 					(unsigned int)((entry->ipv4_address.ipv4_address >> 24) & 0xFF),
@@ -397,9 +424,14 @@ void kablam_command_ban_get_ip::parse_response(kablam_command* in_command)
 	{
 		kablam_string_quick_wprintf(L"%ws", kablam_string_info_list_empty);
 	}
+
+	return;
 }
 
-kablam_command* kablam_command_ban_get_ip::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_ban_get_ip::create_instance(
+	wchar_t const* const* arguments,
+	uint32 argument_count,
+	kablam_string* out_message)
 {
 	UNREFERENCED_PARAMETER(arguments);
 	UNREFERENCED_PARAMETER(argument_count);
@@ -407,37 +439,40 @@ kablam_command* kablam_command_ban_get_ip::create_instance(const wchar_t* const*
 	out_message->free();
 
 	kablam_command_ban_get_ip* instance = new kablam_command_ban_get_ip();
-	instance->type = _kablam_command_get_ban_ip;
-	instance->valid = true;
-	instance->entry_count = 0;
-	instance->entry_buffer = nullptr;
+	instance->set_type(_kablam_command_get_ban_ip);
+	instance->set_valid(true);
+	instance->m_entry_count = 0;
+	instance->m_entry_buffer = nullptr;
 	return instance;
 }
 
-void kablam_command_ban_get_nic::execute_rpc_command()
+void kablam_command_ban_get_nic::execute_rpc_command(void)
 {
 	int32 returned_entry_size = 0;
 
-	kablam_command_get_ban_nic_rpc(&this->entry_count, &returned_entry_size, ((s_expiration_entry_mac_address**)&this->entry_buffer));
+	kablam_command_get_ban_nic_rpc(&this->m_entry_count, &returned_entry_size, ((s_expiration_entry_mac_address**)&this->m_entry_buffer));
 
-	if (!returned_entry_size && this->entry_buffer)
+	if (!returned_entry_size && this->m_entry_buffer)
 	{
-		free(this->entry_buffer);
-		this->entry_buffer = nullptr;
+		free(this->m_entry_buffer);
+		this->m_entry_buffer = nullptr;
 	}
+
+	return;
 }
 
-void kablam_command_ban_get_nic::parse_response(kablam_command* in_command)
+void kablam_command_ban_get_nic::parse_response(
+	kablam_command* in_command)
 {
 	kablam_command_ban_get_nic* command = (kablam_command_ban_get_nic*)in_command;
 
-	if (command->entry_count)
+	if (command->m_entry_count)
 	{
-		if (command->entry_buffer)
+		if (command->m_entry_buffer)
 		{
-			for (uint32 i = 0; i < command->entry_count; ++i)
+			for (uint32 i = 0; i < command->m_entry_count; ++i)
 			{
-				s_expiration_entry_mac_address* entry = &((s_expiration_entry_mac_address*)command->entry_buffer)[i];
+				s_expiration_entry_mac_address* entry = &((s_expiration_entry_mac_address*)command->m_entry_buffer)[i];
 
 				wprintf(L"%02X-%02X-%02X-%02X-%02X-%02X",
 					entry->mac_address.octets[0],
@@ -475,9 +510,14 @@ void kablam_command_ban_get_nic::parse_response(kablam_command* in_command)
 	{
 		kablam_string_quick_wprintf(L"%ws", kablam_string_info_list_empty);
 	}
+
+	return;
 }
 
-kablam_command* kablam_command_ban_get_nic::create_instance(const wchar_t* const* arguments, uint32 argument_count,	kablam_string* out_message)
+kablam_command* kablam_command_ban_get_nic::create_instance(
+	wchar_t const* const* arguments,
+	uint32 argument_count,
+	kablam_string* out_message)
 {
 	UNREFERENCED_PARAMETER(arguments);
 	UNREFERENCED_PARAMETER(argument_count);
@@ -485,36 +525,39 @@ kablam_command* kablam_command_ban_get_nic::create_instance(const wchar_t* const
 	out_message->free();
 
 	kablam_command_ban_get_nic* instance = new kablam_command_ban_get_nic();
-	instance->type = _kablam_command_get_ban_nic;
-	instance->valid = true;
-	instance->entry_count = 0;
-	instance->entry_buffer = nullptr;
+	instance->set_type(_kablam_command_get_ban_nic);
+	instance->set_valid(true);
+	instance->m_entry_count = 0;
+	instance->m_entry_buffer = nullptr;
 	return instance;
 }
 
-void kablam_command_ban_get_gamer::execute_rpc_command()
+void kablam_command_ban_get_gamer::execute_rpc_command(void)
 {
 	int32 returned_entry_size = 0;
 
-	kablam_command_get_ban_gamer_rpc(&this->entry_count, &returned_entry_size, ((s_expiration_entry_gamer**)&this->entry_buffer));
+	kablam_command_get_ban_gamer_rpc(&this->m_entry_count, &returned_entry_size, ((s_expiration_entry_gamer**)&this->m_entry_buffer));
 
-	if (!returned_entry_size && this->entry_buffer)
+	if (!returned_entry_size && this->m_entry_buffer)
 	{
-		free(this->entry_buffer);
-		this->entry_buffer = nullptr;
+		free(this->m_entry_buffer);
+		this->m_entry_buffer = nullptr;
 	}
+
+	return;
 }
 
-void kablam_command_ban_get_gamer::parse_response(kablam_command* in_command)
+void kablam_command_ban_get_gamer::parse_response(
+	kablam_command* in_command)
 {
 	kablam_command_ban_get_gamer* command = (kablam_command_ban_get_gamer*)in_command;
-	if (command->entry_count)
+	if (command->m_entry_count)
 	{
-		if (command->entry_buffer)
+		if (command->m_entry_buffer)
 		{
-			for (uint32 i = 0; i < command->entry_count; ++i)
+			for (uint32 i = 0; i < command->m_entry_count; ++i)
 			{
-				s_expiration_entry_gamer* entry = &((s_expiration_entry_gamer*)command->entry_buffer)[i];
+				s_expiration_entry_gamer* entry = &((s_expiration_entry_gamer*)command->m_entry_buffer)[i];
 
 				wprintf(L"%ws", entry->gamer_tag.gamertag);
 
@@ -548,7 +591,10 @@ void kablam_command_ban_get_gamer::parse_response(kablam_command* in_command)
 	}
 }
 
-kablam_command* kablam_command_ban_get_gamer::create_instance(const wchar_t* const* arguments, uint32 argument_count,kablam_string* out_message)
+kablam_command* kablam_command_ban_get_gamer::create_instance(
+	wchar_t const* const* arguments,
+	uint32 argument_count,
+	kablam_string* out_message)
 {
 	UNREFERENCED_PARAMETER(arguments);
 	UNREFERENCED_PARAMETER(argument_count);
@@ -556,9 +602,9 @@ kablam_command* kablam_command_ban_get_gamer::create_instance(const wchar_t* con
 	out_message->free();
 
 	kablam_command_ban_get_gamer* instance = new kablam_command_ban_get_gamer();
-	instance->type = _kablam_command_get_ban_gamer;
-	instance->valid = true;
-	instance->entry_count = 0;
-	instance->entry_buffer = nullptr;
+	instance->set_type(_kablam_command_get_ban_gamer);
+	instance->set_valid(true);
+	instance->m_entry_count = 0;
+	instance->m_entry_buffer = nullptr;
 	return instance;
 }

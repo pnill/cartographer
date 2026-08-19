@@ -7,7 +7,7 @@
 /* constants */
 
 static const RPC_WSTR k_local_rpc_protocol = (RPC_WSTR)L"ncalrpc";
-static const wchar_t* const k_kablam_rpc_endpoint_prefix = L"H2SERVER_LRPC";
+static wchar_t const* const k_kablam_rpc_endpoint_prefix = L"H2SERVER_LRPC";
 
 /* globals */
 
@@ -15,7 +15,8 @@ static kablam_rpc_client* g_kablam_rpc_client;
 
 /* public code */
 
-void kablam_rpc_client::build_instance_endpoint(const wchar_t* instance_name)
+void kablam_rpc_client::build_instance_endpoint(
+	wchar_t const* instance_name)
 {
 	if (instance_name)
 	{
@@ -40,7 +41,8 @@ RPC_STATUS kablam_rpc_client::build_binding_string_local(void)
 	);
 }
 
-RPC_STATUS kablam_rpc_client::set_auth_info_local(const wchar_t* instance_username)
+RPC_STATUS kablam_rpc_client::set_auth_info_local(
+	wchar_t const* instance_username)
 {
 	RPC_SECURITY_QOS security_qos{};
 	security_qos.Version = RPC_C_SECURITY_QOS_VERSION;
@@ -58,7 +60,10 @@ RPC_STATUS kablam_rpc_client::set_auth_info_local(const wchar_t* instance_userna
 		&security_qos);
 }
 
-bool kablam_rpc_client::connect_local(const wchar_t* instance_name, const wchar_t* instance_username, kablam_rpc_service_version_info* out_version_info)
+bool kablam_rpc_client::connect_local(
+	wchar_t const* instance_name,
+	wchar_t const* instance_username,
+	kablam_rpc_service_version_info* out_version_info)
 {
 	UNREFERENCED_PARAMETER(instance_username);
 

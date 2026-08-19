@@ -4,25 +4,34 @@
 #include "kablam_command_util.h"
 #include "kablam_strings.h"
 
-void kablam_command_description::execute_rpc_command()
-{
-	if (this->type == _kablam_command_get_description)
-		kablam_command_get_description_rpc(&this->result_code, 32, this->description);
+/* public code */
 
-	if (this->type == _kablam_command_set_description)
+void kablam_command_description::execute_rpc_command(void)
+{
+	if (type() == _kablam_command_get_description)
+	{
+		kablam_command_get_description_rpc(&this->result_code, 32, this->description);
+	}
+	else if (type() == _kablam_command_set_description)
+	{
 		kablam_command_set_description_rpc(this->description, &this->result_code);
+	}
+
+	return;
 }
 
-void kablam_command_description::print_help_text()
+void kablam_command_description::print_help_text(void)
 {
 	kablam_command_print_help_text(kablam_string_help_description_desc, kablam_string_help_description_usage);
+	return;
 }
 
-void kablam_command_description::parse_response(kablam_command* in_command)
+void kablam_command_description::parse_response(
+	kablam_command* in_command)
 {
 	kablam_command_description* command = (kablam_command_description*)in_command;
 
-	if (command->type == _kablam_command_get_description)
+	if (command->type() == _kablam_command_get_description)
 	{
 		if (!command->result_code)
 		{
@@ -43,7 +52,7 @@ void kablam_command_description::parse_response(kablam_command* in_command)
 		}
 	}
 
-	if (command->type == _kablam_command_set_description)
+	if (command->type() == _kablam_command_set_description)
 	{
 		int32 result_string_id;
 		switch (command->result_code)
@@ -64,9 +73,14 @@ void kablam_command_description::parse_response(kablam_command* in_command)
 
 		kablam_string_quick_wprintf(L"%s", result_string_id);
 	}
+
+	return;
 }
 
-kablam_command* kablam_command_description::create_instance(const wchar_t* const* arguments, uint32 argument_count,	kablam_string* out_message)
+kablam_command* kablam_command_description::create_instance(
+	wchar_t const* const* arguments, 
+	uint32 argument_count,
+	kablam_string* out_message)
 {
 	kablam_command_description* result = nullptr;
 	out_message->free();
@@ -78,16 +92,16 @@ kablam_command* kablam_command_description::create_instance(const wchar_t* const
 	else
 	{
 		result = new kablam_command_description();
-		result->valid = true;
+		result->set_valid(true);
 
 		if (argument_count == 1)
 		{
-			result->type = _kablam_command_get_description;
+			result->set_type(_kablam_command_get_description);
 			memset(result->description, 0, 32);
 		}
 		else
 		{
-			result->type = _kablam_command_set_description;
+			result->set_type(_kablam_command_set_description);
 			wcsncpy_s(result->description, 32, arguments[1], _TRUNCATE);
 		}
 	}

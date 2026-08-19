@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+#include "kablam_command/kablam_command.h"
 #include "kablam_command/kablam_command_table.h"
 #include "kablam_rpc/kablam_rpc.h"
 #include "kablam_rpc/kablam_rpc_client.h"
@@ -9,13 +10,16 @@
 
 /* prototypes */
 
-static bool valid_instance_name(const wchar_t* instance_name);
+static bool valid_instance_name(wchar_t const* instance_name);
 
 static void print_admin_usage_and_die(void);
 
 /* public code */
 
-int main(int argc, const char** argv, const char** envp)
+int main(
+    int argc,
+    char const** argv,
+    char const** envp)
 {
     UNREFERENCED_PARAMETER(argc);
     UNREFERENCED_PARAMETER(argv);
@@ -149,7 +153,7 @@ int main(int argc, const char** argv, const char** envp)
 
                 if (command)
                 {
-                    if (command->valid)
+                    if (command->valid())
                     {
                         RpcTryExcept
                         {
@@ -186,7 +190,7 @@ int main(int argc, const char** argv, const char** envp)
                     }
                     else
                     {
-                        kablam_command_table_print_help_function(command->type);
+                        kablam_command_table_print_help_function(command->type());
                     }
 
                     free(command);
@@ -217,14 +221,16 @@ int main(int argc, const char** argv, const char** envp)
 }
 
 // Memory allocation function for RPC.
-void* __RPC_USER midl_user_allocate(size_t size)
+void* __RPC_USER midl_user_allocate(
+    size_t size)
 {
     // todo: move to cseries allocation?
     return malloc(size);
 }
 
 // Memory deallocation function for RPC.
-void __RPC_USER midl_user_free(void* p)
+void __RPC_USER midl_user_free(
+    void* p)
 {
     // todo: move to cseries free?
     free(p);
@@ -233,13 +239,14 @@ void __RPC_USER midl_user_free(void* p)
 
 /* private code */
 
-static bool valid_instance_name(const wchar_t* instance_name)
+static bool valid_instance_name(
+    wchar_t const* instance_name)
 {
     assert(instance_name != NULL);
 
     int length = 0;
 
-    for (const wchar_t* p = instance_name; *p != L'\0'; ++p)
+    for (wchar_t const * p = instance_name; *p != L'\0'; ++p)
     {
         wchar_t ch = *p;
 

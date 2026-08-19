@@ -20,6 +20,8 @@
 
 #include "kablam_strings.h"
 
+/* macros */
+
 #define CREATE_KABLAM_COMMAND_DEFINITION(command_name, class_def) \
 	kablam_command_definition \
 	{ \
@@ -29,6 +31,7 @@
 		class_def::parse_response \
 	}
 
+/* globals */
 
 static const kablam_command_definition g_command_table[k_kablam_command_table_count]
 {
@@ -49,6 +52,8 @@ static const kablam_command_definition g_command_table[k_kablam_command_table_co
 	CREATE_KABLAM_COMMAND_DEFINITION(L"unban", kablam_command_unban),
 	CREATE_KABLAM_COMMAND_DEFINITION(L"vip", kablam_command_vip),
 };
+
+/* public code */
 
 kablam_command* kablam_command_table_create_command(wchar_t** arguments, uint32 argument_count, bool print_messages, uint32* out_command_table_index)
 {
@@ -129,14 +134,23 @@ kablam_command* kablam_command_table_create_command(wchar_t** arguments, uint32 
 	return nullptr;
 }
 
-void kablam_command_table_print_help_function(e_kablam_command_type command_type)
+void kablam_command_table_print_help_function(
+	e_kablam_command_type command_type)
 {
 	if (g_command_table[command_type].command && g_command_table[command_type].help_text_function)
+	{
 		g_command_table[command_type].help_text_function();
+	}
+
+	return;
 }
 
 
-void kablam_command_table_parse_input(wchar_t* command_buffer, wchar_t** command_arguments, uint32 max_argument_count, uint32* command_argument_count)
+void kablam_command_table_parse_input(
+	wchar_t* command_buffer,
+	wchar_t** command_arguments,
+	uint32 max_argument_count,
+	uint32* command_argument_count)
 {
 	wchar_t* quote_write_ptr = NULL;
 	uint32 argument_count = 0;
@@ -282,11 +296,15 @@ void kablam_command_table_parse_input(wchar_t* command_buffer, wchar_t** command
 	}
 
 	*command_argument_count = argument_count;
+	return;
 }
 
-void kablam_command_table_parse_response(kablam_command* command, uint32 command_table_index)
+void kablam_command_table_parse_response(
+	kablam_command* command,
+	uint32 command_table_index)
 {
 	g_command_table[command_table_index].parse_response_function(command);
+	return;
 }
 
 #undef CREATE_KABLAM_COMMAND_DEFINITION
