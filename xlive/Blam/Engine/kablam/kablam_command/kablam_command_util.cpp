@@ -77,34 +77,34 @@ void kablam_command_print_playlist_warning(
 
 		switch (warning->warning_type)
 		{
-		case _play_warning_duplicate_variant_name:
-		case _play_warning_error_unknown_setting:
-		case _play_warning_error_unknown_section:
-		case _play_warning_error_match_missing_setting:
+		case play_warning_duplicate_variant_name:
+		case play_warning_error_unknown_setting:
+		case play_warning_error_unknown_section:
+		case play_warning_error_match_missing_setting:
 			wprintf(L"%ws (\"%ws\")", label.get(), warning->parameter);
 			break;
-		case _play_warning_error_invalid_setting_value:
+		case play_warning_error_invalid_setting_value:
 			wprintf(label.get(), warning->parameter, warning->value);
 			break;
-		case _play_warning_error_setting_value_already_set:
+		case play_warning_error_setting_value_already_set:
 			wprintf(label.get(), warning->parameter);
 			break;
-		case _play_warning_error_invalid_variant_setting:
+		case play_warning_error_invalid_variant_setting:
 			_wprintf_p(label.get(), warning->parameter, warning->value);
 			break;
-		case _play_warning_error_variant_invalid_base_variant:
+		case play_warning_error_variant_invalid_base_variant:
 			_wprintf_p(label.get(), warning->parameter);
 			break;
-		case _play_warning_error_variant_missing_type_or_base:
-		case _play_warning_error_variant_missing_name:
-		case _play_warning_error_variant_invalid_utf16:
-		case _play_warning_error_fariant_pipe_forbidden:
-		case _play_warning_error_variant_both_type_and_base:
-		case _play_warning_error_variant_missing_or_invalid:
-		case _play_warning_error_map_missing_or_invalid:
-		case _play_warning_warn_variants_overflow:
-		case _play_warning_warn_matches_overflow:
-		case _play_warning_duplicate_playlist_section:
+		case play_warning_error_variant_missing_type_or_base:
+		case play_warning_error_variant_missing_name:
+		case play_warning_error_variant_invalid_utf16:
+		case play_warning_error_fariant_pipe_forbidden:
+		case play_warning_error_variant_both_type_and_base:
+		case play_warning_error_variant_missing_or_invalid:
+		case play_warning_error_map_missing_or_invalid:
+		case play_warning_warn_variants_overflow:
+		case play_warning_warn_matches_overflow:
+		case play_warning_duplicate_playlist_section:
 			wprintf(L"%ws", label.get());
 			break;
 		default:

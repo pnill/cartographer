@@ -27,13 +27,13 @@ void kablam_command_kick::parse_response(
 	int32 response_string_id;
 	switch (command->result_code)
 	{
-	case _kick_player_response_player_kicked:
+	case kick_player_response_player_kicked:
 		response_string_id = kablam_string_info_player_booted;
 		break;
-	case _kick_player_response_server_not_running:
+	case kick_player_response_server_not_running:
 		response_string_id = kablam_string_status_server_not_active;
 		break;
-	case _kick_player_response_player_not_found:
+	case kick_player_response_player_not_found:
 		response_string_id = kablam_string_err_player_not_found;
 		break;
 	default:
@@ -77,7 +77,7 @@ kablam_command* kablam_command_kick::create_instance(
 
 	wcsncpy_s(instance->gamertag, 32, arguments[1], _TRUNCATE);
 
-	instance->result_code = _kick_player_response_player_kicked;
+	instance->result_code = kick_player_response_player_kicked;
 
 	return instance;
 }

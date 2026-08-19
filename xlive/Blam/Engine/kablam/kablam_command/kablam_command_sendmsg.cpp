@@ -27,16 +27,16 @@ void kablam_command_sendmsg::parse_response(
 	int32 response_string_id;
 	switch (command->result_code)
 	{
-	case _send_message_result_code_sent:
+	case send_message_result_code_sent:
 		response_string_id = kablam_string_info_message_sent;
 		break;
-	case _send_message_result_code_server_not_active:
+	case send_message_result_code_server_not_active:
 		response_string_id = kablam_string_status_server_not_active;
 		break;
-	case _send_message_result_code_no_players_in_session:
+	case send_message_result_code_no_players_in_session:
 		response_string_id = kablam_string_info_no_players_in_session;
 		break;
-	case _send_message_result_code_message_failed:
+	case send_message_result_code_message_failed:
 		response_string_id = kablam_string_err_send_message_failed;
 		break;
 	default:
@@ -75,7 +75,7 @@ kablam_command* kablam_command_sendmsg::create_instance(
 
 		result->set_type(_kablam_command_send_message);
 		result->set_valid(true);
-		result->result_code = _send_message_result_code_sent;
+		result->result_code = send_message_result_code_sent;
 		wcsncpy_s(result->message, NUMBEROF(result->message) - 1, arguments[1], _TRUNCATE);
 	}
 	

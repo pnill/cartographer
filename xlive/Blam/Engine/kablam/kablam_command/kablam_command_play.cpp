@@ -30,17 +30,17 @@ void kablam_command_play::parse_response(
 	{
 		switch (command->response.error_code)
 		{
-		case _play_error_file_not_found:
+		case play_error_file_not_found:
 			response_string_id = kablam_string_err_file_not_found;
 			break;
-		case _play_error_file_open_access_denied:
+		case play_error_file_open_access_denied:
 			response_string_id = kablam_string_err_file_open_access_denied;
 			break;
-		case _play_error_playlist_no_valid_matches:
+		case play_error_playlist_no_valid_matches:
 			response_string_id = kablam_string_err_playlist_no_valid_matches;
 			break;
 		default:
-		case _play_error_playlist_read_failed:
+		case play_error_playlist_read_failed:
 			response_string_id = kablam_string_err_playlist_read_failed;
 			break;
 		}

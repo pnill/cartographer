@@ -121,13 +121,13 @@ void kablam_command_live_key::parse_response(
 	int32 response_string_id;
 	switch (command->result_code)
 	{
-	case _live_key_response_code_product_key_set:
+	case live_key_response_code_product_key_set:
 		response_string_id = kablam_string_info_product_key_set;
 		break;
-	case _live_key_response_code_key_invalid:
+	case live_key_response_code_key_invalid:
 		response_string_id = kablam_string_err_product_key_invalid;
 		break;
-	case _live_key_response_code_key_set_failed:
+	case live_key_response_code_key_set_failed:
 		response_string_id = kablam_string_err_product_key_set_failed;
 		break;
 	default:
@@ -164,7 +164,7 @@ kablam_command* kablam_command_live_key::create_instance(
 
 		if (wcsncpy_s(result->live_key, NUMBEROF(result->live_key), arguments[2], _TRUNCATE))
 		{
-			result->result_code = _live_key_response_code_product_key_set;
+			result->result_code = live_key_response_code_product_key_set;
 		}
 		else
 		{
@@ -187,7 +187,7 @@ kablam_command* kablam_command_live_key::create_instance(
 				}
 			}
 
-			result->result_code = format_ok ? _live_key_response_code_product_key_set : _live_key_response_code_key_invalid;
+			result->result_code = format_ok ? live_key_response_code_product_key_set : live_key_response_code_key_invalid;
 		}
 	}
 	return result;
@@ -206,10 +206,10 @@ void kablam_command_live_signin::parse_response(
 	int32 response_string_id;
 	switch (command->result_code)
 	{
-	case _live_signin_result_code_success:
+	case live_signin_result_code_success:
 		response_string_id = kablam_string_info_signing_in_manual;
 		break;
-	case _live_signin_result_code_live_only:
+	case live_signin_result_code_live_only:
 		response_string_id = kablam_string_err_command_live_only;
 		break;
 	default:
@@ -276,7 +276,7 @@ kablam_command* kablam_command_live_signin::create_instance(
 
 			result->set_type(_kablam_command_live_signin);
 			result->set_valid(true);
-			result->result_code = _live_signin_result_code_success;
+			result->result_code = live_signin_result_code_success;
 
 			wcsncpy_s(result->username, NUMBEROF(result->username), arguments[2], _TRUNCATE);
 			wcsncpy_s(result->password, NUMBEROF(result->password), password, _TRUNCATE);
@@ -300,13 +300,13 @@ void kablam_command_live_auto_signin::parse_response(
 	int32 response_string_id;
 	switch (command->result_code)
 	{
-	case _live_auto_signin_response_code_auto_signin_enabled:
+	case live_auto_signin_response_code_auto_signin_enabled:
 		response_string_id = kablam_string_info_autosignin_enabled;
 		break;
-	case _live_auto_signin_response_code_auto_signin_failed:
+	case live_auto_signin_response_code_auto_signin_failed:
 		response_string_id = kablam_string_err_autosignin_failed;
 		break;
-	case _live_auto_signin_response_code_live_only:
+	case live_auto_signin_response_code_live_only:
 		response_string_id = kablam_string_err_command_live_only;
 		break;
 	default:
@@ -382,7 +382,7 @@ kablam_command* kablam_command_live_auto_signin::create_instance(
 
 			result->set_type(_kablam_command_live_signin);
 			result->set_valid(true);
-			result->result_code = _live_auto_signin_response_code_auto_signin_enabled;
+			result->result_code = live_auto_signin_response_code_auto_signin_enabled;
 			result->xlive_login_result = XLIVE_S_OK;
 
 			wcsncpy_s(result->username, NUMBEROF(result->username), arguments[2], _TRUNCATE);
@@ -407,13 +407,13 @@ void kablam_command_live_signout::parse_response(
 	int32 response_string_id;
 	switch (command->result_code)
 	{
-	case _live_signout_result_code_signing_out_live:
+	case live_signout_result_code_signing_out_live:
 		response_string_id = kablam_string_info_signing_out_live;
 		break;
-	case _live_signout_result_code_not_signed_in:
+	case live_signout_result_code_not_signed_in:
 		response_string_id = kablam_string_live_not_signed_in;
 		break;
-	case _live_signout_result_code_live_only:
+	case live_signout_result_code_live_only:
 		response_string_id = kablam_string_err_command_live_only;
 		break;
 	default:

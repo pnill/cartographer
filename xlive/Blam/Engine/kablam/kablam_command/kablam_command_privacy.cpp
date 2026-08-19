@@ -45,7 +45,7 @@ void kablam_command_privacy::parse_response(
 	{
 
 		int32 response_string_id = 0;
-		if (command->result_code == _privacy_result_code_live_only)
+		if (command->result_code == privacy_result_code_live_only)
 		{
 			response_string_id = kablam_string_err_command_live_only;
 		}
@@ -53,13 +53,13 @@ void kablam_command_privacy::parse_response(
 		{
 			switch (command->privacy_mode)
 			{
-			case _kablam_command_privacy_open:
+			case kablam_command_privacy_open:
 				response_string_id = kablam_string_privacy_open_label;
 				break;
-			case _kablam_command_privacy_gold:
+			case kablam_command_privacy_gold:
 				response_string_id = kablam_string_privacy_gold_label;
 				break;
-			case _kablam_command_privacy_vip:
+			case kablam_command_privacy_vip:
 				response_string_id = kablam_string_privacy_vip_label;
 				break;
 			default:
@@ -73,7 +73,7 @@ void kablam_command_privacy::parse_response(
 	if (command->type() == _kablam_command_privacy_set)
 	{
 		kablam_string response_string;
-		response_string.load(command->result_code == _privacy_result_code_live_only ? kablam_string_err_command_live_only : kablam_string_info_privacy_changed);
+		response_string.load(command->result_code == privacy_result_code_live_only ? kablam_string_err_command_live_only : kablam_string_info_privacy_changed);
 
 		wprintf(L"%ws", response_string.get());
 
@@ -105,13 +105,13 @@ kablam_command* kablam_command_privacy::create_instance(
 		{
 			result->set_type(_kablam_command_privacy_get);
 			result->privacy_mode = _kablam_command_privacy_none;
-			result->result_code = _privacy_result_code_success;
+			result->result_code = privacy_result_code_success;
 		}
 		else
 		{
 			result->set_type(_kablam_command_privacy_set);
 			result->privacy_mode = _kablam_command_privacy_none;
-			result->result_code = _privacy_result_code_success;
+			result->result_code = privacy_result_code_success;
 
 			for (int32 i = 0; i < k_kablam_command_privacy_type_count; ++i)
 			{

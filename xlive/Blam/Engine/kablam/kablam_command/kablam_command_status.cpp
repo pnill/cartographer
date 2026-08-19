@@ -52,7 +52,7 @@ void kablam_command_status::parse_response(
 {
 	kablam_command_status* command = (kablam_command_status*)in_command;
 
-	const bool is_live = TEST_BIT(command->response.flags, _status_response_flag_live);
+	const bool is_live = TEST_BIT(command->response.flags, status_response_flag_live);
 
 	wprintf(L"Network mode: %ws\r\n", is_live ? L"LIVE" : L"LAN");
 
@@ -63,8 +63,8 @@ void kablam_command_status::parse_response(
 	{
 		int32 xlive_result_string_id = 0;
 
-		if (TEST_BIT(command->response.flags, _status_response_flag_xlive_signin_result) && 
-			IN_RANGE(command->response.result_code, _status_result_code_connecting, _status_result_code_offline_signin_failed))
+		if (TEST_BIT(command->response.flags, status_response_flag_xlive_signin_result) && 
+			IN_RANGE(command->response.result_code, status_result_code_connecting, status_result_code_offline_signin_failed))
 		{
 			XLIVE_HResult xlive_result = (XLIVE_HResult)command->response.xlive_signin_result_code;
 
@@ -132,13 +132,13 @@ void kablam_command_status::parse_response(
 			kablam_string_quick_wprintf(L"Reason: %ws\r\n", xlive_result_string_id);
 		}
 
-		if (TEST_BIT(command->response.flags, _status_response_flag_xlive_signin_result))
+		if (TEST_BIT(command->response.flags, status_response_flag_xlive_signin_result))
 		{
 			wprintf(L"Sign-in: %ws (%ws)\r\n",
 				command->response.live_id,
-				TEST_BIT(command->response.flags, _status_response_flag_signin_mode) ? L"Automatic" : L"Manual");
+				TEST_BIT(command->response.flags, status_response_flag_signin_mode) ? L"Automatic" : L"Manual");
 
-			if (TEST_BIT(command->response.flags, _status_response_flag_has_gamertag))
+			if (TEST_BIT(command->response.flags, status_response_flag_has_gamertag))
 			{
 				wprintf(L"Name: %hs\r\n", command->response.gamer_tag);
 			}
@@ -151,13 +151,13 @@ void kablam_command_status::parse_response(
 	}
 	else // LAN
 	{
-		if (TEST_BIT(command->response.flags, _status_response_flag_has_lan_name))
+		if (TEST_BIT(command->response.flags, status_response_flag_has_lan_name))
 		{
 			wprintf(L"Name: %ws\r\n", command->response.lan_server_name);
 		}
 	}
 
-	if (TEST_BIT(command->response.flags, _status_response_flag_has_playlist_path) &&
+	if (TEST_BIT(command->response.flags, status_response_flag_has_playlist_path) &&
 		wcscmp(command->response.playlist_path, L""))
 	{
 		wprintf(L"Playlist: %ws\r\n", command->response.playlist_path);
@@ -168,7 +168,7 @@ void kablam_command_status::parse_response(
 		wprintf(L"Custom map folder: %ws\r\n", command->response.custom_map_path);
 	}
 
-	if (TEST_BIT(command->response.flags, _status_response_flag_lobby_info))
+	if (TEST_BIT(command->response.flags, status_response_flag_lobby_info))
 	{
 		wprintf(L"\r\n");
 
@@ -177,7 +177,7 @@ void kablam_command_status::parse_response(
 			wprintf(L"Playing: %ws on %ws.\r\n", command->response.playing_variant, command->response.playing_map);
 		}
 
-		if (command->response.result_code == _status_result_code_online_game_in_progress)
+		if (command->response.result_code == status_result_code_online_game_in_progress)
 		{
 			int32 time_in_game_seconds = command->response.game_time_in_seconds;
 			int32 hours = time_in_game_seconds / 3600;
@@ -211,29 +211,29 @@ void kablam_command_status::parse_response(
 	}
 	switch (command->response.result_code)
 	{
-	case _status_result_code_offline_product_key_required:
-	case _status_result_code_offline_invalid_product_key:
+	case status_result_code_offline_product_key_required:
+	case status_result_code_offline_invalid_product_key:
 		wprintf(L"\r\nUse the \"live key\" command to set your server's product key.");
 		break;
 
-	case _status_result_code_offline:
+	case status_result_code_offline:
 		wprintf(L"\r\nUse the \"live autosignin\" command to sign your server in to LIVE.");
 		break;
 
-	case _status_result_code_offline_signin_failed:
+	case status_result_code_offline_signin_failed:
 		wprintf(L"\r\nUse \"live autosignin\" or \"live signin\" to attempt to sign in again.");
 		break;
 
-	case _status_result_code_offline_disconnected:
+	case status_result_code_offline_disconnected:
 		wprintf(
 			L"\r\n"
 			"Check your Internet connection, and make sure this account is not being\r\n"
 			"used for automatic signin by another server.");
 		break;
 
-	case _status_result_code_online_no_playlist:
-	case _status_result_code_online_failed_to_load_playlist:
-	case _status_result_code_online_empty_playlist:
+	case status_result_code_online_no_playlist:
+	case status_result_code_online_failed_to_load_playlist:
+	case status_result_code_online_empty_playlist:
 		wprintf(
 			L"\r\n"
 			"Use the \"play\" command to set your server's playlist.\r\n"

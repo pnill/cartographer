@@ -115,16 +115,16 @@ void kablam_command_vip_add::parse_response(
 	int32 response_string_id;
 	switch (command->result_code)
 	{
-	case _gamer_table_result_code_success:
+	case gamer_table_result_code_success:
 		response_string_id = kablam_string_info_vip_added;
 		break;
-	case _gamer_table_result_code_live_only:
+	case gamer_table_result_code_live_only:
 		response_string_id = kablam_string_err_command_live_only;
 		break;
-	case _gamer_table_result_code_table_full:
+	case gamer_table_result_code_table_full:
 		response_string_id = kablam_string_err_vip_list_full;
 		break;
-	case _gamer_table_result_code_gamer_not_found:
+	case gamer_table_result_code_gamer_not_found:
 		response_string_id = kablam_string_err_vip_not_found;
 		break;
 	default:
@@ -162,7 +162,7 @@ kablam_command* kablam_command_vip_add::create_instance(
 		result = new kablam_command_vip_add();
 		result->set_type(_kablam_command_vip_add);
 		result->set_valid(true);
-		result->result_code = _gamer_table_result_code_success;
+		result->result_code = gamer_table_result_code_success;
 		wcsncpy_s(result->gamertag, NUMBEROF(result->gamertag), arguments[2], _TRUNCATE);
 	}
 
@@ -183,16 +183,16 @@ void kablam_command_vip_remove::parse_response(
 	int32 response_string_id;
 	switch (command->result_code)
 	{
-	case _gamer_table_result_code_success:
+	case gamer_table_result_code_success:
 		response_string_id = kablam_string_info_vip_removed;
 		break;
-	case _gamer_table_result_code_live_only:
+	case gamer_table_result_code_live_only:
 		response_string_id = kablam_string_err_command_live_only;
 		break;
-	case _gamer_table_result_code_table_full:
+	case gamer_table_result_code_table_full:
 		response_string_id = kablam_string_err_vip_list_full;
 		break;
-	case _gamer_table_result_code_gamer_not_found:
+	case gamer_table_result_code_gamer_not_found:
 		response_string_id = kablam_string_err_vip_not_found;
 		break;
 	default:
@@ -231,7 +231,7 @@ kablam_command* kablam_command_vip_remove::create_instance(
 
 		result->set_type(_kablam_command_vip_remove);
 		result->set_valid(true);
-		result->result_code = _gamer_table_result_code_success;
+		result->result_code = gamer_table_result_code_success;
 
 		wcsncpy_s(result->gamertag, NUMBEROF(result->gamertag), arguments[2], _TRUNCATE);
 	}
@@ -326,10 +326,10 @@ void kablam_command_vip_clear::parse_response(
 	int32 response_string_id;
 	switch (command->result_code)
 	{
-	case _vip_clear_result_code_success:
+	case vip_clear_result_code_success:
 		response_string_id = kablam_string_info_vip_cleared;
 		break;
-	case _vip_clear_result_code_live_only:
+	case vip_clear_result_code_live_only:
 		response_string_id = kablam_string_err_command_live_only;
 		break;
 	default:
@@ -362,7 +362,7 @@ kablam_command* kablam_command_vip_clear::create_instance(
 
 		result->set_type(_kablam_command_vip_clear);
 		result->set_valid(true);
-		result->result_code = _vip_clear_result_code_success;
+		result->result_code = vip_clear_result_code_success;
 	}
 
 	return result;

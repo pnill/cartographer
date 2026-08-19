@@ -35,16 +35,16 @@ void kablam_command_statsfolder::parse_response(
 		int32 response_string_id;
 		switch (command->result_code)
 		{
-		case _stats_folder_result_code_success:
+		case stats_folder_result_code_success:
 			response_string_id = kablam_string_info_statsfolder_changed;
 			break;
-		case _stats_folder_result_code_invalid:
+		case stats_folder_result_code_invalid:
 			response_string_id = kablam_string_err_statsfolder_invalid;
 			break;
-		case _stats_folder_result_code_not_writable:
+		case stats_folder_result_code_not_writable:
 			response_string_id = kablam_string_err_statsfolder_not_writeable;
 			break;
-		case _stats_folder_result_code_export_disabled:
+		case stats_folder_result_code_export_disabled:
 			response_string_id = kablam_string_info_stats_export_disabled;
 			break;
 		default:
@@ -63,13 +63,13 @@ void kablam_command_statsfolder::parse_response(
 		}
 		else
 		{
-			if (command->result_code == _stats_folder_result_code_export_disabled)
+			if (command->result_code == stats_folder_result_code_export_disabled)
 			{
 				kablam_string_quick_wprintf(L"%ws", kablam_string_info_stats_export_disabled);
 			}
 			else
 			{
-				assert(command->result_code != _stats_folder_result_code_export_disabled);
+				assert(command->result_code != stats_folder_result_code_export_disabled);
 			}
 		}
 	}
@@ -95,7 +95,7 @@ kablam_command* kablam_command_statsfolder::create_instance(
 		result = new kablam_command_statsfolder();
 
 		result->set_valid(true);
-		result->result_code = _stats_folder_result_code_success;
+		result->result_code = stats_folder_result_code_success;
 
 		if (argument_count == 2)
 		{

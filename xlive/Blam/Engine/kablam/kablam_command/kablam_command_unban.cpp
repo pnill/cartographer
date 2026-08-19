@@ -110,16 +110,16 @@ void kablam_command_unban_ip::parse_response(
 	int32 response_string_id;
 	switch (command->result_code)
 	{
-	case _ban_network_result_code_success:
+	case ban_network_result_code_success:
 		response_string_id = kablam_string_info_ban_removed;
 		break;
-	case _ban_network_result_code_lan_only:
+	case ban_network_result_code_lan_only:
 		response_string_id = kablam_string_err_command_lan_only;
 		break;
-	case _ban_network_result_code_ban_list_full:
+	case ban_network_result_code_ban_list_full:
 		response_string_id = kablam_string_err_ban_list_full;
 		break;
-	case _ban_network_result_code_ban_not_found:
+	case ban_network_result_code_ban_not_found:
 		response_string_id = kablam_string_err_ban_not_found;
 		break;
 	default:
@@ -162,7 +162,7 @@ kablam_command* kablam_command_unban_ip::create_instance(
 			result->set_type(_kablam_command_unban_ip);
 			result->set_valid(true);
 			result->ipv4_subnet = ipv4_subnet;
-			result->result_code = _ban_network_result_code_success;
+			result->result_code = ban_network_result_code_success;
 		}
 	}
 
@@ -183,16 +183,16 @@ void kablam_command_unban_nic::parse_response(
 	int32 response_string_id;
 	switch (command->result_code)
 	{
-	case _ban_network_result_code_success:
+	case ban_network_result_code_success:
 		response_string_id = kablam_string_info_ban_removed;
 		break;
-	case _ban_network_result_code_lan_only:
+	case ban_network_result_code_lan_only:
 		response_string_id = kablam_string_err_command_lan_only;
 		break;
-	case _ban_network_result_code_ban_list_full:
+	case ban_network_result_code_ban_list_full:
 		response_string_id = kablam_string_err_ban_list_full;
 		break;
-	case _ban_network_result_code_ban_not_found:
+	case ban_network_result_code_ban_not_found:
 		response_string_id = kablam_string_err_ban_not_found;
 		break;
 	default:
@@ -233,7 +233,7 @@ kablam_command* kablam_command_unban_nic::create_instance(
 		result->set_type(_kablam_command_unban_nic);
 		result->set_valid(true);
 		result->mac_address = nic;
-		result->result_code = _ban_network_result_code_success;
+		result->result_code = ban_network_result_code_success;
 	}
 
 	return result;
@@ -253,16 +253,16 @@ void kablam_command_unban_gamer::parse_response(
 	int32 response_string_id;
 	switch (command->result_code)
 	{
-	case _gamer_table_result_code_success:
+	case gamer_table_result_code_success:
 		response_string_id = kablam_string_info_ban_removed;
 		break;
-	case _gamer_table_result_code_live_only:
+	case gamer_table_result_code_live_only:
 		response_string_id = kablam_string_err_command_live_only;
 		break;
-	case _gamer_table_result_code_table_full:
+	case gamer_table_result_code_table_full:
 		response_string_id = kablam_string_err_ban_list_full;
 		break;
-	case _gamer_table_result_code_gamer_not_found:
+	case gamer_table_result_code_gamer_not_found:
 		response_string_id = kablam_string_err_player_not_found;
 		break;
 	default:
@@ -302,7 +302,7 @@ kablam_command* kablam_command_unban_gamer::create_instance(
 		result->set_type(_kablam_command_unban_gamer);
 		result->set_valid(true);
 		wcsncpy_s(result->gamertag, NUMBEROF(result->gamertag), arguments[2], _TRUNCATE);
-		result->result_code = _gamer_table_result_code_success;
+		result->result_code = gamer_table_result_code_success;
 	}
 
 	return result;
@@ -322,11 +322,11 @@ void kablam_command_unban_all::parse_response(
 	int32 response_string_id;
 	switch (command->result_code)
 	{
-	case _unban_all_result_code_success:
+	case unban_all_result_code_success:
 		response_string_id = kablam_string_info_ban_cleared;
 		break;
-	case _unban_all_result_code_failed:
-		response_string_id = command->clear_type == _unban_all_gamertags ? kablam_string_err_command_live_only : kablam_string_err_command_lan_only;
+	case unban_all_result_code_failed:
+		response_string_id = command->clear_type == unban_all_gamertags ? kablam_string_err_command_live_only : kablam_string_err_command_lan_only;
 		break;
 	default:
 		response_string_id = 0;
@@ -358,19 +358,19 @@ kablam_command* kablam_command_unban_all::create_instance(
 		result = new kablam_command_unban_all();
 		result->set_type(_kablam_command_unban_all);
 		result->set_valid(true);
-		result->result_code = _unban_all_result_code_success;
+		result->result_code = unban_all_result_code_success;
 
 		if (!_wcsicmp(L"ip", arguments[2]))
 		{
-			result->clear_type = _unban_all_ip;
+			result->clear_type = unban_all_ip;
 		}
 		else if (!_wcsicmp(L"nic", arguments[2]))
 		{
-			result->clear_type = _unban_all_nic;
+			result->clear_type = unban_all_nic;
 		}
 		else if (!_wcsicmp(L"gamer", arguments[2]))
 		{
-			result->clear_type = _unban_all_gamertags;
+			result->clear_type = unban_all_gamertags;
 		}
 		else
 		{

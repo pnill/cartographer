@@ -13,210 +13,194 @@ interface kablam_commands_interface
 	#pragma region Enums
 	typedef enum
 	{
-		_skip_result_code_match_skipped = 0,
-		_skip_result_code_match_ended = 1,
-		_skip_result_code_match_ending_waiting = 2,
-		_skip_result_code_server_not_active = 3,
-		k_skip_result_code_count
+		skip_result_code_match_skipped = 0,
+		skip_result_code_match_ended = 1,
+		skip_result_code_match_ending_waiting = 2,
+		skip_result_code_server_not_active = 3,
 
 	} e_kablam_command_skip_code;
 
 	typedef enum
 	{
-		_status_result_code_offine_initializing = 0,
-		_status_result_code_offline_product_key_required = 1,
-		_status_result_code_offline_invalid_product_key = 2,
-		_status_result_code_server_banned = 3,
-		_status_result_code_update_required = 4,
-		_status_result_code_offline = 5,
-		_status_result_code_signing_in = 6,
-		_status_result_code_signin_out = 7,
-		_status_result_code_connecting = 8,
-		_status_result_code_offline_waiting_to_reconnect = 9,
-		_status_result_code_offline_signin_failed = 10,
-		_status_result_code_offline_disconnected = 11,
-		_status_result_code_online_no_playlist = 12,
-		_status_result_code_online_failed_to_load_playlist = 13,
-		_status_result_code_online_empty_playlist = 14,
-		_status_result_code_online_pregame_lobby = 15,
-		_status_result_code_online_starting_game = 16,
-		_status_result_code_online_game_in_progress = 17,
-		_status_result_code_online_game_over = 18,
-		_status_result_code_online_postgame_carnage_report = 19,
+		status_result_code_offine_initializing = 0,
+		status_result_code_offline_product_key_required = 1,
+		status_result_code_offline_invalid_product_key = 2,
+		status_result_code_server_banned = 3,
+		status_result_code_update_required = 4,
+		status_result_code_offline = 5,
+		status_result_code_signing_in = 6,
+		status_result_code_signin_out = 7,
+		status_result_code_connecting = 8,
+		status_result_code_offline_waiting_to_reconnect = 9,
+		status_result_code_offline_signin_failed = 10,
+		status_result_code_offline_disconnected = 11,
+		status_result_code_online_no_playlist = 12,
+		status_result_code_online_failed_to_load_playlist = 13,
+		status_result_code_online_empty_playlist = 14,
+		status_result_code_online_pregame_lobby = 15,
+		status_result_code_online_starting_game = 16,
+		status_result_code_online_game_in_progress = 17,
+		status_result_code_online_game_over = 18,
+		status_result_code_online_postgame_carnage_report = 19,
 		k_status_result_code_count
 
 	} e_kablam_command_status_result_code;
 
 	[v1_enum] typedef enum
 	{
-		_status_response_flag_lobby_info = 0,
-		_status_response_flag_live = 1,
-		_status_response_flag_xlive_signin_result = 2,
-		_status_response_flag_signin_mode = 3,
-		_status_response_flag_has_gamertag = 4,
-		_status_response_flag_has_lan_name = 5,
-		_status_response_flag_has_playlist_path = 6,
-		k_status_response_flag_count
+		status_response_flag_lobby_info = 0,
+		status_response_flag_live = 1,
+		status_response_flag_xlive_signin_result = 2,
+		status_response_flag_signin_mode = 3,
+		status_response_flag_has_gamertag = 4,
+		status_response_flag_has_lan_name = 5,
+		status_response_flag_has_playlist_path = 6,
 
 	} e_kablam_command_status_response_flags;
 
 	typedef enum
 	{
-		_kick_player_response_player_kicked = 0,
-		_kick_player_response_server_not_running = 1,
-		_kick_player_response_player_not_found = 2,
-		k_kick_player_response_count
+		kick_player_response_player_kicked = 0,
+		kick_player_response_server_not_running = 1,
+		kick_player_response_player_not_found = 2,
 
 	} kablam_command_kick_result_code;
 
 	typedef enum
 	{
-		_name_result_code_success = 0,
-		_name_result_code_lan_only = 1,
-		_name_result_code_invalid_utf16 = 2,
-		k_name_result_code_count
+		name_result_code_success = 0,
+		name_result_code_lan_only = 1,
+		name_result_code_invalid_utf16 = 2,
 
 	} e_kablam_command_set_unicode_setting_result_code;
 
 	typedef enum
 	{
-		_play_error_playlist_read_failed = 0,
-		_play_error_file_not_found = 1,
-		_play_error_file_open_access_denied = 2,
-		_play_error_playlist_no_valid_matches = 4,
-		k_play_error_count
+		play_error_playlist_read_failed = 0,
+		play_error_file_not_found = 1,
+		play_error_file_open_access_denied = 2,
+		play_error_playlist_no_valid_matches = 4,
 
 	} e_kablam_command_play_error_code;
 
 	typedef enum
 	{
-		_play_warning_duplicate_playlist_section = 0,
-		_play_warning_duplicate_variant_name = 1,
-		_play_warning_error_unknown_setting = 2,
-		_play_warning_error_unknown_section = 3,
-		_play_warning_error_invalid_setting_value = 4,
-		_play_warning_error_setting_value_already_set = 5,
-		_play_warning_error_match_missing_setting = 6,
-		_play_warning_error_invalid_variant_setting = 7,
-		_play_warning_error_variant_missing_type_or_base = 8,
-		_play_warning_error_variant_missing_name = 9,
-		_play_warning_error_variant_invalid_utf16 = 10,
-		_play_warning_error_fariant_pipe_forbidden = 11,
-		_play_warning_error_variant_invalid_base_variant = 12,
-		_play_warning_error_variant_both_type_and_base = 13,
-		_play_warning_error_variant_missing_or_invalid = 14,
-		_play_warning_error_map_missing_or_invalid = 15,
-		_play_warning_warn_variants_overflow = 16,
-		_play_warning_warn_matches_overflow = 17,
+		play_warning_duplicate_playlist_section = 0,
+		play_warning_duplicate_variant_name = 1,
+		play_warning_error_unknown_setting = 2,
+		play_warning_error_unknown_section = 3,
+		play_warning_error_invalid_setting_value = 4,
+		play_warning_error_setting_value_already_set = 5,
+		play_warning_error_match_missing_setting = 6,
+		play_warning_error_invalid_variant_setting = 7,
+		play_warning_error_variant_missing_type_or_base = 8,
+		play_warning_error_variant_missing_name = 9,
+		play_warning_error_variant_invalid_utf16 = 10,
+		play_warning_error_fariant_pipe_forbidden = 11,
+		play_warning_error_variant_invalid_base_variant = 12,
+		play_warning_error_variant_both_type_and_base = 13,
+		play_warning_error_variant_missing_or_invalid = 14,
+		play_warning_error_map_missing_or_invalid = 15,
+		play_warning_warn_variants_overflow = 16,
+		play_warning_warn_matches_overflow = 17,
 		k_play_warning_count
 
 	} e_kablam_command_play_warning_type;
 
 	typedef enum
 	{
-		_send_message_result_code_sent = 0,
-		_send_message_result_code_server_not_active = 2,
-		_send_message_result_code_no_players_in_session = 3,
-		_send_message_result_code_message_failed = 4,
-		k_send_message_result_code_count
+		send_message_result_code_sent = 0,
+		send_message_result_code_server_not_active = 2,
+		send_message_result_code_no_players_in_session = 3,
+		send_message_result_code_message_failed = 4,
 
 	} e_kablam_command_send_message_result_code;
 
 	typedef enum
 	{
-		_live_key_response_code_product_key_set = 0,
-		_live_key_response_code_key_invalid = 1,
-		_live_key_response_code_key_set_failed = 2,
-		k_live_key_response_code_count
+		live_key_response_code_product_key_set = 0,
+		live_key_response_code_key_invalid = 1,
+		live_key_response_code_key_set_failed = 2,
 
 	} e_kablam_command_live_key_response_code;
 
 	typedef enum
 	{
-		_live_auto_signin_response_code_auto_signin_enabled = 0,
-		_live_auto_signin_response_code_auto_signin_failed = 1,
-		_live_auto_signin_response_code_live_only = 2,
-		k_live_auto_signin_response_code_count
+		live_auto_signin_response_code_auto_signin_enabled = 0,
+		live_auto_signin_response_code_auto_signin_failed = 1,
+		live_auto_signin_response_code_live_only = 2,
 
 	} e_kablam_command_live_auto_signin_response_code;
 
 	typedef enum
 	{
-		_live_signin_result_code_success = 0,
-		_live_signin_result_code_live_only = 1,
-		k_live_signin_result_code_count
+		live_signin_result_code_success = 0,
+		live_signin_result_code_live_only = 1,
 
 	} e_kablam_command_live_signin_result_code;
 
 	typedef enum
 	{
-		_live_signout_result_code_signing_out_live = 0,
-		_live_signout_result_code_not_signed_in = 1,
-		_live_signout_result_code_live_only = 2,
-		k_live_signout_result_code_count
+		live_signout_result_code_signing_out_live = 0,
+		live_signout_result_code_not_signed_in = 1,
+		live_signout_result_code_live_only = 2,
 
 	} e_kablam_command_live_signout_result_code;
 
 	typedef enum
 	{
-		_ban_network_result_code_success = 0,
-		_ban_network_result_code_lan_only = 1,
-		_ban_network_result_code_ban_list_full = 2,
-		_ban_network_result_code_ban_not_found = 3,
-		k_ban_network_result_code_count
+		ban_network_result_code_success = 0,
+		ban_network_result_code_lan_only = 1,
+		ban_network_result_code_ban_list_full = 2,
+		ban_network_result_code_ban_not_found = 3,
 
 	} e_kablam_command_ban_network_result_code;
 
 	typedef enum
 	{
-		_gamer_table_result_code_success = 0,
-		_gamer_table_result_code_live_only = 1,
-		_gamer_table_result_code_table_full = 2,
-		_gamer_table_result_code_gamer_not_found = 3,
-		k_gamer_table_result_code_count
+		gamer_table_result_code_success = 0,
+		gamer_table_result_code_live_only = 1,
+		gamer_table_result_code_table_full = 2,
+		gamer_table_result_code_gamer_not_found = 3,
 
 	} e_kablam_command_gamer_table_result_code;
 
 	typedef enum
 	{
-		_unban_all_ip = 0,
-		_unban_all_nic = 1,
-		_unban_all_gamertags = 2,
-		k_unban_all_count
+		unban_all_ip = 0,
+		unban_all_nic = 1,
+		unban_all_gamertags = 2,
 
 	} e_kablam_unban_all_type;
 
 	typedef enum
 	{
-		_unban_all_result_code_success = 0,
-		_unban_all_result_code_failed = 1,
-		k_unban_all_result_code_count
+		unban_all_result_code_success = 0,
+		unban_all_result_code_failed = 1,
 
 	} e_kablam_command_unban_all_result_code;
 
 	typedef enum
 	{
-		_vip_clear_result_code_success = 0,
-		_vip_clear_result_code_live_only = 1,
-		k_vip_clear_result_code_count
+		vip_clear_result_code_success = 0,
+		vip_clear_result_code_live_only = 1,
 
 	} e_kablam_command_vip_clear_result_code;
 
 	typedef enum
 	{
-		_stats_folder_result_code_success = 0,
-		_stats_folder_result_code_invalid = 1,
-		_stats_folder_result_code_not_writable = 2,
-		_stats_folder_result_code_export_disabled = 3,
-		k_stats_folder_result_code_count
+		stats_folder_result_code_success = 0,
+		stats_folder_result_code_invalid = 1,
+		stats_folder_result_code_not_writable = 2,
+		stats_folder_result_code_export_disabled = 3,
 
 	} e_kablam_command_stats_folder_result_code;
 
 	typedef enum
 	{
-		_kablam_command_privacy_open = 0,
-		_kablam_command_privacy_gold = 1,
-		_kablam_command_privacy_vip = 2,
+		kablam_command_privacy_open = 0,
+		kablam_command_privacy_gold = 1,
+		kablam_command_privacy_vip = 2,
 		k_kablam_command_privacy_type_count,
 		_kablam_command_privacy_none = -1
 
@@ -224,17 +208,15 @@ interface kablam_commands_interface
 
 	typedef enum
 	{
-		_privacy_result_code_success = 0,
-		_privacy_result_code_live_only = 1,
-		k_privacy_result_code_count
+		privacy_result_code_success = 0,
+		privacy_result_code_live_only = 1,
 
 	} e_kablam_command_privacy_result_code;
 
 	typedef enum
 	{
-		_set_max_players_result_code_success = 0,
-		_set_max_players_result_code_out_of_range = 1,
-		k_set_max_players_result_code_count
+		set_max_players_result_code_success = 0,
+		set_max_players_result_code_out_of_range = 1,
 
 	} e_kablam_command_set_max_players_result_code;
 #pragma endregion

@@ -137,16 +137,16 @@ void kablam_command_ban_ip::parse_response(
 	int32 response_string_id;
 	switch (command->result_code)
 	{
-	case _ban_network_result_code_success:
+	case ban_network_result_code_success:
 		response_string_id = kablam_string_info_ban_added;
 		break;
-	case _ban_network_result_code_lan_only:
+	case ban_network_result_code_lan_only:
 		response_string_id = kablam_string_err_command_lan_only;
 		break;
-	case _ban_network_result_code_ban_list_full:
+	case ban_network_result_code_ban_list_full:
 		response_string_id = kablam_string_err_ban_list_full;
 		break;
-	case _ban_network_result_code_ban_not_found:
+	case ban_network_result_code_ban_not_found:
 		response_string_id = kablam_string_warn_unknown;
 		break;
 	default:
@@ -197,7 +197,7 @@ kablam_command* kablam_command_ban_ip::create_instance(
 		result->ipv4_subnet.ipv4_address = ip_addr;
 		result->ipv4_subnet.cidr = cidr;
 		result->duration = duration;
-		result->result_code = _ban_network_result_code_success;
+		result->result_code = ban_network_result_code_success;
 	}
 	return result;
 }
@@ -216,16 +216,16 @@ void kablam_command_ban_nic::parse_response(
 	int32 response_string_id;
 	switch (command->result_code)
 	{
-	case _ban_network_result_code_success:
+	case ban_network_result_code_success:
 		response_string_id = kablam_string_info_ban_added;
 		break;
-	case _ban_network_result_code_lan_only:
+	case ban_network_result_code_lan_only:
 		response_string_id = kablam_string_err_command_lan_only;
 		break;
-	case _ban_network_result_code_ban_list_full:
+	case ban_network_result_code_ban_list_full:
 		response_string_id = kablam_string_err_ban_list_full;
 		break;
-	case _ban_network_result_code_ban_not_found:
+	case ban_network_result_code_ban_not_found:
 		response_string_id = kablam_string_warn_unknown;
 		break;
 	default:
@@ -278,7 +278,7 @@ kablam_command* kablam_command_ban_nic::create_instance(
 
 	memcpy(&instance->mac_address, &mac_address, sizeof(s_mac_address));
 	instance->duration = duration;
-	instance->result_code = _ban_network_result_code_success;
+	instance->result_code = ban_network_result_code_success;
 
 	return instance;
 }
@@ -297,16 +297,16 @@ void kablam_command_ban_gamer::parse_response(
 	int32 response_string_id;
 	switch (command->result_code)
 	{
-	case _gamer_table_result_code_success:
+	case gamer_table_result_code_success:
 		response_string_id = kablam_string_info_ban_added;
 		break;
-	case _gamer_table_result_code_live_only:
+	case gamer_table_result_code_live_only:
 		response_string_id = kablam_string_err_command_live_only;
 		break;
-	case _gamer_table_result_code_table_full:
+	case gamer_table_result_code_table_full:
 		response_string_id = kablam_string_err_ban_list_full;
 		break;
-	case _gamer_table_result_code_gamer_not_found:
+	case gamer_table_result_code_gamer_not_found:
 		response_string_id = kablam_string_warn_unknown;
 		break;
 	default:
@@ -352,7 +352,7 @@ kablam_command* kablam_command_ban_gamer::create_instance(
 
 		wcsncpy_s(result->gamertag, NUMBEROF(result->gamertag), arguments[2], _TRUNCATE);
 		result->duration = duration;
-		result->result_code = _gamer_table_result_code_success;
+		result->result_code = gamer_table_result_code_success;
 	}
 
 	return result;

@@ -41,7 +41,7 @@ void kablam_command_description::parse_response(
 		{
 			kablam_string response_string;
 
-			if (command->result_code == _name_result_code_invalid_utf16)
+			if (command->result_code == name_result_code_invalid_utf16)
 				response_string.load(kablam_string_err_variant_invalid_utf16);
 			else
 				response_string.load(kablam_string_err_command_live_only);
@@ -57,13 +57,13 @@ void kablam_command_description::parse_response(
 		int32 result_string_id;
 		switch (command->result_code)
 		{
-		case _name_result_code_success:
+		case name_result_code_success:
 			result_string_id = kablam_string_info_session_description_changed;
 			break;
-		case _name_result_code_lan_only:
+		case name_result_code_lan_only:
 			result_string_id = kablam_string_err_command_live_only;
 			break;
-		case _name_result_code_invalid_utf16:
+		case name_result_code_invalid_utf16:
 			result_string_id = kablam_string_err_variant_invalid_utf16;
 			break;
 		default:

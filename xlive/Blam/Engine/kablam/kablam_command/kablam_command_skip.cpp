@@ -27,16 +27,16 @@ void kablam_command_skip::parse_response(
 	int32 response_string_id;
 	switch (command->result.result_code)
 	{
-	case _skip_result_code_match_skipped:
+	case skip_result_code_match_skipped:
 		response_string_id = kablam_string_info_playlist_entry_skipped;
 		break;
-	case _skip_result_code_match_ended:
+	case skip_result_code_match_ended:
 		response_string_id = kablam_string_info_match_ended;
 		break;
-	case _skip_result_code_match_ending_waiting:
+	case skip_result_code_match_ending_waiting:
 		response_string_id = kablam_string_info_match_ending_waiting;
 		break;
-	case _skip_result_code_server_not_active:
+	case skip_result_code_server_not_active:
 		response_string_id = kablam_string_status_server_not_active;
 		break;
 	default:
@@ -46,7 +46,7 @@ void kablam_command_skip::parse_response(
 
 	kablam_string_quick_wprintf(L"%ws\r\n", response_string_id);
 
-	if (command->result.result_code == _skip_result_code_match_skipped)
+	if (command->result.result_code == skip_result_code_match_skipped)
 	{
 		if (wcscmp(command->result.playing_variant, L"") && wcscmp(command->result.playing_map, L""))
 			wprintf(L"\r\nPlaying: %s on %s.", command->result.playing_variant, command->result.playing_map);
