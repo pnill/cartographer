@@ -213,6 +213,12 @@ void __cdecl shell_dispose(void)
 	timeEndPeriod(k_system_timer_resolution_ms);
 
 	INVOKE(0x48A9, 0x4CFE, shell_dispose);
+
+	// TODO: rewrite this function and place it in the correct spot within here
+#ifdef ERRORS_ENABLED
+	errors_dispose();
+#endif
+
 	return;
 }
 
