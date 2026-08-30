@@ -45,6 +45,8 @@ static bool g_custom_mouse_cursor_enabled = false;
 
 static uint32 g_instance_number = 0;
 
+static bool g_disable_processor_affix = false;
+
 /* prototypes */
 
 static DWORD WINAPI timeGetTime_hook();
@@ -108,6 +110,8 @@ static BOOL WINAPI CryptUnprotectDataHook(
 
 static void shell_windows_setup_cartographer_protocol();
 
+static void shell_windows_affix_processor_priority();
+
 /* public code */
 
 s_window_globals* window_globals_get(void)
@@ -124,7 +128,7 @@ uint32 shell_get_instance_num(void)
 bool shell_platform_initialize(void)
 {
 	const bool is_dedi = shell_is_dedicated_server();
-	
+
 	if (!is_dedi)
 	{
 		shell_windows_calculate_instance_num();
@@ -135,6 +139,8 @@ bool shell_platform_initialize(void)
 
 		InitOnScreenDebugText();
 	}
+
+	shell_windows_affix_processor_priority();
 
 	shell_windows_initialize_arguments();
 
@@ -159,7 +165,7 @@ bool shell_platform_initialize(void)
 	if (!is_dedi)
 	{
 		shell_windows_adjust_name();
-	
+
 		// TODO: remove this garbage
 		custom_language_initialize();
 	}
@@ -198,7 +204,7 @@ void shell_windows_apply_patches(void)
 
 	// disables profiles/game saves encryption
 	PatchWinAPICall(Memory::GetAddress(0x9B08A, 0x85F5E), CryptProtectDataHook);
-	PatchWinAPICall(Memory::GetAddress(0x9AF9E, 0x352538), CryptUnprotectDataHook);	
+	PatchWinAPICall(Memory::GetAddress(0x9AF9E, 0x352538), CryptUnprotectDataHook);
 	return;
 }
 
@@ -223,7 +229,7 @@ LARGE_INTEGER shell_time_counter_freq()
 LARGE_INTEGER shell_time_counter_now(LARGE_INTEGER* freq)
 {
 	LARGE_INTEGER counter;
-	if (freq) 
+	if (freq)
 	{
 		*freq = shell_time_counter_freq();
 	}
@@ -336,11 +342,11 @@ static int WINAPI H2WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR 
 	if (!pcc_result)
 	{
 		error(_error_delayed, "Failed to get PCC info / insufficient system resources");
-		
+
 		// ### TODO change this?
 		std::thread([]() {
 			_Shell::OpenMessageBox(NULL, MB_ICONEXCLAMATION, "PCC Error", "Failed to get compatibility info.");
-		}).detach();
+			}).detach();
 
 		show_fatal_error(108);
 	}
@@ -551,11 +557,11 @@ static void shell_windows_yield_thread(LARGE_INTEGER last_counter, real32 desire
 			{
 				LARGE_INTEGER liDueTime = {};
 				liDueTime.QuadPart = -10ll * system_yield_time_usec;
-				
+
 				// Wait for the timer.
 				NtWaitForSingleObjectHelper(GetCurrentThread(), FALSE, &liDueTime);
 			}
-			
+
 			/*int sleepTimeMs = system_yield_time_usec / 1000ll;
 			if (sleepTimeMs >= 0)
 				Sleep(sleepTimeMs);*/
@@ -729,6 +735,10 @@ static void shell_windows_initialize_arguments(void)
 				g_game_auto_join.do_auto_join = true;
 				g_game_auto_join.auto_join_session = join_session;
 			}
+			else if (_wcsnicmp(current_argument, L"-noaffix:", 9) == 0)
+			{
+				g_disable_processor_affix = true;
+			}
 		}
 	}
 	return;
@@ -875,4 +885,62 @@ static void shell_windows_setup_cartographer_protocol()
 	_snwprintf_s(buffer, _countof(buffer), L"\"%s\" %%1", final_path.get_buffer());
 	RegSetValueExW(hKey, NULL, 0, REG_SZ, (const BYTE*)buffer, (DWORD)(wcslen(buffer) + 1) * sizeof(wchar_t));
 	RegCloseKey(hKey);
+}
+
+void shell_windows_affix_processor_priority()
+{
+	/*
+	 * execute instances across cores so that each process can execute without being cpu locked
+	 *
+	 * on a 8 logical core cpu
+	 *
+	 * Instance 1: All cores
+	 * Instance 2: Cannot run on core 0
+	 * Instance 3: Cannot run on core 0, 1
+	 * ...
+	 * Instance 8: Runs on core 7 only
+	 * Instance 9: Runs on all cores again
+	 */
+
+	if (g_disable_processor_affix)
+		return;
+
+	DWORD_PTR processMask;
+	DWORD_PTR systemMask;
+
+	if (GetProcessAffinityMask(GetCurrentProcess(), &processMask, &systemMask))
+	{
+		int8 core_indices[sizeof(DWORD_PTR) * CHAR_BIT];
+		int8 logical_core_count = 0;
+
+		for (uint32 bit = 0; bit < NUMBEROF(core_indices); bit++)
+		{
+			if (processMask & ((DWORD_PTR)1 << bit))
+			{
+				core_indices[logical_core_count++] = (int8)bit;
+			}
+		}
+
+		if (logical_core_count <= 1)
+		{
+			return;
+		}
+
+		uint8 slot = (g_instance_number - 1) % logical_core_count;
+
+		DWORD_PTR new_mask = processMask;
+		for (uint8 i = 0; i < slot; i++)
+		{
+			new_mask &= ~((DWORD_PTR)1 << core_indices[i]);
+		}
+
+		if (!SetProcessAffinityMask(GetCurrentProcess(), new_mask))
+		{
+			error(_error_delayed, "Failed to set processor affinity mask");
+		}
+	}
+	else
+	{
+		error(_error_delayed, "Failed to get processor affinity mask");
+	}
 }
