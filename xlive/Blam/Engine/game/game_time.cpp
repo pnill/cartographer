@@ -7,50 +7,55 @@
 
 /* structures */
 
-struct s_time_globals
+struct game_time_globals_definition
 {
 	bool initialized;
 	bool paused;
 	int16 tick_rate;
 	real32 tick_length;
-	uint32 passed_ticks_count;
-	real32 game_speed;
+	int32 time;
+	real32 speed;
 	real32 game_ticks_leftover;
-	real32 field_14;
-	real32 field_18;
-	real32 field_1C;
-	real32 field_20;
+	real32 rate_scale_timer;
+	real32 rate_scale_duration;
+	real32 rate_scale_initial;
+	real32 rate_scale_final;
 };
-ASSERT_STRUCT_SIZE(s_time_globals, 36);
+ASSERT_STRUCT_SIZE(game_time_globals_definition, 36);
 
 /* prototypes */
 
-static s_time_globals* time_globals_get(void);
+static game_time_globals_definition* time_globals_get(void);
+
+static void game_time_statistics_start(void);
+
+static void game_time_set_variant_speed(void);
 
 /* public code */
 
-void game_time_apply_patches()
+void game_time_apply_patches(void)
 {
-	WritePointer(Memory::GetAddress(0x3A06F8, 0x35D428), game_time_setup_scenario);
+	WritePointer(Memory::GetAddress(0x3A06F8, 0x35D428), game_time_initialize_for_new_map);
+	return;
 }
 
 bool game_time_initialized(void)
 {
-	const s_time_globals* game_time_globals = time_globals_get();
+	const game_time_globals_definition* game_time_globals = time_globals_get();
 	return game_time_globals && game_time_globals->initialized;
 }
 
 uint32 game_time_get(void)
 {
-	const s_time_globals* game_time_globals = time_globals_get();
+	const game_time_globals_definition* game_time_globals = time_globals_get();
 	ASSERT(game_time_globals && game_time_globals->initialized);
 
-	return game_time_globals->passed_ticks_count;
+	return game_time_globals->time;
 }
 
 void game_time_discard(int32 desired_ticks, int32 actual_ticks, real32* elapsed_game_dt)
 {
-	s_time_globals* game_time_globals = time_globals_get();
+	game_time_globals_definition* game_time_globals = time_globals_get();
 	ASSERT(game_time_globals);
 	ASSERT(game_time_globals->initialized);
 	ASSERT(desired_ticks > 0);
@@ -76,23 +81,23 @@ void game_time_discard(int32 desired_ticks, int32 actual_ticks, real32* elapsed_
 
 void game_time_advance(void)
 {
-	s_time_globals* game_time_globals = time_globals_get();
+	game_time_globals_definition* game_time_globals = time_globals_get();
 	ASSERT(game_time_globals);
 	ASSERT(game_time_globals->initialized);
-	++game_time_globals->passed_ticks_count;
+	++game_time_globals->time;
 	return;
 }
 
 bool game_time_get_paused(void)
 {
-	s_time_globals* game_time_globals = time_globals_get();
+	game_time_globals_definition* game_time_globals = time_globals_get();
 	ASSERT(game_time_globals);
 	return game_time_globals->initialized && game_time_globals->paused;
 }
 
 void game_time_set_paused(bool pause)
 {
-	s_time_globals* game_time_globals = time_globals_get();
+	game_time_globals_definition* game_time_globals = time_globals_get();
 	ASSERT(game_time_globals);
 	ASSERT(game_time_globals->initialized);
 
@@ -102,24 +107,24 @@ void game_time_set_paused(bool pause)
 
 real32 game_time_get_speed(void)
 {
-	const s_time_globals* game_time_globals = time_globals_get();
+	const game_time_globals_definition* game_time_globals = time_globals_get();
 	ASSERT(game_time_globals);
 	ASSERT(game_time_globals->initialized);
-	return game_time_globals->game_speed;
+	return game_time_globals->speed;
 }
 
 void game_time_set_speed(real32 speed)
 {
-	s_time_globals* game_time_globals = time_globals_get();
+	game_time_globals_definition* game_time_globals = time_globals_get();
 	ASSERT(game_time_globals);
 	ASSERT(game_time_globals->initialized);
-	game_time_globals->game_speed = speed;
+	game_time_globals->speed = speed;
 	return;
 }
 
 int32 game_seconds_integer_to_ticks(int32 seconds)
 {
-	const s_time_globals* game_time_globals = time_globals_get();
+	const game_time_globals_definition* game_time_globals = time_globals_get();
 
 	ASSERT(game_time_globals);
 	ASSERT(game_time_globals->initialized);
@@ -134,7 +139,7 @@ bool __cdecl game_time_update(real32 world_seconds_elapsed, real32* game_seconds
 
 int32 game_tick_rate(void)
 {
-	const s_time_globals* game_time_globals = time_globals_get();
+	const game_time_globals_definition* game_time_globals = time_globals_get();
 	ASSERT(game_time_globals);
 	ASSERT(game_time_globals->initialized);
 
@@ -143,7 +148,7 @@ int32 game_tick_rate(void)
 
 real32 game_tick_length(void)
 {
-	const s_time_globals* game_time_globals = time_globals_get();
+	const game_time_globals_definition* game_time_globals = time_globals_get();
 	ASSERT(game_time_globals);
 	ASSERT(game_time_globals->initialized);
 
@@ -152,7 +157,7 @@ real32 game_tick_length(void)
 
 real32 game_ticks_to_seconds(real32 ticks)
 {
-	const s_time_globals* game_time_globals = time_globals_get();
+	const game_time_globals_definition* game_time_globals = time_globals_get();
 	ASSERT(game_time_globals);
 	ASSERT(game_time_globals->initialized);
 
@@ -161,7 +166,7 @@ real32 game_ticks_to_seconds(real32 ticks)
 
 real32 game_seconds_to_ticks_real(real32 seconds)
 {
-	const s_time_globals* game_time_globals = time_globals_get();
+	const game_time_globals_definition* game_time_globals = time_globals_get();
 
 	ASSERT(game_time_globals);
 	ASSERT(game_time_globals->initialized);
@@ -171,7 +176,7 @@ real32 game_seconds_to_ticks_real(real32 seconds)
 
 real32 game_tick_rate_legacy_ratio_real()
 {
-	const s_time_globals* game_time_globals = time_globals_get();
+	const game_time_globals_definition* game_time_globals = time_globals_get();
 
 	ASSERT(game_time_globals);
 	ASSERT(game_time_globals->initialized);
@@ -181,7 +186,7 @@ real32 game_tick_rate_legacy_ratio_real()
 
 int32 game_seconds_to_ticks_round(real32 seconds)
 {
-	const s_time_globals* game_time_globals = time_globals_get();
+	const game_time_globals_definition* game_time_globals = time_globals_get();
 
 	ASSERT(game_time_globals);
 	ASSERT(game_time_globals->initialized);
@@ -191,7 +196,7 @@ int32 game_seconds_to_ticks_round(real32 seconds)
 
 real32 game_time_get_max_frame_time(void)
 {
-	s_time_globals* game_time_globals = time_globals_get();
+	game_time_globals_definition* game_time_globals = time_globals_get();
 	ASSERT(game_time_globals);
 	ASSERT(game_time_globals->initialized);
 
@@ -201,71 +206,87 @@ real32 game_time_get_max_frame_time(void)
 
 real32 game_time_get_leftover(void)
 {
-	s_time_globals* game_time_globals = time_globals_get();
+	game_time_globals_definition* game_time_globals = time_globals_get();
 	return PIN(game_time_globals->game_ticks_leftover, 0.f, 1.f);
 }
 
-
-void __cdecl game_time_reset()
+void __cdecl game_time_initialize_for_new_map(void)
 {
-	s_time_globals* game_time_globals = time_globals_get();
+	game_time_globals_definition* game_time_globals = time_globals_get();
+	s_game_options const* game_options = game_options_get();
 
-	game_time_globals->initialized = false;
-	game_time_globals->tick_length = 0;
-	game_time_globals->passed_ticks_count = 0;
-	game_time_globals->game_speed = 0.f;
-	game_time_globals->game_ticks_leftover = 0.f;
-	game_time_globals->field_14 = 0.f;
-	game_time_globals->field_18 = 0.f;
-	game_time_globals->field_1C = 0.f;
-	game_time_globals->field_20 = 0.f;
-}
+	ASSERT(game_time_globals && !game_time_globals->initialized);
 
-void __cdecl game_time_setup_scenario()
-{
-	game_time_reset();
-
-	s_time_globals* game_time_globals = time_globals_get();
-	s_game_options* game_options = game_options_get();
+	csmemset(game_time_globals, 0, sizeof(*game_time_globals));
 
 	game_time_globals->tick_rate = game_options->game_tick_rate;
+
+	ASSERT(game_time_globals->tick_rate > 0);
+
 	game_time_globals->tick_length = 1.f / (real32)game_time_globals->tick_rate;
 
-	s_game_variant* variant = get_game_variant();
+	// Updated method for allowing variants with custom speeds
+	if (true)
+	{
+		game_time_set_variant_speed();
+	}
+	// Old method of setting game speed
+	else
+	{
+		game_time_globals->speed = k_game_time_default_game_speed;
+	}
+
+	game_time_statistics_start();
+
+	game_time_globals->initialized = true;
+
+	return;
+}
+
+/* private code */
+
+static game_time_globals_definition* time_globals_get(void)
+{
+	return *Memory::GetAddress<game_time_globals_definition**>(0x4C06E4, 0x4CF0EC);
+}
+
+static void game_time_statistics_start(void)
+{
+	// TODO: reimplement
+	return;
+}
+
+static void game_time_set_variant_speed(void)
+{
+	game_time_globals_definition* game_time_globals = time_globals_get();
+	s_game_variant const* variant = get_game_variant();
 
 	if (game_is_multiplayer() && variant)
 	{
 		switch (variant->cartographer_settings.game_speed)
 		{
-			case _game_speed_modifier_half:
-				game_time_globals->game_speed = 0.5f;
-				break;
-			case _game_speed_modifier_hundred_fifty:
-				game_time_globals->game_speed = 1.5f;
-				break;
-			case _game_speed_modifier_double:
-				game_time_globals->game_speed = 2.f;
-				break;
-			case _game_speed_modifier_ludicrous:
-				game_time_globals->game_speed = 5.f;
-				break;
-			case _game_speed_modifier_none:
-			default:
-				game_time_globals->game_speed = k_game_time_default_game_speed;
-				break;
+		case _game_speed_modifier_half:
+			game_time_globals->speed = 0.5f;
+			break;
+		case _game_speed_modifier_hundred_fifty:
+			game_time_globals->speed = 1.5f;
+			break;
+		case _game_speed_modifier_double:
+			game_time_globals->speed = 2.f;
+			break;
+		case _game_speed_modifier_ludicrous:
+			game_time_globals->speed = 5.f;
+			break;
+		case _game_speed_modifier_none:
+		default:
+			game_time_globals->speed = k_game_time_default_game_speed;
+			break;
 		}
 	}
 	else
 	{
-		game_time_globals->game_speed = k_game_time_default_game_speed;
+		game_time_globals->speed = k_game_time_default_game_speed;
 	}
 
-	game_time_globals->initialized = true;
-}
-
-/* private code */
-
-static s_time_globals* time_globals_get(void)
-{
-	return *Memory::GetAddress<s_time_globals**>(0x4C06E4, 0x4CF0EC);
+	return;
 }
