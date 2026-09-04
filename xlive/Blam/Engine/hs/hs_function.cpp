@@ -16,6 +16,7 @@
 
 #include "cartographer/cartographer.h"
 
+#include "camera/director.h"
 #include "main/console.h"
 #include "main/main.h"
 #include "main/main_game.h"
@@ -216,6 +217,8 @@ static void user_interface_test_error_ok_evaluate(int16 function_index, int32 th
 static void user_interface_test_error_ok_cancel_evaluate(int16 function_index, int32 thread_index, bool initialize);
 
 static void user_interface_test_confirmation_evaluate(int16 function_index, int32 thread_index, bool initialize);
+
+static void director_debug_camera_evaluate(int16 function_index, int32 thread_index, bool initialize);
 
 /* globals */
 
@@ -2728,11 +2731,20 @@ HS_FUNCTION_DEFINITION_CREATE(
 HS_FUNCTION_DEFINITION_CREATE(
 	debug_camera_load_name_definition,
 );
-
+*/
 HS_FUNCTION_DEFINITION_CREATE(
 	director_debug_camera_definition,
+	_hs_type_void,
+	"director_debug_camera",
+	0,
+	&hs_macro_function_parse,
+	&director_debug_camera_evaluate,
+	"toggles the editor flying camera",
+	NULL,
+	1,
+	_hs_type_boolean
 );
-
+/*
 HS_FUNCTION_DEFINITION_CREATE(
 	game_difficulty_get_definition,
 );
@@ -5356,7 +5368,9 @@ const hs_function_definition* hs_function_table[] =
 	&debug_camera_load_definition,
 	&debug_camera_save_name_definition,
 	&debug_camera_load_name_definition,
+*/
 	&director_debug_camera_definition,
+/*
 	&game_difficulty_get_definition,
 	&game_difficulty_get_real_definition,
 	&pvs_set_object_definition,
@@ -6523,6 +6537,17 @@ static void user_interface_test_confirmation_evaluate(int16 function_index, int3
 #ifdef UI_DEBUG
 		user_interface_test_confirmation(*(int16*)&arguments[0]);
 #endif
+		hs_return(thread_index, 0);
+	}
+	return;
+}
+
+static void director_debug_camera_evaluate(int16 function_index, int32 thread_index, bool initialize)
+{
+	const int32* arguments = hs_macro_function_evaluate(function_index, thread_index, initialize);
+	if (arguments)
+	{
+		director_debug_camera(*(const uint8*)&arguments[0] != 0);
 		hs_return(thread_index, 0);
 	}
 	return;
