@@ -365,7 +365,7 @@ void __cdecl object_build_render_cache_and_info(
             {
                 if (TEST_BIT(info->field_170, 6))
                 {
-                    render_model_definition* render_model = (render_model_definition*)tag_get_fast(info->render_model_tag_defs[render_model_storage_index]);
+                    render_model_definition* render_model = render_model_definition_get(info->render_model_tag_defs[render_model_storage_index]);
                     prt_info* prt = render_model->prt_info[0];
 
                     object_render_valid = sub_59EB0C(

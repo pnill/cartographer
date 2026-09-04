@@ -2,7 +2,12 @@
 #include "game/player_constants.h"
 #include "math/function_definitions.h"
 
-#define k_count_of_effects_that_effect_vibration 8 
+enum
+{
+	k_count_of_effects_that_effect_vibration = 8,
+};
+
+/* structures */
 
 struct s_vibration_effect_globals
 {
@@ -42,6 +47,8 @@ struct s_vibration_definition
 	s_vibration_frequency_definition frequency_vibration[2];
 };
 ASSERT_STRUCT_SIZE(s_vibration_definition, 24);
+
+/* prototypes */
 
 void __cdecl rumble_player_set_scripted_scale(real32 scale);
 

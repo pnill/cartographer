@@ -7,7 +7,7 @@
 #include "game/game_time.h"
 #include "game/players.h"
 #include "interface/user_interface_controller.h"
-#include "items/item_collection_definition.h"
+#include "items/item_definitions.h"
 #include "networking/logic/life_cycle_manager.h"
 #include "networking/logic/network_life_cycle.h"
 #include "networking/logic/network_session_interface.h"
@@ -310,33 +310,43 @@ void Infection::removeUnwantedItems()
 
 	while (tag_iterator_next(&iterator) != NONE)
 	{
-		const char* tag_name = tag_get_name(iterator.current_tag_index);
+		char const* tag_name = tag_get_name(iterator.current_tag_index);
+
 		if (strstr(tag_name, "multiplayer\\powerups") ||
 			strncmp(tag_name, "multiplayer\\single_weapons\\frag_grenades", 256) == 0 ||
 			strncmp(tag_name, "multiplayer\\single_weapons\\plasma_grenades", 256) == 0)
 		{
-			item_collection_definition* itmc = (item_collection_definition*)tag_get_fast(iterator.current_tag_index);
+			item_collection_definition const* item_collection = item_collection_definition_get(iterator.current_tag_index);
 
-			for (int32 i = 0; i < itmc->item_permutations.count; i++)
+			for (int32 i = 0; i < item_collection->item_permutations.count; i++)
 			{
-				itmc->item_permutations[i]->item.group.group = _tag_group_equipment;
-				itmc->item_permutations[i]->item.index = shotgun_ammo_equip_datum;
+				struct item_permutation_definition* item_permutation_definition = TAG_BLOCK_GET_ELEMENT(
+					&item_collection->item_permutations,
+					i,
+					struct item_permutation_definition
+				);
+
+				item_permutation_definition->item.group = _tag_group_equipment;
+				item_permutation_definition->item.index = shotgun_ammo_equip_datum;
 			}
 		}
 	}
 
 	//Replace vehicles with shotgun ammo
-	scenario* scenario_definition = global_scenario_get();
+	scenario const* scenario_definition = global_scenario_get();
+
 	for (int32 i = 0; i < scenario_definition->netgame_equipment.count; i++)
 	{
 		scenario_netgame_equipment* netgame_equipment = TAG_BLOCK_GET_ELEMENT(&scenario_definition->netgame_equipment, i, scenario_netgame_equipment);
-		if (netgame_equipment->item_vehicle_collection.group.group == _tag_group_vehicle_collection)
+		if (netgame_equipment->item_vehicle_collection.group == _tag_group_vehicle_collection)
 		{
 			netgame_equipment->classification = netgame_item_classification_powerup;
-			netgame_equipment->item_vehicle_collection.group.group = _tag_group_item_collection;
+			netgame_equipment->item_vehicle_collection.group = _tag_group_item_collection;
 			netgame_equipment->item_vehicle_collection.index = NONE;
 		}
 	}
+
+	return;
 }
 
 void Infection::Initialize()

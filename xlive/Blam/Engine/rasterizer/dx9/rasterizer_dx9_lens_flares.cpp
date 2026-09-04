@@ -11,7 +11,7 @@
 #include "rasterizer_dx9_submit.h"
 
 #include "cache/cache_files.h"
-#include "effects/lens_flares.h"
+#include "effects/lens_flare_definitions.h"
 #include "game/game_globals.h"
 #include "rasterizer/dx9/shaders/compiled/sun_glow_convolve.h"
 #include "rasterizer/rasterizer_globals.h"
@@ -50,12 +50,15 @@ void __cdecl lens_flares_submit_occlusions(void)
 	return;
 }
 
-e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* point, e_rasterizer_target rasterizer_target)
+e_rasterizer_target rasterizer_dx9_sun_glow_draw(
+	datum tag_index,
+	real_point3d const* point,
+	e_rasterizer_target rasterizer_target)
 {
 	IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
 	ASSERT(global_d3d_device);
 
-	const s_lens_flare_definition* definition = (s_lens_flare_definition*)tag_get_fast(tag_index);
+	const s_lens_flare_definition* definition = lens_flare_definition_get(tag_index);
 	ASSERT(definition);
 
 	const s_frame* global_window_parameters = global_window_parameters_get();
@@ -287,9 +290,13 @@ e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* 
 	return rasterizer_target;
 }
 
-e_rasterizer_target rasterizer_dx9_sun_glow_occlude(datum tag_index, real_point3d* point, e_rasterizer_target rasterizer_target)
+e_rasterizer_target rasterizer_dx9_sun_glow_occlude(
+	datum tag_index,
+	real_point3d const* point,
+	e_rasterizer_target rasterizer_target)
 {
-	const s_lens_flare_definition* definition = (s_lens_flare_definition*)tag_get_fast(tag_index);
+	const s_lens_flare_definition* definition = lens_flare_definition_get(tag_index);
+
 	ASSERT(definition);
 
 	s_frame* global_window_parameters = global_window_parameters_get();

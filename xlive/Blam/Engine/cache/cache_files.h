@@ -28,7 +28,7 @@ enum e_shared_resource_database_type : int32
 
 struct cache_file_tag_instance
 {
-	tag_group group_tag;
+	uint32 group_tag;
 	int32 tag_index;
 	uint32 data_offset;
 	uint32 size;
@@ -148,9 +148,13 @@ void cache_files_apply_patches(void);
 
 void* cache_file_handle_get(void);
 
+uintptr_t* tag_data_get(void);
+
 s_cache_file_memory_globals* cache_file_memory_globals_get(void);
 
-bool cache_file_is_loaded();
+void* tag_data_get_from_instance(cache_file_tag_instance const* tag_instance);
+
+bool cache_file_is_loaded(void);
 
 cache_file_header* cache_files_get_header(void);
 
@@ -168,10 +172,6 @@ datum __cdecl tag_iterator_next(tag_iterator* itr);
 
 void __cdecl cache_file_map_clear_all_failures(void);
 
-// Get tag data from tag index
-void* __cdecl tag_get_fast(datum tag_index);
-
-
 void __cdecl cache_file_close();
 
 bool __cdecl cache_header_verify(cache_file_header* cache_header);
@@ -182,7 +182,9 @@ bool __cdecl cache_file_blocking_read(intptr_t a1, uint32 cache_offset, uint32 r
 
 bool __cdecl scenario_tags_load_internal(const char* scenario_path);
 
-datum tag_loaded(int32 group_tag, const char* name);
+void* tag_get(uint32 expected_group_tag, int32 tag_index);
+
+datum tag_loaded(uint32 group_tag, const char* name);
 
 const char* tag_get_name(datum tag_name_index);
 

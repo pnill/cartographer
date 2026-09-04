@@ -23,7 +23,7 @@ object_type_definition* object_type_definition_get(e_object_type object_type)
 		k_object_types_count
 	);
 	ASSERT(object_type_definitions[object_type]);
-	ASSERT(object_type_definitions[object_type]->group_tag.group);
+	ASSERT(object_type_definitions[object_type]->group_tag);
 
 	return object_type_definitions[object_type];
 }

@@ -295,9 +295,9 @@ const animation_graph_node* c_model_animation_graph::get_node(uint8 node_index) 
 	return this->resources.get_node(node_index);
 }
 
-const c_model_animation_graph* c_model_animation_graph::get_writable(datum tag_index) const
+c_model_animation_graph* c_model_animation_graph::get_writable(datum tag_index) const
 {
-	return (const c_model_animation_graph*)tag_get_fast(tag_index);
+	return animation_definition_get(tag_index);
 }
 
 int16 c_model_animation_graph::get_node_count(void) const

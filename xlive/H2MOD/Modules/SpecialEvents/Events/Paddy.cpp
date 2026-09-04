@@ -6,6 +6,7 @@
 #include "cache/cache_files.h"
 #include "items/weapon_definitions.h"
 #include "models/models.h"
+#include "models/model_definitions.h"
 #include "models/render_model_definitions.h"
 #include "objects/scenery.h"
 #include "tag_files/tag_loader/tag_injection.h"
@@ -24,8 +25,8 @@ void paddy_event_map_load(void)
 	{
 		tag_injection_inject();
 
-		scenery_definition* paddy_pot = (scenery_definition*)tag_get_fast(paddy_pot_datum);
-		s_model_definition* paddy_pot_model = (s_model_definition*)tag_get_fast(paddy_pot->object.model.index);
+		scenery_definition* paddy_pot = scenery_definition_get(paddy_pot_datum);
+		s_model_definition* paddy_pot_model = model_definition_get(paddy_pot->object.model.index);
 
 		// Give Hat and Beard to Masterchief & Friends
 		if (datum hlmt_chief_datum = tag_loaded(_tag_group_model, "objects\\characters\\masterchief\\masterchief");
@@ -46,8 +47,8 @@ void paddy_event_map_load(void)
 		if (datum ball_weapon_datum = tag_loaded(_tag_group_weapon, "objects\\weapons\\multiplayer\\ball\\ball"); 
 			ball_weapon_datum != NONE)
 		{
-			weapon_definition* ball_weapon = (weapon_definition*)tag_get_fast(ball_weapon_datum);
-			s_model_definition* ball_model = (s_model_definition*)tag_get_fast(ball_weapon->object.model.index);
+			weapon_definition* ball_weapon = weapon_definition_get(ball_weapon_datum);
+			s_model_definition* ball_model = model_definition_get(ball_weapon->object.model.index);
 
 			ball_model->render_model.index = paddy_pot_model->render_model.index;
 
@@ -58,11 +59,11 @@ void paddy_event_map_load(void)
 		if (datum bomb_weapon_datum = tag_loaded(_tag_group_weapon, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
 			bomb_weapon_datum != NONE)
 		{
-			weapon_definition* bomb_weapon = (weapon_definition*)tag_get_fast(bomb_weapon_datum);
-			s_model_definition* bomb_model = (s_model_definition*)tag_get_fast(bomb_weapon->object.model.index);
+			weapon_definition* bomb_weapon = weapon_definition_get(bomb_weapon_datum);
+			s_model_definition* bomb_model = model_definition_get(bomb_weapon->object.model.index);
 
 			bomb_model->render_model.index = paddy_pot_model->render_model.index;
-			render_model_definition* paddy_pot_render = (render_model_definition*)tag_get_fast(paddy_pot_model->render_model.index);
+			render_model_definition* paddy_pot_render = render_model_definition_get(paddy_pot_model->render_model.index);
 			render_model_node* pot_node = paddy_pot_render->nodes[0];
 			pot_node->default_rotation.v.k = -0.75f;
 			pot_node->default_translation.y = 0.07f;

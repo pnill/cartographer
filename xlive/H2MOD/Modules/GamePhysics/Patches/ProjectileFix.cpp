@@ -26,10 +26,10 @@ projectile_update_t p_projectile_update;
 // determines whether the projectile should be updated in a 30hz context or not
 real32 projectile_get_update_tick_length(datum projectile_index, bool projectile_instant_update)
 {
-	object_datum* object = object_get(projectile_index);
-	const _projectile_definition* projectile_definition = (const struct _projectile_definition*)tag_get_fast(object->definition_index);
+	object_datum const* object = object_get(projectile_index);
+	struct projectile_definition const* projectile_definition = projectile_definition_get(object->definition_index);
 
-	if (TEST_BIT(projectile_definition->flags, 5) // check if travels instantaneously flag is set in the projectile flags
+	if (TEST_BIT(projectile_definition->projectile.flags, _projectile_travels_instantaneously_bit) // check if travels instantaneously flag is set in the projectile flags
 		&& (projectile_instant_update || *(uint32*)(((uint8*)object) + 428) == game_time_get())) // also check if the projectile is updated twice in the same tick
 	{
 		//LIMITED_LOG(128, LOG_TRACE_GAME, "{} - projectile: {:X} at 30 hz context", __FUNCTION__, projectile_index);
@@ -151,11 +151,13 @@ void ProjectileFix::ApplyProjectileVelocity()
 	for (uint32 i = 0; i < ARRAYSIZE(tag_names); i++)
 	{
 		datum proj_index = tag_loaded(_tag_group_projectile, tag_names[i]);
+
 		if (proj_index != NONE)
 		{
-			_projectile_definition* projectile = (_projectile_definition*)tag_get_fast(proj_index);
-			projectile->initial_velocity *= 2;
-			projectile->final_velocity *= 2;
+			struct projectile_definition* projectile_definition = projectile_definition_get(proj_index);
+
+			projectile_definition->projectile.initial_velocity *= 2;
+			projectile_definition->projectile.final_velocity *= 2;
 		}
 	}
 	return;

@@ -116,20 +116,28 @@ XINPUT_VIBRATION vibration_get_state(s_vibration_user_globals* user_globals)
 
 	for (uint32 effect_index = 0; effect_index < k_count_of_effects_that_effect_vibration; effect_index++)
 	{
-		s_vibration_effect_globals* effect = &user_globals->effects[effect_index];
+		s_vibration_effect_globals const* effect = &user_globals->effects[effect_index];
+
 		if (effect->damage_effect_index != NONE && effect->response_index != NONE)
 		{
-			s_damage_effect_definition* damage_effect_definition = (s_damage_effect_definition*)tag_get_fast(effect->damage_effect_index);
+			s_damage_effect_definition const* damage_effect_definition = damage_effect_definition_get(effect->damage_effect_index);
+			
 			if (effect->response_index >= 0)
 			{
 				ASSERT(damage_effect_definition);
 				if (effect->response_index < damage_effect_definition->player_responses.count)
 				{
-					s_damage_effect_player_response_definition* response = damage_effect_definition->player_responses[effect->response_index];
+					s_damage_effect_player_response_definition const* response = TAG_BLOCK_GET_ELEMENT(
+						&damage_effect_definition->player_responses,
+						effect->response_index,
+						s_damage_effect_player_response_definition
+					);
 					real32 duration = user_globals->duration[effect_index];
+
 					for (uint32 intensity_index = 0; intensity_index < 2; intensity_index++)
 					{
-						s_vibration_frequency_definition* frequency_definition = &response->vibration.frequency_vibration[intensity_index];
+						s_vibration_frequency_definition const* frequency_definition = &response->vibration.frequency_vibration[intensity_index];
+						
 						if (frequency_definition->duration > duration)
 						{
 							real32 result = duration / frequency_definition->duration;
@@ -162,5 +170,6 @@ XINPUT_VIBRATION vibration_get_state(s_vibration_user_globals* user_globals)
 		(uint16)PIN(intensities[0], 0.0f, (real32)UINT16_MAX),  // Left
 		(uint16)PIN(intensities[1], 0.0f, (real32)UINT16_MAX)   // Right
 	};
+
 	return state;
 }

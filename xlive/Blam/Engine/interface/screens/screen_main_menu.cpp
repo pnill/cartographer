@@ -13,6 +13,7 @@
 #include "interface/user_interface_guide.h"
 #include "interface/user_interface_utilities.h"
 #include "main/game_preferences.h"
+#include "memory/data.h"
 #include "Networking/online/online_account_xbox.h"
 #include "Networking/transport/transport.h"
 #include "Networking/panorama/panorama_friends.h"

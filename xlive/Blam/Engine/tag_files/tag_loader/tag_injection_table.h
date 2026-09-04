@@ -36,16 +36,17 @@ public:
 	void clear(void);
 
 	uint16 get_entry_count(void) const;
-	uint16 get_entry_count_by_type(e_tag_group type) const;
+	uint16 get_entry_count_by_type(tag_group type) const;
 
-	s_tag_injecting_table_entry* init_entry(datum cache_index, e_tag_group type);
+	s_tag_injecting_table_entry* init_entry(datum cache_index, tag_group type);
 
 	s_tag_injecting_table_entry* get_entry(uint16 index) const;
 	s_tag_injecting_table_entry* get_entry_by_cache_index(datum datum_index) const;
 	s_tag_injecting_table_entry* get_entry_by_injected_index(datum datum_index) const;
-	void get_entries_by_type(e_tag_group type, s_tag_injecting_table_entry* out_results);
+	void get_entries_by_type(tag_group type, s_tag_injecting_table_entry* out_results);
 
 	bool has_entry_by_cache_index(datum datum_index) const;
+
 private:
 	s_tag_injecting_table_entry* m_table;
 	uint16 m_entry_count;

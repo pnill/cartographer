@@ -3,6 +3,7 @@
 #include "user_interface_widget_list_item.h"
 #include "user_interface_widget_text.h"
 
+#include "memory/data.h"
 #include "main/game_preferences.h"
 
 c_list_widget::c_list_widget(uint16 user_flags)

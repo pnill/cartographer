@@ -364,9 +364,9 @@ void* c_screen_settings::load(c_screen_parameters* parameters)
 
 void c_screen_settings::apply_patches_on_map_load()
 {
-	const char* main_widget_tag_path = "ui\\screens\\game_shell\\settings_screen\\settings";
+	const char* k_main_widget_tag_path = "ui\\screens\\game_shell\\settings_screen\\settings";
 
-	datum main_widget_datum_index = tag_loaded(_tag_group_user_interface_screen_widget_definition, main_widget_tag_path);
+	datum main_widget_datum_index = tag_loaded(_tag_group_user_interface_screen_widget_definition, k_main_widget_tag_path);
 
 	if (main_widget_datum_index == NONE)
 	{
@@ -374,17 +374,33 @@ void c_screen_settings::apply_patches_on_map_load()
 		return;
 	}
 
-	s_user_interface_screen_widget_definition* main_widget_tag = (s_user_interface_screen_widget_definition*)tag_get_fast(main_widget_datum_index);
+	s_user_interface_screen_widget_definition* main_widget_tag = user_interface_screen_widget_definition_get(main_widget_datum_index);
 
-	//    add window_pane for guide option 
-	tag_injection_extend_block(&main_widget_tag->panes, main_widget_tag->panes.type_size(), k_number_of_addition_panes_for_settings_screen);
-	//copy data from about_pane
-	csmemcpy(main_widget_tag->panes[_settings_pane_guide], main_widget_tag->panes[_settings_pane_about], sizeof(s_window_pane_reference));
+	// add window_pane for guide option 
+	tag_injection_extend_block(&main_widget_tag->panes, sizeof(s_window_pane_reference), k_number_of_addition_panes_for_settings_screen);
+	
+	s_window_pane_reference* guide_pane = user_interface_widget_pane_get(&main_widget_tag->panes, _settings_pane_guide);
+	s_window_pane_reference* about_pane = user_interface_widget_pane_get(&main_widget_tag->panes, _settings_pane_about);
+
+	// copy data from about_pane
+	*guide_pane = *about_pane;
 	
 	// updating the new number of visible items in each pane
 	for (int32 i = 0; i < main_widget_tag->panes.count; ++i)
 	{
-		main_widget_tag->panes[i]->list_block[0]->num_visible_items = k_no_of_visible_items_for_settings;
+		s_window_pane_reference const* pane_reference = TAG_BLOCK_GET_ELEMENT(
+			&main_widget_tag->panes,
+			i,
+			s_window_pane_reference
+		);
+		s_list_reference* list_reference = TAG_BLOCK_GET_ELEMENT(
+			&pane_reference->list_block,
+			0,
+			s_list_reference
+		);
+
+
+		list_reference->num_visible_items = k_no_of_visible_items_for_settings;
 	}
 
 	tag_injection_set_active_map(L"mainmenu_bitmaps");
@@ -408,18 +424,25 @@ void c_screen_settings::apply_patches_on_map_load()
 		cartographer_bitmap_datum = NONE;
 	}
 
-	s_window_pane_reference* guide_pane = main_widget_tag->panes[_settings_pane_guide];
+	
 
 	//clone blocks into a seperate memory (so we dont end up affecting about_pane)
-	tag_injection_extend_block(&main_widget_tag->panes[_settings_pane_guide]->text_blocks, sizeof(s_text_block_reference), k_number_of_addition_texts_for_guide_pane);
+	tag_injection_extend_block(&guide_pane->text_blocks, sizeof(s_text_block_reference), k_number_of_addition_texts_for_guide_pane);
 
 	//copy data from existing blocks
-	csmemcpy(guide_pane->text_blocks[_pane_guide_text_custom_flavor_text1], guide_pane->text_blocks[_pane_guide_text_flavor_text33], sizeof(s_text_block_reference));
-	csmemcpy(guide_pane->text_blocks[_pane_guide_text_custom_flavor_text2], guide_pane->text_blocks[_pane_guide_text_flavor_text33], sizeof(s_text_block_reference));
+
+	s_text_block_reference* flavor_text33 = TAG_BLOCK_GET_ELEMENT(&guide_pane->text_blocks, _pane_guide_text_flavor_text33, s_text_block_reference);
+	s_text_block_reference* flavor_text34 = TAG_BLOCK_GET_ELEMENT(&guide_pane->text_blocks, _pane_guide_text_flavor_text34, s_text_block_reference);
+	s_text_block_reference* flavor_text1 = TAG_BLOCK_GET_ELEMENT(&guide_pane->text_blocks, _pane_guide_text_custom_flavor_text1, s_text_block_reference);
+	s_text_block_reference* flavor_text2 = TAG_BLOCK_GET_ELEMENT(&guide_pane->text_blocks, _pane_guide_text_custom_flavor_text2, s_text_block_reference);
+
+	csmemcpy(flavor_text1, flavor_text33, sizeof(s_text_block_reference));
+	csmemcpy(flavor_text2, flavor_text33, sizeof(s_text_block_reference));
 
 	//update new text_block to reposition callout texts
-	guide_pane->text_blocks[_pane_guide_text_flavor_text33]->text_bounds = { -5 ,-5,-115 ,75 };
-	guide_pane->text_blocks[_pane_guide_text_flavor_text34]->text_bounds = { 180 ,460,140 ,860 };
-	guide_pane->text_blocks[_pane_guide_text_custom_flavor_text1]->text_bounds = { 250 ,30,150 ,150 };
-	guide_pane->text_blocks[_pane_guide_text_custom_flavor_text2]->text_bounds = { -120 ,450,-220 ,530 };
+	flavor_text33->text_bounds = { -5 ,-5,-115 ,75 };
+	flavor_text34->text_bounds = { 180 ,460,140 ,860 };
+	flavor_text1->text_bounds = { 250 ,30,150 ,150 };
+	flavor_text2->text_bounds = { -120 ,450,-220 ,530 };
+	return;
 }

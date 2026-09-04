@@ -54,8 +54,10 @@ real32 __cdecl player_control_get_field_of_view(uint32 user_index)
 		}
 		else
 		{
-			unit_definition* unit = (unit_definition*)tag_get_fast(unit_get(player_control->unit_datum_index)->definition_index);
-			fov = unit->unit.camera_field_of_view;
+			unit_datum const* unit = unit_get(player_control->unit_datum_index);
+			struct unit_definition const* unit_definition = unit_definition_get(unit->definition_index);
+			
+			fov = unit_definition->unit.camera_field_of_view;
 		}
 
 		result = unit_get_field_of_view(player_control->unit_datum_index, fov, player_control->control_state.desired_zoom_level);

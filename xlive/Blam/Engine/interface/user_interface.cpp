@@ -452,6 +452,7 @@ void c_screen_parameters::initialize_internal(
 	return;
 }
 
+// TODO: move to user_interface_automation.h
 bool user_interface_automation_is_active(void)
 {
 	return false;

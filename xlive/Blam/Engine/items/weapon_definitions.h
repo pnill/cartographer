@@ -1,10 +1,21 @@
 #pragma once
 #include "item_definitions.h"
 
-#include "cache/predicted_resources.h"
 #include "game/aim_assist.h"
 #include "math/periodic_functions.h"
 #include "objects/damage_reporting.h"
+
+/* constants */
+
+enum
+{
+	WEAPON_DEFINITION_TAG = 'weap',
+	WEAPON_DEFINITION_VERSION = 2,		// TODO: verify
+};
+
+/* macros */
+
+#define weapon_definition_get(index)	((struct weapon_definition*)tag_get(WEAPON_DEFINITION_TAG, (index)))
 
 /* enums */
 
@@ -160,6 +171,8 @@ enum e_barrel_distribution_function : int16
 	_barrel_distribution_function_point = 0,
 	_barrel_distribution_function_horizontal_fan = 1
 };
+
+/* structures */
 
 struct s_melee_damage_parameters
 {

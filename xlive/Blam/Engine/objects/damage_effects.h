@@ -1,8 +1,21 @@
 #pragma once
-
 #include "effects/player_effects.h"
 #include "game/player_vibration.h"
-#include "tag_files/tag_block.h"
+#include "math/function_definitions.h"
+
+/* constants */
+
+enum
+{
+	DAMAGE_EFFECT_DEFINITION_TAG = 'jpt!',
+	DAMAGE_EFFECT_DEFINITION_VERSION = 6,	// TODO: verify
+};
+
+/* macros */
+
+#define damage_effect_definition_get(index)	((struct s_damage_effect_definition*)tag_get(DAMAGE_EFFECT_DEFINITION_TAG, (index)))
+
+/* enums */
 
 enum e_damage_effect_flags
 {
@@ -63,6 +76,8 @@ enum e_response_type : int16
 	_response_type_unshielded = 1,
 	_response_type_all = 2
 };
+
+/* structures */
 
 struct s_damage_effect_sound_effect_definition
 {
@@ -135,7 +150,7 @@ struct s_damage_effect_definition
 	real_vector2d ai_stun_bounds;
 	real32 shake_radius;
 	real32 emp_radius;
-	tag_block<s_damage_effect_player_response_definition> player_responses;
+	s_tag_block player_responses;		// s_damage_effect_player_response_definition
 
 	// Explaination("temporary camera impulse", "EMPTY STRING")
 	s_temporary_camera_impulse camera_impulse;

@@ -1,7 +1,6 @@
 #pragma once
 #include "user_interface_widget.h"
 #include "signal_slot.h"
-#include "memory/data.h"
 
 /* enums */
 
@@ -101,7 +100,7 @@ public:
 	virtual int32 get_intro_delay() override;
 	virtual bool handle_event(s_event_record* event) override;
 	virtual void construct_animation_on_region_enter(int32 a1) override;
-	virtual c_user_interface_text* get_interface() override;
+	virtual class c_user_interface_text* get_interface(void) override;
 
 	// c_list_widget additions
 

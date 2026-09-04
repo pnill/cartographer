@@ -1,9 +1,19 @@
 #pragma once
-#include "tag_files/tag_block.h"
+
+/* constants */
+
+enum
+{
+	VERTEX_SHADER_TAG = 'vrtx'
+};
+
+/* macros */
+
+#define vertex_shader_definition_get(index)	((class c_vertex_shader_definition*)tag_get(VERTEX_SHADER_TAG, (index)))
 
 /* enums */
 
-enum e_global_vertex_shader : int32
+enum e_global_vertex_shader
 {
 	_global_vertex_shader_bloom = 0,
 	_global_vertex_shader_convolution,
@@ -40,9 +50,9 @@ enum e_global_vertex_shader : int32
 	k_global_vertex_shader_count
 };
 
-enum e_vertex_shader_platform : int16
+enum e_vertex_shader_platform
 {
-	_vertex_shader_platform_pc,
+	_vertex_shader_platform_pc = 0,
 	_vertex_shader_platform_xbox
 };
 
@@ -51,7 +61,7 @@ enum e_vertex_shader_platform : int16
 class c_vertex_shader_classification
 {
 public:
-	IDirect3DVertexShader9* m_handle;
+	struct IDirect3DVertexShader9* m_handle;
 
 	/****************************************
 	* definition_name: compiled_shader_block
@@ -76,9 +86,9 @@ class c_vertex_shader_definition
 	static const uint32 k_vertex_shader_classification_count = 12;
 
 public:
-	e_vertex_shader_platform m_platform;
+	int16 m_platform;	// e_vertex_shader_platform
 	int16 pad;
-	tag_block<c_vertex_shader_classification> m_geometry_classifications;
+	s_tag_block m_geometry_classifications;	// c_vertex_shader_classification
 	int32 m_output_swizzles;
 };
 ASSERT_STRUCT_SIZE(c_vertex_shader_definition, 16);

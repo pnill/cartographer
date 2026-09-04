@@ -14,11 +14,15 @@ bool __cdecl biped_is_running_invisible_crouched_uber_melee(datum object_index)
 	return INVOKE(0x152744, 0x136A00, biped_is_running_invisible_crouched_uber_melee, object_index);
 }
 
-
-void biped_build_2d_camera_frame(const real_vector3d* forward, const real_vector3d* up, real_vector2d* forward_out, real_vector2d* up_out)
+void biped_build_2d_camera_frame(
+	real_vector3d const* forward,
+	real_vector3d const* up, 
+	real_vector2d* forward_out,
+	real_vector2d* up_out)
 {
 	forward_out->i = forward->i;
 	forward_out->j = forward->j;
+	
 	if (normalize2d(forward_out) == 0.0f)
 	{
 		forward_out->i = up->i;
@@ -33,13 +37,20 @@ void biped_build_2d_camera_frame(const real_vector3d* forward, const real_vector
 			*forward_out = *global_forward2d;
 		}
 	}
+
 	perpendicular2d(forward_out, up_out);
+
+	return;
 }
 
-void __cdecl biped_offset_first_person_camera(datum object_index, real_point3d* camera_position, const real_vector3d* camera_forward, const real_vector3d* camera_up)
+void __cdecl biped_offset_first_person_camera(
+	datum object_index, 
+	real_point3d* camera_position,
+	real_vector3d const* camera_forward,
+	real_vector3d const* camera_up)
 {
-	const biped_datum* biped = biped_get(object_index);
-	const biped_definition* biped_def = (biped_definition*)tag_get_fast(biped->definition_index);
+	biped_datum const* biped = biped_get(object_index);
+	biped_definition const* biped_def = biped_definition_get(biped->definition_index);
 
 	ASSERT(camera_position);
 	ASSERT(camera_forward);
@@ -117,6 +128,7 @@ void __cdecl biped_offset_first_person_camera(datum object_index, real_point3d* 
 			camera_position->z += vertical_offset;
 		}
 	}
+
 	return;
 }
 
@@ -152,7 +164,7 @@ void __cdecl biped_get_sight_position(
 	biped_datum* biped = biped_get(biped_index);
 	ASSERT(biped);
 
-	struct biped_definition* biped_definition = (struct biped_definition*)tag_get_fast(biped->definition_index);
+	struct biped_definition* biped_definition = biped_definition_get(biped->definition_index);
 	ASSERT(biped_definition);
 
 	real32 crouching = 0.0f;

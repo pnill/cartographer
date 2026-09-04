@@ -5,6 +5,7 @@
 #include "interface/first_person_weapons.h"
 #include "main/interpolator.h"
 #include "models/models.h"
+#include "models/model_definitions.h"
 #include "models/render_model_definitions.h"
 #include "objects/objects.h"
 #include "objects/object_definition.h"
@@ -30,7 +31,7 @@ void render_object_get_model_node_data(
 	if (first_person)
 	{
 		const s_first_person_model_data* model_data = first_person_model_data_get(render_model_index_index);
-		const render_model_definition* render_model = (render_model_definition*)tag_get_fast(model_data->render_model_index);
+		const render_model_definition* render_model = render_model_definition_get(model_data->render_model_index);
 		ASSERT(render_model);
 
 		*render_model_index = model_data->render_model_index;
@@ -43,11 +44,11 @@ void render_object_get_model_node_data(
 	else
 	{
 		datum tag_index = object_get(object_index)->definition_index;
-		object_definition* object_def = (object_definition*)tag_get_fast(tag_index);
-		ASSERT(object_def);
-		s_model_definition* model = (s_model_definition*)tag_get_fast(object_def->object.model.index);
+		struct object_definition* object_definition = object_definition_get(tag_index);
+		ASSERT(object_definition);
+		s_model_definition* model = model_definition_get(object_definition->object.model.index);
 		ASSERT(model);
-		render_model_definition* render_model = (render_model_definition*)tag_get_fast(model->render_model.index);
+		render_model_definition* render_model = render_model_definition_get(model->render_model.index);
 		ASSERT(render_model);
 
 		ASSERT(render_model_index_index == 0);

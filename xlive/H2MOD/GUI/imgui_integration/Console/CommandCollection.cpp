@@ -690,14 +690,11 @@ static int CommandCollection::InjectTagCmd(const std::vector<std::string>& token
 	std::wstring mapName(tokens[3].begin(), tokens[3].end());
 
 	const char* p_string = tokens[2].c_str();
-	tag_group tag_type;
-	tag_type.string[3] = p_string[0];
-	tag_type.string[2] = p_string[1];
-	tag_type.string[1] = p_string[2];
-	tag_type.string[0] = p_string[3];
+
+	tag_group tag_type = p_string[0] << 24 | p_string[1] << 16 | p_string[2] << 8 | p_string[3];
 
 	tag_injection_set_active_map(mapName.c_str());
-	auto tag_datum = tag_injection_load(tag_type.group, tagName.c_str(), true);
+	int32 tag_datum = tag_injection_load(tag_type, tagName.c_str(), true);
 	tag_injection_inject();
 
 	outputCb(StringFlag_None, "# loaded tag datum: %#X", tag_datum);

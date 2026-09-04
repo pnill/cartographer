@@ -18,11 +18,10 @@
 #include "interface/user_interface_screen_widget_definition.h"
 #include "interface/user_interface_shared_globals.h"
 #include "interface/user_interface_utilities.h"
+#include "memory/data.h"
 #include "rasterizer/rasterizer_settings.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
-
-/* macro defines */
 
 /* constants */
 
@@ -315,16 +314,21 @@ void* c_screen_video_settings::load(c_screen_parameters* parameters)
 
 void c_screen_video_settings::apply_patches_on_map_load()
 {
-	const char* main_widget_tag_path = "ui\\screens\\game_shell\\settings_screen\\video_settings\\video_settings";
-	datum main_widget_datum_index = tag_loaded(_tag_group_user_interface_screen_widget_definition, main_widget_tag_path);
+	const char* k_main_widget_tag_path = "ui\\screens\\game_shell\\settings_screen\\video_settings\\video_settings";
+	datum main_widget_datum_index = tag_loaded(_tag_group_user_interface_screen_widget_definition, k_main_widget_tag_path);
 
 	if (main_widget_datum_index == NONE)
 	{
 		error(_error_log, "bad datum found");
 		return;
 	}
-	s_user_interface_screen_widget_definition* main_widget_tag = (s_user_interface_screen_widget_definition*)tag_get_fast(main_widget_datum_index);
-	
-	//orignal value was 9 , but now that we have 10 elements to show this needs to be increased
-	main_widget_tag->panes[0]->list_block[0]->num_visible_items = k_no_of_visible_items_for_video_settings;
+
+	s_user_interface_screen_widget_definition const* main_widget_tag = user_interface_screen_widget_definition_get(main_widget_datum_index);
+	s_window_pane_reference const* main_pane = user_interface_widget_pane_get(&main_widget_tag->panes, 0);
+	s_list_reference* main_list = user_interface_widget_pane_get_list(&main_pane->list_block, 0);
+
+	// Orignal value was 9, but now that we have 10 elements to show this needs to be increased
+	main_list->num_visible_items = k_no_of_visible_items_for_video_settings;
+
+	return;
 }

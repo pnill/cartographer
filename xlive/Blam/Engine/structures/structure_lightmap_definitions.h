@@ -2,6 +2,8 @@
 #include "objects/object_identifier.h"
 #include "render/render_lights.h"
 
+/* constants */
+
 enum
 {
 	MAXIMUM_LIGHTS_PER_MAP = 350,

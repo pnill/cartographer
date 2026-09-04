@@ -8,7 +8,7 @@
 
 #include "animations/animation_manager.h"
 #include "cache/cache_files.h"
-#include "devices/devices.h"
+#include "devices/device_definitions.h"
 #include "effects/effects.h"
 #include "game/game.h"
 #include "game/game_time.h"
@@ -16,6 +16,7 @@
 #include "main/interpolator.h"
 #include "memory/memory_pool.h"
 #include "models/models.h"
+#include "models/model_definitions.h"
 #include "objects/lights.h"
 #include "objects/widgets/widgets.h"
 #include "physics/collision_bsp.h"
@@ -430,13 +431,13 @@ datum __cdecl object_new(object_placement_data* data)
 	{
 		const bool process_is_game_client = !shell_is_dedicated_server();
 
-		const struct object_definition* object_definition = (struct object_definition*)tag_get_fast(data->definition_index);
-		const s_model_definition* model_definition = NULL;
+		struct object_definition const* object_definition = object_definition_get(data->definition_index);
+		s_model_definition const* model_definition = NULL;
 
 		const datum object_model_index = object_definition->object.model.index;
 		if (object_model_index != NONE)
 		{
-			model_definition = (s_model_definition*)tag_get_fast(object_model_index);
+			model_definition = model_definition_get(object_model_index);
 		}
 
 		if (data->object_identifier.is_scenario_object())
@@ -597,8 +598,9 @@ datum __cdecl object_new(object_placement_data* data)
 						// allow interpolation if object is device and device flags include interpolation
 						if (TEST_FLAG(FLAG(object_definition->object.object_type), _object_mask_device))
 						{
-							device_definition* device_def = (device_definition*)tag_get_fast(data->definition_index);
-							if (TEST_FLAG(device_def->device.flags, _device_definition_allow_interpolation))
+							struct device_definition const* device_definition = device_definition_get(data->definition_index);
+
+							if (TEST_FLAG(device_definition->device.flags, _device_definition_allow_interpolation))
 							{
 								can_interpolate = true;
 							}
@@ -1386,10 +1388,12 @@ static void __cdecl object_move(datum object_index)
 static datum object_allocate_header(datum tag_definition_index)
 {
 	datum object_index = NONE;
+
 	if (tag_definition_index != NONE)
 	{
-		const object_definition* object_def = (object_definition*)tag_get_fast(tag_definition_index);
-		const object_type_definition* object_type_definition = object_type_definition_get((e_object_type)object_def->object.object_type);
+		struct object_definition const* object_definition = object_definition_get(tag_definition_index);
+		object_type_definition const* object_type_definition = object_type_definition_get((e_object_type)object_definition->object.object_type);
+		
 		object_index = object_header_new(object_type_definition->datum_size);
 	}
 
@@ -1413,15 +1417,15 @@ static void object_header_delete(datum object_index)
 
 static void object_postprocess_node_matrices(datum object_index)
 {
-	const object_datum* object = object_get(object_index);
-	const struct object_definition* object_definition = (struct object_definition*)tag_get_fast(object->definition_index);
+	object_datum const* object = object_get(object_index);
+	struct object_definition const* object_definition = object_definition_get(object->definition_index);
 	
 	ASSERT(object_definition);
 
 	const datum model_index = object_definition->object.model.index;
 	if (model_index != NONE)
 	{
-		const s_model_definition* model_tag = (s_model_definition*)tag_get_fast(model_index);
+		s_model_definition const* model_tag = model_definition_get(model_index);
 		if (model_tag->render_model.index != NONE && model_tag->animation_graph.index != NONE)
 		{
 			int32 node_count;
@@ -1670,11 +1674,11 @@ static bool __cdecl object_update(datum object_index)
 static void object_initialize_for_interpolation(datum object_index)
 {
 	object_datum* object = object_get(object_index);
-	object_definition* object_def = (object_definition*)tag_get_fast(object->definition_index);
+	struct object_definition const* object_definition = object_definition_get(object->definition_index);
 
-	if (object_def->object.model.index == NONE)
+	if (object_definition->object.model.index == NONE)
 	{
-		if ((int16)object_def->object.attachments.count <= 0)
+		if ((int16)object_definition->object.attachments.count <= 0)
 		{
 			return;
 		}
@@ -1682,21 +1686,26 @@ static void object_initialize_for_interpolation(datum object_index)
 		int16 tag_block_index = 0;
 		while (1)
 		{
-			object_attachment_definition* attachment = object_def->object.attachments[tag_block_index];
+			object_attachment_definition const* attachment = TAG_BLOCK_GET_ELEMENT(
+				&object_definition->object.attachments,
+				tag_block_index,
+				object_attachment_definition
+			);
+
 			if (attachment->type.index != NONE)
 			{
 				tag_group type = attachment->type.group;
-				if (type.group == _tag_group_lens_flare
-					|| type.group == _tag_group_light
-					|| type.group == _tag_group_light_volume
-					|| type.group == _tag_group_liquid
-					|| type.group == _tag_group_contrail
-					|| type.group == _tag_group_effect)
+				if (type == _tag_group_lens_flare
+					|| type == _tag_group_light
+					|| type == _tag_group_light_volume
+					|| type == _tag_group_liquid
+					|| type == _tag_group_contrail
+					|| type == _tag_group_effect)
 				{
 					break;
 				}
 			}
-			if (++tag_block_index >= (int16)object_def->object.attachments.count)
+			if (++tag_block_index >= (int16)object_definition->object.attachments.count)
 			{
 				return;
 			}
@@ -1741,14 +1750,14 @@ static int16 __cdecl internal_object_get_markers_by_string_id(
 	if (parent_object_index != NONE)
 	{
 		object_datum* parent_object = object_get(parent_object_index);
-		struct object_definition* object_definition = (struct object_definition*)tag_get_fast(parent_object->definition_index);
+		struct object_definition const* object_definition = object_definition_get(parent_object->definition_index);
 
 		ASSERT(object_definition);
 
 		const datum object_model_index = object_definition->object.model.index;
 		if (object_model_index != NONE)
 		{
-			s_model_definition* model_definition = (s_model_definition*)tag_get_fast(object_model_index);
+			s_model_definition const* model_definition = model_definition_get(object_model_index);
 
 			int32 node_count = 0;
 			const real_matrix4x3* node_matrices;

@@ -5,38 +5,46 @@
 
 enum
 {
+	k_multilingual_unicode_string_lists_group_tag = 'unic',
+	k_multilingual_unicode_string_lists_group_version = 2,	// TODO: verify
+};
+
+enum
+{
 	k_max_strings_per_language = 0x8000,
 	k_maximum_multilingual_unicode_strings_per_string_list = 9216
 };
 
-/* structures */
+/* macros */
 
-struct s_unicode_string_list_reference
-{
-	uint16 strings_index;
-	uint16 strings_count;
-};
+#define multilingual_unicode_string_list_group_header_get(index)	((struct s_multilingual_unicode_string_list_group_header *)tag_get(k_multilingual_unicode_string_lists_group_tag, (index)))
+
+/* structures */
 
 struct s_multilingual_unicode_string_reference
 {
-	string_id string_id;
-	int32 language_offsets[k_language_count];
+	string_id id;
+	int32 offset[k_language_count];
 };
-ASSERT_STRUCT_SIZE(s_multilingual_unicode_string_reference, 40);
+
+struct s_language_pack_offsets
+{
+	int16 start_index;
+	int16 string_count;
+};
 
 struct s_multilingual_unicode_string_list_group_header
 {
-	// MAX: k_maximum_multilingual_unicode_strings_per_string_list
 	s_tag_block string_references;		// s_multilingual_unicode_string_reference
-	tag_data string_data;
-	s_unicode_string_list_reference strings[k_language_count];
+	tag_data text_data;
+	s_language_pack_offsets langue_pack_offsets[k_language_count];
 };
 ASSERT_STRUCT_SIZE(s_multilingual_unicode_string_list_group_header, 52);
 
 struct s_string_reference
 {
 	string_id string_id;
-	uint32 buffer_offset;
+	int32 offset;
 };
 
 /* classes */
@@ -47,11 +55,11 @@ class c_language_pack
 public:
 	bool unload_data(void);
 	
-	bool try_find_string_exists(string_id id, int32 starting_index, int32 max_count);
-	utf8* get_string_utf8(string_id id, int32 starting_index, int32 max_count);
+	bool try_find_string_exists(string_id id, int32 starting_index, int32 max_count) const;
+	utf8 const* get_string_utf8(string_id id, int32 starting_index, int32 max_count) const;
 	
-	void string_list_get_normal_string(string_id id, c_maximum_interface_text* out_string, int32 strings_start_index, int32 strings_count);
-	void get_string_ids(string_id* array, int32 array_size, int32 starting_index, int32 max_count);
+	void string_list_get_normal_string(string_id id, c_maximum_interface_text* out_string, int32 strings_start_index, int32 string_count) const;
+	void get_string_ids(string_id* array, int32 array_size, int32 starting_index, int32 max_count) const;
 
 	void append_strings(s_string_reference* string_references, utf8* string_buffer, uint32 string_buffer_size, uint32 string_count, uint16* out_index);
 

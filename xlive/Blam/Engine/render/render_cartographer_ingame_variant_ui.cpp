@@ -237,7 +237,7 @@ void cartographer_ingame_variant_ui_render()
 				{
 					for (int32 i = 0; i < category_reference->options.count; ++i)
 					{
-						s_text_value_pair_definition* text_pair = (s_text_value_pair_definition*)tag_get_fast(category_reference->options[i]->index);
+						s_text_value_pair_definition* text_pair = text_value_pair_definition_get(category_reference->options[i]->index);
 
 						int32 setting_value = multiplayer_variant_settings_interface_get_variant_parameter_value(variant, text_pair->parameter);
 						s_text_value_pair_reference_new* setting_label = multiplayer_variant_settings_interface_get_variant_parameter_label(text_pair, setting_value);
@@ -253,7 +253,6 @@ void cartographer_ingame_variant_ui_render()
 						{
 							string_list_get_normal_string(text_pair->string_list.index, setting_label->label_string, &value_buffer);
 							swprintf_s(string_buffer, L"%s: %s", label_buffer.get_string(), value_buffer.get_string());
-
 						}
 						else
 						{
@@ -271,7 +270,7 @@ void cartographer_ingame_variant_ui_render()
 						{
 							for (int32 i = 0; i < category_reference->options.count; ++i)
 							{
-								s_text_value_pair_definition* text_pair = (s_text_value_pair_definition*)tag_get_fast(category_reference->options[i]->index);
+								s_text_value_pair_definition* text_pair = text_value_pair_definition_get(category_reference->options[i]->index);
 
 								int32 setting_value = multiplayer_variant_settings_interface_get_variant_parameter_value(variant, text_pair->parameter);
 								s_text_value_pair_reference_new* setting_label = multiplayer_variant_settings_interface_get_variant_parameter_label(text_pair, setting_value);

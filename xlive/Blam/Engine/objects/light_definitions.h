@@ -1,5 +1,19 @@
 #pragma once
 
+/* constants */
+
+enum
+{
+	LIGHT_DEFINITION_TAG = 'ligh',
+	LIGHT_DEFINITION_VERSION = 5,	// TODO: verify
+};
+
+/* macros */
+
+#define light_definition_get(index)	((struct light_definition*)tag_get(LIGHT_DEFINITION_TAG, (index)))
+
+/* enums */
+
 enum e_light_definition_flags : uint32
 {
     _light_definition_no_illumination_dont_cast_any_per_pixel_dynamic_light = 0,

@@ -1,7 +1,42 @@
 #pragma once
-#include "user_interface_shared_globals.h"
 
-#include "tag_files/tag_block.h"
+/* constants */
+
+enum
+{
+	USER_INTERFACE_SCREEN_WIDGET_TAG = 'wgit',
+};
+
+enum
+{
+	k_maximum_number_of_window_pane_tag_blocks = 16,
+	k_maximum_number_of_button_widget_blocks = 64,
+	k_maximum_text_value_pairs_per_block = 100,
+	k_max_list_reference_block_count = 1,
+	k_maximum_number_of_table_view_list_cell_blocks = 8,
+	k_maximum_number_of_table_view_list_row_blocks = 16,
+	k_maximum_number_of_table_view_list_blocks = 1,
+	k_maximum_number_of_text_blocks = 64,
+	k_maximum_number_of_hud_blocks = 64,
+	k_maximum_number_of_player_blocks = 64,
+	k_maximum_number_of_local_string_id_sections = 16,
+	k_maximum_number_of_local_string_ids = 64,
+	k_maximum_number_of_local_bitmaps = 16,
+};
+
+/* macros */
+
+#define user_interface_screen_widget_definition_get(index)	((struct s_user_interface_screen_widget_definition*)tag_get(USER_INTERFACE_SCREEN_WIDGET_TAG, (index)));
+
+#define user_interface_widget_pane_get(block, index)		(TAG_BLOCK_GET_ELEMENT((block), (index), s_window_pane_reference))
+
+#define user_interface_widget_pane_get_button(block, index)		(TAG_BLOCK_GET_ELEMENT((block), (index), s_button_widget_reference))
+#define user_interface_widget_pane_get_list(block, index)		(TAG_BLOCK_GET_ELEMENT((block), (index), s_list_reference))
+#define user_interface_widget_pane_get_bitmap(block, index)		(TAG_BLOCK_GET_ELEMENT((block), (index), s_bitmap_block_reference))
+#define user_interface_widget_pane_get_text(block, index)		(TAG_BLOCK_GET_ELEMENT((block), (index), s_text_block_reference))
+#define user_interface_widget_pane_get_player(block, index)		(TAG_BLOCK_GET_ELEMENT((block), (index), s_player_block_reference))
+
+/* enums */
 
 enum e_screen_widget_flags : int
 {
@@ -140,30 +175,6 @@ enum e_button_flags : int
 	button_flag_doesnt_tab_horizontally = FLAG(1)
 };
 
-#define k_maximum_number_of_button_widget_blocks 64
-struct s_button_widget_reference
-{
-	e_text_flags text_flags;
-	e_animation_index animation_index;
-	short intro_animation_delay_milliseconds;
-	short pad;
-
-	e_custom_font custom_font;
-	real_argb_color text_color;
-	rectangle2d bounds;
-
-	// bitm
-	tag_reference bitmap;
-	/// from top-left
-	point2d bitmap_offset;
-	string_id string_id;
-	short render_depth_bias;
-	short mouse_region_top_offset;
-	
-	e_button_flags button_flags;
-};
-ASSERT_STRUCT_SIZE(s_button_widget_reference, 0x3C);
-
 enum e_list_reference_flags : int
 {
 	list_reference_flag_list_wraps = FLAG(0),
@@ -206,7 +217,7 @@ enum e_skin_index : short
 	skin_index_unused31 = 31,
 };
 
-// This is a stupid enum but it's sized as a short in the original game so this is how things have to be
+// This is a stupid enum but it's sized as a int16 in the original game so this is how things have to be
 enum e_boolean_value : short
 {
 	boolean_value_false = 0,
@@ -221,7 +232,90 @@ enum e_value_type : short
 	value_type_text_string = 3
 };
 
-#define k_maximum_text_value_pairs_per_block 100
+enum e_table_view_list_reference_flags : int
+{
+	table_view_list_reference_flag_unused = FLAG(0),
+};
+
+enum e_table_view_list_row_reference_flags : int
+{
+	table_view_list_row_reference_flag_unused = FLAG(0),
+};
+
+enum e_hud_block_reference_flags : int
+{
+	hud_block_reference_flag_ignore_for_list_skin_size = FLAG(0),
+	hud_block_reference_flag_needs_valid_rank = FLAG(1)
+};
+
+enum e_table_order : char
+{
+	table_order_row_major = 0,
+	table_order_column_major = 1,
+};
+
+enum e_shape_group
+{
+	_shape_group_none = 0,
+	_shape_group_0,
+	_shape_group_1,
+	_shape_group_2,
+	_shape_group_3,
+	_shape_group_4,
+	_shape_group_5,
+	_shape_group_6,
+	_shape_group_7,
+	_shape_group_8,
+	_shape_group_9,
+	_shape_group_10,
+	_shape_group_11,
+	_shape_group_12,
+	_shape_group_13,
+	_shape_group_14,
+	_shape_group_15,
+	_shape_group_16,
+	_shape_group_17,
+	_shape_group_18,
+	_shape_group_19,
+	_shape_group_20,
+	_shape_group_21,
+	_shape_group_22,
+	_shape_group_23,
+	_shape_group_24,
+	_shape_group_25,
+	_shape_group_26,
+	_shape_group_27,
+	_shape_group_28,
+	_shape_group_29,
+	_shape_group_30,
+	_shape_group_31,
+};
+
+/* structures */
+
+struct s_button_widget_reference
+{
+	e_text_flags text_flags;
+	e_animation_index animation_index;
+	int16 intro_animation_delay_milliseconds;
+	int16 pad;
+
+	e_custom_font custom_font;
+	real_argb_color text_color;
+	rectangle2d bounds;
+
+	// bitm
+	tag_reference bitmap;
+	/// from top-left
+	point2d bitmap_offset;
+	string_id string_id;
+	int16 render_depth_bias;
+	int16 mouse_region_top_offset;
+	
+	e_button_flags button_flags;
+};
+ASSERT_STRUCT_SIZE(s_button_widget_reference, 0x3C);
+
 struct s_text_value_pair_reference_UNUSED
 {
 	// Explaination("OBSOLETE", "this is all obsolete")
@@ -240,115 +334,91 @@ struct s_text_value_pair_reference_UNUSED
 };
 ASSERT_STRUCT_SIZE(s_text_value_pair_reference_UNUSED, 20);
 
-#define k_max_list_reference_block_count 1
 struct s_list_reference
 {
 	e_list_reference_flags flags;
 	e_skin_index skin_index;
-	short num_visible_items;
+	int16 num_visible_items;
 	point2d bottom_left;
 
 	e_animation_index animation_index;
-	short intro_animation_delay_milliseconds;
+	int16 intro_animation_delay_milliseconds;
 
 	// Explaination("UNUSED", "This is unused")
-	tag_block<s_text_value_pair_reference_UNUSED> uNUSED;
+	s_tag_block unused;	// s_text_value_pair_reference_UNUSED
 };
 ASSERT_STRUCT_SIZE(s_list_reference, 24);
 
-enum e_table_view_list_reference_flags : int
-{
-	table_view_list_reference_flag_unused = FLAG(0),
-};
-
-#define k_maximum_number_of_table_view_list_cell_blocks 8
-struct table_view_list_item_reference_block
+struct s_table_view_list_cell_reference_OBSOLETE
 {
 	e_text_flags text_flags;
-	short cell_width;
-	short pad;
+	int16 cell_width;
+	int16 pad;
 	point2d bitmap_topleft_if_there_is_a_bitmap;
 
-	// bitm
-	tag_reference bitmap_tag;
+	tag_reference bitmap_tag;	// bitm
 	string_id string;
-	short renderDepthBias;
-	short pad2;
+	int16 render_depth_bias;
+	int16 pad2;
 };
-ASSERT_STRUCT_SIZE(table_view_list_item_reference_block, 0x1C);
+ASSERT_STRUCT_SIZE(s_table_view_list_cell_reference_OBSOLETE, 0x1C);
 
-enum e_table_view_list_row_reference_flags : int
-{
-	table_view_list_row_reference_flag_unused = FLAG(0),
-};
-
-#define k_maximum_number_of_table_view_list_row_blocks 16
 struct s_table_view_list_row_reference_OBSOLETE
 {
 	e_table_view_list_row_reference_flags flags;
-	short row_height;
-	short pad;
-	tag_block<table_view_list_item_reference_block> rowCells;
+	int16 row_height;
+	int16 pad;
+	s_tag_block row_cells;	// s_table_view_list_cell_reference_OBSOLETE
 };
 ASSERT_STRUCT_SIZE(s_table_view_list_row_reference_OBSOLETE, 16);
 
-#define k_maximum_number_of_table_view_list_blocks 1
 struct s_table_view_list_reference_OBSOLETE
 {
 	e_table_view_list_reference_flags flags;
 	e_animation_index animation_index;
-	short intro_animation_delay_milliseconds;
+	int16 intro_animation_delay_milliseconds;
 
 	e_custom_font custom_font;
-	short pad;
+	int16 pad;
 	real_argb_color text_color;
 	point2d topleft;
-	tag_block<s_table_view_list_row_reference_OBSOLETE> table_rows;
+	s_tag_block table_rows;	// s_table_view_list_row_reference_OBSOLETE
 };
 ASSERT_STRUCT_SIZE(s_table_view_list_reference_OBSOLETE, 40);
 
-#define k_maximum_number_of_text_blocks 64
 struct s_text_block_reference
 {
 	e_text_flags text_flags;
 	e_animation_index animation_index;
-	short intro_animation_delay_milliseconds;
-	short pad0;
+	int16 intro_animation_delay_milliseconds;
+	int16 pad0;
 
 	e_custom_font custom_font;
 	real_argb_color text_color;
 	rectangle2d text_bounds;
 	string_id string;
-	short render_depth_bias;
-	short pad1;
+	int16 render_depth_bias;
+	int16 pad1;
 };
 ASSERT_STRUCT_SIZE(s_text_block_reference, 44);
 
-
-#define k_maximum_text_value_pairs_per_block 100
 struct s_text_value_pair_block_UNUSED
 {
 	// Explaination("OBSOLETE", "this is all obsolete")
+
 	char name[k_tag_string_length];
-	tag_block<s_text_value_pair_reference_UNUSED> text_value_pairs;
+	s_tag_block text_value_pairs;		// s_text_value_pair_reference_UNUSED
 };
 ASSERT_STRUCT_SIZE(s_text_value_pair_block_UNUSED, 40);
 
-enum e_hud_block_reference_flags : int
-{
-	hud_block_reference_flag_ignore_for_list_skin_size = FLAG(0),
-	hud_block_reference_flag_needs_valid_rank = FLAG(1)
-};
-
-#define k_maximum_number_of_hud_blocks 64
 struct s_hud_block_reference
 {
 	e_hud_block_reference_flags flags;
 
 	e_animation_index animation_index;
-	short intro_animation_delay_milliseconds;
-	short render_depth_bias;
-	short starting_bitmap_sequence_index;
+	int16 intro_animation_delay_milliseconds;
+	int16 render_depth_bias;
+	int16 starting_bitmap_sequence_index;
 
 	// bitm
 	tag_reference bitmap;
@@ -359,13 +429,6 @@ struct s_hud_block_reference
 };
 ASSERT_STRUCT_SIZE(s_hud_block_reference, 36);
 
-enum class e_table_order : char
-{
-	table_order_row_major = 0,
-	table_order_column_major = 1,
-};
-
-#define k_maximum_number_of_player_blocks 64
 struct s_player_block_reference
 {
 	int pad;
@@ -377,46 +440,67 @@ struct s_player_block_reference
 	byte maximum_player_count;
 	byte row_count;
 	byte column_count;
-	short row_height;
-	short column_width;
+	int16 row_height;
+	int16 column_width;
 }; 
 ASSERT_STRUCT_SIZE(s_player_block_reference, 24);
 
-#define k_maximum_number_of_window_pane_tag_blocks 16
 struct s_window_pane_reference
 {
-	short pad;
+	int16 pad;
 	e_animation_index animation_index;
 
 	// Explaination("Button Definitions", "If the pane contains buttons, define them here")
-	tag_block<s_button_widget_reference> buttons;
+	
+	s_tag_block buttons;			// s_button_widget_reference
 
 	// Explaination("List Definition", "If the pane contains a list, define it here")
-	tag_block<s_list_reference> list_block;
+	
+	s_tag_block list_block;			// s_list_reference
 
 	// Explaination("OBSOLETE Table View Definition", "If the pane contains a table-view, define it here")
-	tag_block<s_table_view_list_reference_OBSOLETE> table_view;
+	
+	s_tag_block table_view;			// s_table_view_list_reference_OBSOLETE
 
 	// Explaination("Flavor Item Blocks", "Define additional flavor items here")
-	tag_block<s_text_block_reference> text_blocks;
+	
+	s_tag_block text_blocks;		// s_text_block_reference
 
-	tag_block<s_bitmap_block_reference> bitmap_blocks;
-
-	tag_block<s_ui_model_scene_reference> model_scene_blocks;
+	s_tag_block bitmap_blocks;		// s_bitmap_block_reference
+	s_tag_block model_scene_blocks;	// s_ui_model_scene_reference
 
 	// Explaination("UNUSED", "these are all OBSOLETE")
-	tag_block<s_text_value_pair_block_UNUSED> textvalue_blocks;
+	
+	s_tag_block text_value_blocks;	// s_text_value_pair_block_UNUSED
 
-	tag_block<s_hud_block_reference> hud_blocks;
-
-	tag_block<s_player_block_reference> player_blocks;
+	s_tag_block hud_blocks;			// s_hud_block_reference
+	s_tag_block player_blocks;		// s_player_block_reference
 };
 ASSERT_STRUCT_SIZE(s_window_pane_reference, 0x4C);
 
-// ### TODO Finish this
+struct s_local_string_id_list_reference
+{
+	string_id string;
+};
+ASSERT_STRUCT_SIZE(s_local_string_id_list_reference, 4);
+
+struct s_local_string_id_list_section_reference
+{
+	string_id section_name;
+	s_tag_block local_string_section_references;	// s_local_string_id_list_reference
+};
+ASSERT_STRUCT_SIZE(s_local_string_id_list_section_reference, 12);
+
+struct s_local_bitmap_reference
+{
+	tag_reference bitmap;
+};
+ASSERT_STRUCT_SIZE(s_local_bitmap_reference, 8);
+
 struct s_user_interface_screen_widget_definition
 {
-	/* Explaination("Notes on screen widgets:", 
+	/*
+	Explaination("Notes on screen widgets:", 
 	"- the widget coordinate system is a left-handed system (+x to the right, +y up, +z into the screen)
 	with the origin centered in the display(regardless of display size)
 	- for widget component placement, all coordinates you define in the tag specifiy the object's
@@ -426,7 +510,8 @@ struct s_user_interface_screen_widget_definition
 	all of the string indices you may need to specify will refer to the screen's string list tag
 	- a pane may contain either buttons OR a list OR a table - view, but never a combination of those
 	(widget won't function correctly if you try that)
-	- all text is centered unless you specify otherwise")*/
+	- all text is centered unless you specify otherwise")
+	*/
 
 	// Explaination("Flags", "Set misc. screen behavior here")
 
@@ -435,13 +520,40 @@ struct s_user_interface_screen_widget_definition
 
 	// Explaination("Button Key", 
 	// "The labels here are just a guide; the actual string used comes from the Nth position of this button key entry as found in the ui globals button key string list tag")
+	
 	e_button_key_type button_key_type;
 
 	// Explaination("Default Text Color", "Any ui elements that don't explicitly set a text color will use this color")
 	real_argb_color text_color;
+	
 	// Explaination("Screen Text", "All text specific to this screen")
-	// TagReference("unic")
-	tag_reference string_list_tag;
+	
+	tag_reference string_list_tag;	// unic
+	
 	// Explaination("Panes", "Define the screen's panes here (normal screens have 1 pane, tab-view screens have 2+ panes)")
-	tag_block<s_window_pane_reference> panes;
+	
+	s_tag_block panes;		// s_window_pane_reference
+
+	int16 shape_group;		// e_shape_group
+	int16 pad;
+
+	string_id header;
+
+	// Explaination("Local strings", "String IDs here allow defining new string ids that are visible only to this screen.")
+
+	s_tag_block local_strings;	// s_local_string_id_list_section_reference
+	s_tag_block local_bitmaps;	// s_local_bitmap_reference
+
+	// Explaination("LEVEL LOAD PROGRESS FIELDS", "These are used only for level load progress bitmaps")
+
+	real_rgb_color source_color;
+	real_rgb_color destination_color;
+
+	real_point2d accumulate_zoom_scale;
+	real_point2d refraction_scale;
+
+	// Explaination("Mouse cursors", "The mouse cursor definition for this screen.")
+	
+	tag_reference mouse_cursor_definition;	// mcsr
 };
+ASSERT_STRUCT_SIZE(s_user_interface_screen_widget_definition, 112);

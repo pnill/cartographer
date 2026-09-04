@@ -5,10 +5,12 @@
 #include "game/game_globals.h"
 #include "interface/new_hud_definitions.h"
 #include "models/models.h"
+#include "models/model_definitions.h"
 #include "models/render_model_definitions.h"
 #include "scenario/scenario.h"
 #include "scenario/scenario_definitions.h"
 #include "shaders/shader_definitions.h"
+#include "shaders/shader_postprocess_definitions.h"
 #include "sound/sound_classes.h"
 #include "sound/sound_definitions.h"
 #include "structures/structure_bsp_definitions.h"
@@ -92,7 +94,7 @@ static void tag_fixes_masterchief(void)
 	datum fp_shader_datum = tag_loaded(_tag_group_shader, "objects\\characters\\masterchief\\fp\\shaders\\fp_arms");
 	if (fp_shader_datum != NONE)
 	{
-		s_shader_definition* fp_shader = (s_shader_definition*)tag_get_fast(fp_shader_datum);
+		s_shader_definition* fp_shader = shader_definition_get(fp_shader_datum);
 		fp_shader->lightmap_specular_brightness = 1.f;
 	}
 
@@ -101,7 +103,7 @@ static void tag_fixes_masterchief(void)
 	datum visor_shader_datum = tag_loaded(_tag_group_shader, "objects\\characters\\masterchief\\shaders\\masterchief_visor");
 	if (visor_shader_datum != NONE)
 	{
-		s_shader_definition* visor_shader = (s_shader_definition*)tag_get_fast(visor_shader_datum);
+		s_shader_definition* visor_shader = shader_definition_get(visor_shader_datum);
 		s_shader_postprocess_definition_new* postprocess = TAG_BLOCK_GET_ELEMENT(&visor_shader->postprocess_definition, 0, s_shader_postprocess_definition_new);
 		postprocess->shader_template_index = tex_bump_env_datum;
 	}
@@ -113,21 +115,21 @@ static void tag_fixes_grunt(void)
 	datum grunt_arm_shader_datum = tag_loaded(_tag_group_shader, "objects\\characters\\grunt\\shaders\\grunt_arms");
 	if (grunt_arm_shader_datum != NONE)
 	{
-		s_shader_definition* grunt_arm_shader = (s_shader_definition*)tag_get_fast(grunt_arm_shader_datum);
+		s_shader_definition* grunt_arm_shader = shader_definition_get(grunt_arm_shader_datum);
 		grunt_arm_shader->lightmap_specular_brightness = 1.f;
 	}
 
 	datum grunt_backpack_shader_datum = tag_loaded(_tag_group_shader, "objects\\characters\\grunt\\shaders\\grunt_backpack");
 	if (grunt_backpack_shader_datum != NONE)
 	{
-		s_shader_definition* grunt_backpack_shader = (s_shader_definition*)tag_get_fast(grunt_backpack_shader_datum);
+		s_shader_definition* grunt_backpack_shader = shader_definition_get(grunt_backpack_shader_datum);
 		grunt_backpack_shader->lightmap_specular_brightness = 1.f;
 	}
 
 	datum grunt_torso_shader_datum = tag_loaded(_tag_group_shader, "objects\\characters\\grunt\\shaders\\grunt_torso");
 	if (grunt_torso_shader_datum != NONE)
 	{
-		s_shader_definition* grunt_torso_shader = (s_shader_definition*)tag_get_fast(grunt_torso_shader_datum);
+		s_shader_definition* grunt_torso_shader = shader_definition_get(grunt_torso_shader_datum);
 		grunt_torso_shader->lightmap_specular_brightness = 1.f;
 	}
 	return;
@@ -139,13 +141,13 @@ static void tag_fixes_brute(void)
 	datum brute_head_shader_index = tag_loaded(_tag_group_shader, "objects\\characters\\brute\\shaders\\brute_head");
 	if (brute_shader_index != NONE && brute_head_shader_index != NONE)
 	{
-		s_shader_definition* shader = (s_shader_definition*)tag_get_fast(brute_shader_index);
+		s_shader_definition* shader = shader_definition_get(brute_shader_index);
 		s_shader_postprocess_definition_new* postprocess = TAG_BLOCK_GET_ELEMENT(&shader->postprocess_definition, 0, s_shader_postprocess_definition_new);
 
 		*postprocess->pixel_constants[0] = PIXEL32_RGBA(87, 79, 69, 0);
 		*postprocess->pixel_constants[1] = PIXEL32_RGBA(180, 179, 189, 0);
 
-		shader = (s_shader_definition*)tag_get_fast(brute_head_shader_index);
+		shader = shader_definition_get(brute_head_shader_index);
 		*postprocess->pixel_constants[0] = PIXEL32_RGBA(255, 255, 255, 0);
 		*postprocess->pixel_constants[1] = PIXEL32_RGBA(180, 179, 189, 0);
 	}
@@ -157,7 +159,7 @@ static void tag_fixes_smg(void)
 	datum smg_painted_metal_index = tag_loaded(_tag_group_shader, "objects\\weapons\\rifle\\smg\\shaders\\smg_painted_metal");
 	if (smg_painted_metal_index != NONE)
 	{
-		s_shader_definition* smg_painted_metal = (s_shader_definition*)tag_get_fast(smg_painted_metal_index);
+		s_shader_definition* smg_painted_metal = shader_definition_get(smg_painted_metal_index);
 
 		// Original values (Changed for some reason in h2v)
 		smg_painted_metal->lightmap_type = _shader_lightmap_type_dull_specular;
@@ -183,7 +185,7 @@ static void tag_fixes_environment(void)
 	if (glass_interrior_index != NONE && glass_smudged_index != NONE && forerunner_interiors_index != NONE)
 	{
 		// Set bitmaps to originals (Changed for some reason in h2v)
-		s_shader_definition* glass_interrior = (s_shader_definition*)tag_get_fast(glass_interrior_index);
+		s_shader_definition* glass_interrior = shader_definition_get(glass_interrior_index);
 
 		s_shader_postprocess_definition_new* postprocess = TAG_BLOCK_GET_ELEMENT(&glass_interrior->postprocess_definition, 0, s_shader_postprocess_definition_new);
 		
@@ -199,7 +201,7 @@ static void tag_fixes_environment(void)
 	datum tex_bump_index = tag_loaded(_tag_group_shader_template, "shaders\\shader_templates\\opaque\\tex_bump");
 	if (panel_thin_strips_index != NONE && tex_bump_index != NONE)
 	{
-		const s_shader_definition* shader = (s_shader_definition*)tag_get_fast(panel_thin_strips_index);
+		const s_shader_definition* shader = shader_definition_get(panel_thin_strips_index);
 		s_shader_postprocess_definition_new* postprocess = TAG_BLOCK_GET_ELEMENT(&shader->postprocess_definition, 0, s_shader_postprocess_definition_new);
 		postprocess->shader_template_index = tex_bump_index;
 	}
@@ -227,17 +229,18 @@ static void tag_fixes_misty_rain(void)
 				structure_weather_palette_entry* palette = TAG_BLOCK_GET_ELEMENT(&scenario_definition->weather_palette, 0, structure_weather_palette_entry);
 				const char name[] = "misty_cs";
 				csstrncpy(palette->name, name, NUMBEROF(name));
-				palette->weather_system.group.group = _tag_group_weather_system;
+				palette->weather_system.group = _tag_group_weather_system;
 				palette->weather_system.index = misty_rain_datum;
 
 				// Set the field in every single bsp in the scenario
 				for (int32 i = 0; i < scenario_definition->structure_bsp_references.count; ++i)
 				{
-					const scenario_structure_bsp_reference* reference = TAG_BLOCK_GET_ELEMENT(&scenario_definition->structure_bsp_references, i, scenario_structure_bsp_reference);
-					structure_bsp* bsp_definition = (structure_bsp*)tag_get_fast(reference->structure_bsp.index);
+					scenario_structure_bsp_reference const* reference = TAG_BLOCK_GET_ELEMENT(&scenario_definition->structure_bsp_references, i, scenario_structure_bsp_reference);
+					structure_bsp const* bsp_definition = structure_bsp_definition_get(reference->structure_bsp.index);
 					structure_weather_palette_entry* bsp_palette = TAG_BLOCK_GET_ELEMENT(&bsp_definition->weather_palette, 0, structure_weather_palette_entry);
+					
 					csstrncpy(bsp_palette->name, name, NUMBEROF(name));
-					bsp_palette->weather_system.group.group = _tag_group_weather_system;
+					bsp_palette->weather_system.group = _tag_group_weather_system;
 					bsp_palette->weather_system.index = misty_rain_datum;
 				}
 			}
@@ -253,10 +256,11 @@ static void tag_fixes_elite_mp(void)
 
 	if (player_rep->third_person_unit.index != NONE)
 	{
-		const biped_definition* elite_biped = (biped_definition*)tag_get_fast(player_rep->third_person_unit.index);
+		biped_definition const* elite_biped = biped_definition_get(player_rep->third_person_unit.index);
+		
 		if (elite_biped->object.model.index != NONE)
 		{
-			s_model_definition* elite_model = (s_model_definition*)tag_get_fast(elite_biped->object.model.index);
+			s_model_definition* elite_model = model_definition_get(elite_biped->object.model.index);
 
 			const static char* elite_shader_map[6]
 			{
@@ -278,7 +282,7 @@ static void tag_fixes_elite_mp(void)
 				"objects\\characters\\elite\\shaders\\inset_lights"
 			};
 
-			render_model_definition* elite_render_model = (render_model_definition*)tag_get_fast(elite_model->render_model.index);
+			render_model_definition* elite_render_model = render_model_definition_get(elite_model->render_model.index);
 
 			tag_injection_set_active_map(L"shared");
 			if (tag_injection_active_map_verified())
@@ -335,9 +339,10 @@ static void tag_fixes_split_screen_hud(void)
 
 	tag_iterator hud_iterator;
 	tag_iterator_new(&hud_iterator, _tag_group_new_hud_definition);
+
 	while (tag_iterator_next(&hud_iterator) != NONE)
 	{
-		s_new_hud_definition* hud = (s_new_hud_definition*)tag_get_fast(hud_iterator.current_tag_index);
+		s_new_hud_definition const* hud = new_hud_definition_get(hud_iterator.current_tag_index);
 
 		if (!tag_fixes_split_screen_block_adjusted(hud->bitmap_widgets.data))
 		{
@@ -400,37 +405,38 @@ static void tag_fixes_split_screen_hud(void)
 
 static void sound_classes_fix_values(void)
 {
-	const s_game_globals* game_globals = scenario_get_game_globals();
-	const s_sound_globals_definition* sound_globals = TAG_BLOCK_GET_ELEMENT(&game_globals->sound_globals, 0, s_sound_globals_definition);
+	s_game_globals const* game_globals = scenario_get_game_globals();
+	s_sound_globals_definition const* sound_globals = TAG_BLOCK_GET_ELEMENT(&game_globals->sound_globals, 0, s_sound_globals_definition);
 
 	if (game_globals->sound_globals.count > 0 && sound_globals->sound_classes.index != NONE)
 	{
-		s_sound_classes_definition* sound_classes = (s_sound_classes_definition*)tag_get_fast(sound_globals->sound_classes.index);
+		s_sound_classes_definition* sound_classes = sound_classes_definition_get(sound_globals->sound_classes.index);
 
-		sound_classes->sound_classes[_sound_class_projectile_impact]->gain_bounds = { -0.f, -4.f };
-		sound_classes->sound_classes[_sound_class_projectile_detonation]->gain_bounds = { -0.f, -4.f };
-		sound_classes->sound_classes[_sound_class_projectile_flyby]->gain_bounds = { -0.f, -4.f };
-		sound_classes->sound_classes[_sound_class_projectile_unused1]->gain_bounds = { -0.f, -4.f };
-		sound_classes->sound_classes[_sound_class_weapon_fire]->gain_bounds = { -0.f, -4.f };
-		sound_classes->sound_classes[_sound_class_weapon_ready]->gain_bounds = { -0.f, -4.f };
-		sound_classes->sound_classes[_sound_class_weapon_reload]->gain_bounds = { -0.f, -4.f };
-		sound_classes->sound_classes[_sound_class_weapon_empty]->gain_bounds = { -0.f, -4.f };
-		sound_classes->sound_classes[_sound_class_weapon_charge]->gain_bounds = { -0.f, -4.f };
-		sound_classes->sound_classes[_sound_class_weapon_overheat]->gain_bounds = { -0.f, -4.f };
-		sound_classes->sound_classes[_sound_class_weapon_idle]->gain_bounds = { -0.f, -4.f };
-		sound_classes->sound_classes[_sound_class_weapon_melee]->gain_bounds = { -0.f, -4.f };
-		sound_classes->sound_classes[_sound_class_weapon_animation]->gain_bounds = { -0.f, -4.f };
-		sound_classes->sound_classes[_sound_class_object_impacts]->gain_bounds = { -64.f, -4.f };
-		sound_classes->sound_classes[_sound_class_particle_impacts]->gain_bounds = { -12.f, -4.f };
-		sound_classes->sound_classes[_sound_class_footstep]->gain_bounds = { -32.f, -9.f };
-		sound_classes->sound_classes[_sound_class_unit_animation]->gain_bounds = { -0.f, -2.f };
-		sound_classes->sound_classes[_sound_class_vehicle_impact]->gain_bounds = { -0.f, -4.f };
-		sound_classes->sound_classes[_sound_class_vehicle_engine]->gain_bounds = { -0.f, -4.f };
-		sound_classes->sound_classes[_sound_class_vehicle_animation]->gain_bounds = { -0.f, -4.f };
-		sound_classes->sound_classes[_sound_class_device_machinery]->gain_bounds = { -0.f, -4.f };
-		sound_classes->sound_classes[_sound_class_device_stationary]->gain_bounds = { -0.f, -4.f };
-		sound_classes->sound_classes[_sound_class_ambient_machinery]->gain_bounds = { -0.f, -4.f };
+		sound_class_get(&sound_classes->sound_classes, _sound_class_projectile_impact)->gain_bounds = { -0.f, -4.f };
+		sound_class_get(&sound_classes->sound_classes, _sound_class_projectile_detonation)->gain_bounds = { -0.f, -4.f };
+		sound_class_get(&sound_classes->sound_classes, _sound_class_projectile_flyby)->gain_bounds = { -0.f, -4.f };
+		sound_class_get(&sound_classes->sound_classes, _sound_class_projectile_unused1)->gain_bounds = { -0.f, -4.f };
+		sound_class_get(&sound_classes->sound_classes, _sound_class_weapon_fire)->gain_bounds = { -0.f, -4.f };
+		sound_class_get(&sound_classes->sound_classes, _sound_class_weapon_ready)->gain_bounds = { -0.f, -4.f };
+		sound_class_get(&sound_classes->sound_classes, _sound_class_weapon_reload)->gain_bounds = { -0.f, -4.f };
+		sound_class_get(&sound_classes->sound_classes, _sound_class_weapon_empty)->gain_bounds = { -0.f, -4.f };
+		sound_class_get(&sound_classes->sound_classes, _sound_class_weapon_charge)->gain_bounds = { -0.f, -4.f };
+		sound_class_get(&sound_classes->sound_classes, _sound_class_weapon_overheat)->gain_bounds = { -0.f, -4.f };
+		sound_class_get(&sound_classes->sound_classes, _sound_class_weapon_idle)->gain_bounds = { -0.f, -4.f };
+		sound_class_get(&sound_classes->sound_classes, _sound_class_weapon_melee)->gain_bounds = { -0.f, -4.f };
+		sound_class_get(&sound_classes->sound_classes, _sound_class_weapon_animation)->gain_bounds = { -0.f, -4.f };
+		sound_class_get(&sound_classes->sound_classes, _sound_class_object_impacts)->gain_bounds = { -64.f, -4.f };
+		sound_class_get(&sound_classes->sound_classes, _sound_class_particle_impacts)->gain_bounds = { -12.f, -4.f };
+		sound_class_get(&sound_classes->sound_classes, _sound_class_footstep)->gain_bounds = { -32.f, -9.f };
+		sound_class_get(&sound_classes->sound_classes, _sound_class_unit_animation)->gain_bounds = { -0.f, -2.f };
+		sound_class_get(&sound_classes->sound_classes, _sound_class_vehicle_impact)->gain_bounds = { -0.f, -4.f };
+		sound_class_get(&sound_classes->sound_classes, _sound_class_vehicle_engine)->gain_bounds = { -0.f, -4.f };
+		sound_class_get(&sound_classes->sound_classes, _sound_class_vehicle_animation)->gain_bounds = { -0.f, -4.f };
+		sound_class_get(&sound_classes->sound_classes, _sound_class_device_machinery)->gain_bounds = { -0.f, -4.f };
+		sound_class_get(&sound_classes->sound_classes, _sound_class_device_stationary)->gain_bounds = { -0.f, -4.f };
+		sound_class_get(&sound_classes->sound_classes, _sound_class_ambient_machinery)->gain_bounds = { -0.f, -4.f };
 	}
+
 	return;
 }
 
@@ -443,7 +449,8 @@ static void gravity_throne_collision_fix(void)
 		const datum collision_index = tag_loaded(_tag_group_collision_model, tag_name);
 		if (collision_index != NONE)
 		{
-			s_model_definition* model_definition = (s_model_definition*)tag_get_fast(model_index);
+			s_model_definition* model_definition = model_definition_get(model_index);
+
 			ASSERT(model_definition);
 
 			model_definition->collision_model.index = collision_index;
@@ -465,7 +472,7 @@ static void shader_template_fix_nvidia(const char* template_name, const char* bi
 
 		while (tag_iterator_next(&iterator) != NONE)
 		{
-			s_shader_definition* shader = (s_shader_definition*)tag_get_fast(iterator.current_tag_index);
+			s_shader_definition* shader = shader_definition_get(iterator.current_tag_index);
 			if (shader->shader_template.index == broken_template_index)
 			{
 				if (shader->postprocess_definition.count > 0)

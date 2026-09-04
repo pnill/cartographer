@@ -133,8 +133,9 @@ bool __cdecl unit_desires_tight_camera_track(datum unit_index)
 
 bool unit_does_not_show_readied_weapon(datum unit_index)
 {
-	const unit_datum* unit = unit_get(unit_index);
-	const struct unit_definition* unit_definition = (struct unit_definition*)tag_get_fast(unit->definition_index);
+	unit_datum const* unit = unit_get(unit_index);
+	struct unit_definition const* unit_definition = unit_definition_get(unit->definition_index);
+
 	ASSERT(unit_definition);
 
 	return unit_definition->unit.flags.test(_unit_definition_doesnt_show_readied_weapon_bit);

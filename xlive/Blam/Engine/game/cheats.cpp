@@ -140,9 +140,13 @@ void cheat_drop_tag_name(const char* name)
 	return;
 }
 
-bool cheat_drop_tag(tag_group group, const char* name, bool ignore_error)
+bool cheat_drop_tag(
+	tag_group group,
+	char const* name,
+	bool ignore_error)
 {
-	const datum tag_index = tag_loaded(group.group, name);
+	const datum tag_index = tag_loaded(group, name);
+
 	if (tag_index == NONE)
 	{
 		if (!ignore_error)
@@ -161,13 +165,14 @@ bool cheat_drop_tag(tag_group group, const char* name, bool ignore_error)
 	const s_observer_result* camera = observer_try_and_get_camera(active_user);
 	
 	tag_group base_group = group;
-	switch (group.group)
+	
+	switch (group)
 	{
 	case _tag_group_effect:
-		base_group.group = _tag_group_effect;
+		base_group = _tag_group_effect;
 		break;
 	case _tag_group_shader:
-		base_group.group = _tag_group_shader;
+		base_group = _tag_group_shader;
 		break;
 	case _tag_group_vehicle:
 	case _tag_group_weapon:
@@ -182,7 +187,7 @@ bool cheat_drop_tag(tag_group group, const char* name, bool ignore_error)
 	case _tag_group_biped:
 	case _tag_group_crate:
 	case _tag_group_creature:
-		base_group.group = _tag_group_object;
+		base_group = _tag_group_object;
 		break;
 	default:
 		// Do nothing
@@ -192,18 +197,19 @@ bool cheat_drop_tag(tag_group group, const char* name, bool ignore_error)
 	random_seed_allow_use();
 
 	bool result = false;
+
 	if (camera)
 	{
-		if (base_group.group == _tag_group_effect)
+		if (base_group == _tag_group_effect)
 		{
 			result = cheat_drop_effect(tag_index, &camera->forward, name, &camera->position);
 		}
-		else if (base_group.group == _tag_group_shader)
+		else if (base_group == _tag_group_shader)
 		{
 			const datum shader_drop_object_index = tag_loaded(_tag_group_scenery, k_shader_drop_object_name);
 			result = cheat_place_tag(&camera->forward, shader_drop_object_index, &camera->position, name, _tag_group_shader, tag_index);
 		}
-		else if (base_group.group == _tag_group_object)
+		else if (base_group == _tag_group_object)
 		{
 			result = cheat_place_tag(&camera->forward, tag_index, &camera->position, name, _tag_group_object, NONE);
 		}
@@ -214,6 +220,7 @@ bool cheat_drop_tag(tag_group group, const char* name, bool ignore_error)
 	}
 
 	random_seed_disallow_use();
+
 	return result;
 }
 
@@ -238,7 +245,7 @@ static bool cheat_place_tag(const real_vector3d* forward, datum tag_index, const
 		}
 		else
 		{
-			object_definition* object = (object_definition*)tag_get_fast(/*_tag_group_object,*/ tag_index);
+			object_definition* object = object_definition_get(tag_index);
 
 			object_placement_data placement_data;
 			object_placement_data_new(&placement_data, tag_index, NONE, NULL);

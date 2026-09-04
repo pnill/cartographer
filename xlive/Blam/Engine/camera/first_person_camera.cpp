@@ -70,7 +70,7 @@ static void __cdecl first_person_camera_build_observer_command(
 			vehicle_datum* vehicle_unit = vehicle_get(player_unit->object.parent_object_index);
 			if (vehicle_unit)
 			{
-				const struct vehicle_definition* vehicle_definition = (const struct vehicle_definition*)tag_get_fast(vehicle_unit->definition_index);
+				struct vehicle_definition const* vehicle_definition = vehicle_definition_get(vehicle_unit->definition_index);
 
 				ASSERT(vehicle_definition);
 

@@ -4,6 +4,19 @@
 
 #include "objects.h"
 
+/* constants */
+
+
+enum
+{
+	SCENERY_DEFINITION_TAG = 'scen',
+	SCENERY_DEFINITION_VERSION = 1,		// TODO: verify
+};
+
+/* macros */
+
+#define scenery_definition_get(index)	((struct scenery_definition*)tag_get(SCENERY_DEFINITION_TAG, (index)))
+
 /* enums */
 
 enum e_scenery_pathfinding_policy : int16
@@ -22,9 +35,10 @@ enum e_scenery_definition_flags : uint16
 
 enum e_scenery_lightmapping_policy : int16
 {
-	_scenery_lightmapping_policy_per_vertex = 0,
-	_scenery_lightmapping_policy_per_pixel = 1,		// not implemented
-	_scenery_lightmapping_policy_dynamic = 2,
+	_scenery_lightmapping_per_vertex = 0,
+	_scenery_lightmapping_per_pixel = 1,		// not implemented
+	_scenery_lightmapping_dynamic = 2,
+	k_scenery_lightmapping_count,
 	_scenery_lightmapping_policy_none = NONE
 };
 
@@ -61,7 +75,6 @@ struct scenery_definition
 	_scenery_definition scenery;
 };
 ASSERT_STRUCT_SIZE(scenery_definition, 196);
-
 
 struct _scenery_datum
 {

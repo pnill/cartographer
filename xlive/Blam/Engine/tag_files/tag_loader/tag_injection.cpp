@@ -68,12 +68,18 @@ bool tag_injection_active_map_verified()
 }
 
 
-datum tag_injection_load(e_tag_group group, const char* tag_name, bool load_dependencies)
+datum tag_injection_load(
+	tag_group group,
+	char const* tag_name,
+	bool load_dependencies)
 {
 	return g_tag_injection_manager->load_tag(group, tag_name, load_dependencies);
 }
 
-datum tag_injection_load(e_tag_group group, datum cache_datum, bool load_dependencies)
+datum tag_injection_load(
+	tag_group group,
+	datum cache_datum,
+	bool load_dependencies)
 {
 	return g_tag_injection_manager->load_tag(group, cache_datum, load_dependencies);
 }
@@ -115,7 +121,7 @@ void tag_injection_scenario_load_setup(uint32 allocation_size)
 	//Clear the table
 	for (uint16 i = k_first_injected_datum; i < g_tag_injection_manager->get_entry_count(); i++)
 	{
-		g_tag_table[i] = cache_file_tag_instance{ _tag_group_none, NONE, 0, 0 };
+		g_tag_table[i] = cache_file_tag_instance{ (uint32)_tag_group_none, NONE, 0, 0 };
 	}
 
 	g_tag_injection_manager->reset();

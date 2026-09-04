@@ -1,6 +1,7 @@
 #pragma once
 #include "bitmaps/bitmap_types.h"
 #include "cseries/language.h"
+#include "sound/sound_definitions.h"
 #include "text/text_group.h"
 
 /* constants */
@@ -552,7 +553,26 @@ inline s_game_globals_rasterizer_data* rasterizer_globals_get_data(void)
 	return *Memory::GetAddress<s_game_globals_rasterizer_data**>(0xA3DA3C);
 }
 
-inline tag_reference game_globals_get_interface_tag_reference(int32 interface_tag_index)
+inline tag_reference game_globals_get_interface_tag_reference(
+	int32 interface_tag_index)
 {
 	return TAG_BLOCK_GET_ELEMENT(&scenario_get_game_globals()->interface_tags, 0, s_game_globals_interface_tag_references)->interface_tag_references[interface_tag_index];
+}
+
+inline struct s_sound_globals_definition* game_globals_get_sound_globals(
+	s_game_globals* gg,
+	uintptr_t offset,
+	int32 index)
+{
+	s_sound_globals_definition* result = NULL;
+	s_tag_block const* block = (s_tag_block*)((uint8*)gg + offset);
+
+	ASSERT(gg);
+
+	if (block != NULL)
+	{
+		result = TAG_BLOCK_GET_ELEMENT(block, index, s_sound_globals_definition);
+	}
+
+	return result;
 }

@@ -1,12 +1,21 @@
 #pragma once
-#include "tag_files/tag_block.h"
 
 /* constants */
 
 enum
 {
+	CAMERA_TRACK_TAG = 'trak',
+};
+
+enum
+{
+
 	k_maximum_number_of_camera_track_control_points = 16
 };
+
+/* macros */
+
+#define camera_track_definition_get(index)	((struct s_camera_track_definition*)tag_get(CAMERA_TRACK_TAG, (index)))
 
 /* structures */
 
@@ -21,6 +30,6 @@ ASSERT_STRUCT_SIZE(s_camera_track_control_point, 28);
 struct s_camera_track_definition
 {
 	uint32 unused_flags;
-	tag_block<s_camera_track_control_point> control_points;
+	s_tag_block control_points;		// s_camera_track_control_point
 };
 ASSERT_STRUCT_SIZE(s_camera_track_definition, 12);

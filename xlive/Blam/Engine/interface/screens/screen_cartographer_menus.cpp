@@ -2,8 +2,9 @@
 #include "screen_cartographer_menus.h"
 
 #include "cartographer/config/endpoints.h"
-#include "main/game_preferences.h"
+#include "cseries/language.h"
 #include "interface/user_interface_memory.h"
+#include "memory/data.h"
 
 #include "H2MOD/GUI/ImGui_Integration/imgui_handler.h"
 #include "H2MOD/Modules/CustomMenu/CustomMenuGlobals.h"

@@ -1,9 +1,5 @@
 #pragma once
-#include "tag_files/tag_block.h"
-
-#include "cache/predicted_resources.h"
 #include "math/function_definitions.h"
-
 
 /* constants */
 
@@ -15,6 +11,15 @@ enum
 	MAXIMUM_NUMBER_OF_OBJECT_CHANGE_COLOR_INITIAL_PERMUTATIONS = 32,
 	MAXIMUM_NUMBER_OF_OBJECT_CHANGE_COLOR_FUNCTIONS = 4
 };
+
+enum
+{
+	OBJECT_DEFINITION_TAG = 'obje'
+};
+
+/* macros */
+
+#define object_definition_get(index)	((struct object_definition *)tag_get(OBJECT_DEFINITION_TAG, (index)))
 
 /* enums */
 
@@ -184,8 +189,8 @@ ASSERT_STRUCT_SIZE(object_change_color_function, 40);
 
 struct object_change_color_definition
 {
-	tag_block<object_change_color_initial_permutation> initialPermutations;
-	tag_block<object_change_color_function> functions;
+	s_tag_block initial_permutations;	// object_change_color_initial_permutation
+	s_tag_block functions;				// object_change_color_function
 };
 ASSERT_STRUCT_SIZE(object_change_color_definition, 16);
 
@@ -212,8 +217,8 @@ struct _object_definition
 	tag_reference creation_effect;				// effe
 	tag_reference material_effects;				// foot
 
-	tag_block<object_ai_properties> ai_properties;
-	tag_block<s_object_function_definition> functions;
+	s_tag_block ai_properties;					// object_ai_properties
+	s_tag_block functions;						// s_object_function_definition
 
 	// Explaination("Applying collision damage", "for things that want to cause more or less collision damage")
 	
@@ -232,11 +237,11 @@ struct _object_definition
 	int16 hud_text_message_index;
 	int16 pad2;
 
-	tag_block<object_attachment_definition> attachments;
-	tag_block<object_definition_widget> widgets;
-	tag_block<s_old_object_function_definition> old_functions;
-	tag_block<object_change_color_definition> change_colors;
-	tag_block<predicted_resource> predicted_resources;
+	s_tag_block attachments;			// object_attachment_definition
+	s_tag_block widgets;				// object_definition_widget
+	s_tag_block old_functions;			// s_old_object_function_definition
+	s_tag_block change_colors;			// object_change_color_definition
+	s_tag_block predicted_resources;	// predicted_resource
 };
 ASSERT_STRUCT_SIZE(_object_definition, 188);
 

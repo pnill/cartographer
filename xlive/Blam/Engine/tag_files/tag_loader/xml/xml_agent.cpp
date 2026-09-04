@@ -54,13 +54,15 @@ void c_xml_definition_agent::init(tag_group type, const wchar_t* plugin_path)
 	}
 	else
 	{
-		m_type.group = _tag_group_none;
+		m_type = (uint32)_tag_group_none;
 	}
 
 	// Print out message that says we failed to load the plugin 
 	if (error_occured)
 	{
-		xml_def_agent_log("failed to load plugin %ls for type %s", plugin_path, type.string);
+		char group_string[8];
+
+		xml_def_agent_log("failed to load plugin %ls for type %s", plugin_path, tag_to_string(type, group_string));
 	}
 	
 	return;

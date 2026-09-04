@@ -171,43 +171,55 @@ int32 __cdecl tag_group_get_link_set_index(s_tag_group_link* link_set, s_tag_gro
 	return INVOKE(0x8CAC3, 0x7333C, tag_group_get_link_set_index, link_set, tag_link_set, tag_link_set_size, element_size, sort_function, unk);
 }
 
-s_tag_group_link* tag_group_get_link_set(tag_group group)
+s_tag_group_link* tag_group_get_link_set(uint32 group)
 {
 	s_cache_file_memory_globals* cache_file_memory = cache_file_memory_globals_get();
 
-	if (!cache_file_memory->tags_header)
-		return nullptr;
+	s_tag_group_link* group_link = NULL;
 
-	s_tag_group_link t_link;
-	t_link.child = group;
-	t_link.parent_2 = { _tag_group_none };
-	t_link.parent = { _tag_group_none };
+	if (cache_file_memory->tags_header)
+	{
+		s_tag_group_link link_set;
+		link_set.child = group;
+		link_set.parent_2 = (uint32)_tag_group_none;
+		link_set.parent = (uint32)_tag_group_none;
 
-	int32 link_index = tag_group_get_link_set_index(&t_link, cache_file_memory->tags_header->tag_group_link_set, cache_file_memory->tags_header->tag_group_link_set_count, 12, tag_group_get_link_set_sort, 0);
+		int32 link_index = tag_group_get_link_set_index(
+			&link_set,
+			cache_file_memory->tags_header->tag_group_link_set,
+			cache_file_memory->tags_header->tag_group_link_set_count,
+			12,
+			tag_group_get_link_set_sort,
+			0);
 
-	if (link_index == NONE)
-		return nullptr;
+		if (link_index != NONE)
+		{
+			group_link = &cache_file_memory->tags_header->tag_group_link_set[link_index];
+		}
+	}
 
-	s_tag_group_link* link = &cache_file_memory->tags_header->tag_group_link_set[link_index];
-
-	return link;
+	return group_link;
 }
 
-tag_group tag_group_get_name(tag_group group)
+char* tag_to_string(
+	uint32 t,
+	char* s)
 {
 	// We need to reverse this since little endian reorders the character bytes
-	tag_group reversed_group;
-	reversed_group.string[0] = group.string[3];
-	reversed_group.string[1] = group.string[2];
-	reversed_group.string[2] = group.string[1];
-	reversed_group.string[3] = group.string[0];
-	return reversed_group;
+	s[0] = (t >> 24) & BYTE_MAX;
+	s[1] = (t >> 16) & BYTE_MAX;
+	s[2] = (t >> 8) & BYTE_MAX;
+	s[3] = t & BYTE_MAX;
+	s[4] = '\0';
+
+	return s;
 }
 
+// TODO: move this to tag loader code and rename to something like tag_group_to_agent_type and introduce an agent type enum for all tag types
 int32 tag_group_get_as_index(tag_group group)
 {
 	// this is unholy
-	switch (group.group)
+	switch (group)
 	{
 		case _tag_group_cache_file_sound: return 0;
 		case _tag_group_scenario_scenery_resource: return 1;

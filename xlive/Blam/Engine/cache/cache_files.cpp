@@ -11,6 +11,7 @@
 #include "sound/sound_cache_file_definitions.h"
 #include "tag_files/tag_loader/tag_injection.h"
 #include "tag_files/tag_loader/tag_injection_manager.h"
+#include "tag_files/tag_group_access.h"
 
 /* typedefs */
 
@@ -30,7 +31,6 @@ void* tag_get_safe(tag_group group, datum tag_index);
 
 /* public code */
 
-
 void cache_files_apply_patches(void)
 {
 	// Default Maps
@@ -47,12 +47,28 @@ void* cache_file_handle_get(void)
 	return Memory::GetAddress<HANDLE*>(0x4AE8A8, 0x4CF128);
 }
 
+uintptr_t* tag_data_get(void)
+{
+	return Memory::GetAddress<uintptr_t*>(0x482290, 0x4A6438);
+}
+
 s_cache_file_memory_globals* cache_file_memory_globals_get(void)
 {
 	return Memory::GetAddress<s_cache_file_memory_globals*>(0x47CD60, 0x4A29C8);
 }
 
-bool cache_file_is_loaded()
+void* tag_data_get_from_instance(
+	cache_file_tag_instance const* tag_instance)
+{
+	ASSERT(tag_instance);
+
+	return
+		tag_instance->data_offset != NONE ?
+		(void*)(tag_instance->data_offset + *tag_data_get()) :
+		NULL;
+}
+
+bool cache_file_is_loaded(void)
 {
 	const s_cache_file_memory_globals* cache_file_memory_globals = cache_file_memory_globals_get();
 
@@ -97,7 +113,7 @@ cache_file_tag_instance* cache_get_tag_instance(datum tag_index)
 tag_iterator* tag_iterator_new(tag_iterator* itr, e_tag_group type)
 {
 	itr->next_tag_index = 0;
-	itr->tag_type.group = type;
+	itr->tag_type = type;
 	return itr;
 }
 
@@ -361,7 +377,38 @@ scenario_tags_load_internal_end:
 	return is_compatible;
 }
 
-datum tag_loaded(int32 group_tag, const char* name)
+void* tag_get(
+	uint32 expected_group_tag,
+	int32 tag_index)
+{
+	cache_file_tag_instance const* tag_instance = cache_file_tag_instance_try_and_get_unsafe(tag_index);
+	s_tag_group_link* group = tag_group_get_link_set(tag_instance->group_tag);
+
+	ASSERT(group);
+
+	{
+		char group_name[16];
+		char expected_group_name[16];
+
+		SUPRESS_UNUSED(group_name);
+		SUPRESS_UNUSED(expected_group_name);
+
+		vassert(
+			group->child == expected_group_tag || group->parent_2 == expected_group_tag || group->parent == expected_group_tag,
+			"expected tag group '%s' but got '%s' for %08x",
+			tag_to_string(tag_instance->group_tag, group_name),
+			tag_to_string(expected_group_tag, expected_group_name),
+			tag_index);
+	}
+
+	vassert(tag_instance->data_offset!=NONE && *tag_data_get() + tag_instance->data_offset!=NULL, "can't call tag_get() on a cache file tag with a NULL base address", NULL);
+
+	return tag_data_get_from_instance(tag_instance);
+}
+
+datum tag_loaded(
+	uint32 group_tag,
+	char const* name)
 {
 	const s_cache_file_memory_globals* g_cache_file_memory_globals = cache_file_memory_globals_get();
 	datum result = NONE;
@@ -375,7 +422,8 @@ datum tag_loaded(int32 group_tag, const char* name)
 		for (int32 i = 0; i < g_cache_file_memory_globals->tags_header->tag_count; ++i)
 		{
 			const cache_file_tag_instance* tag_instance = &global_tag_instances[i];
-			if (group_tag == tag_instance->group_tag.group)
+
+			if (group_tag == tag_instance->group_tag)
 			{
 				const char* tag_name = tag_get_name(tag_instance->tag_index);
 				if (!csstricmp(name, tag_name))
@@ -397,7 +445,7 @@ datum tag_loaded(int32 group_tag, const char* name)
 		for (uint16 i = k_first_injected_datum; i < last_injected_index; ++i)
 		{
 			const cache_file_tag_instance* tag_instance = &global_tag_instances[i];
-			if (group_tag == tag_instance->group_tag.group)
+			if (group_tag == tag_instance->group_tag)
 			{
 				const char* tag_name = tag_get_name(tag_instance->tag_index);
 				if (!csstricmp(name, tag_name))
@@ -408,6 +456,7 @@ datum tag_loaded(int32 group_tag, const char* name)
 			}
 		}
 	}
+
 	return result;
 }
 
@@ -472,7 +521,7 @@ void* tag_get_safe(tag_group group, datum tag_index)
 
 			if (group_link)
 			{
-				if (group_link->child.group == group.group || group_link->parent_2.group == group.group || group_link->parent.group == group.group)
+				if (group_link->child == group|| group_link->parent_2 == group || group_link->parent == group)
 				{
 					return (void*)((char*)cache_file_memory->tag_cache_base_address + tag_instance->data_offset);
 				}

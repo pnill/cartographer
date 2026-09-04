@@ -26,8 +26,8 @@ void tag_injection_clear_active_map(void);
 
 bool tag_injection_active_map_verified(void);
 
-datum tag_injection_load(e_tag_group group, const char* tag_name, bool load_dependencies);
-datum tag_injection_load(e_tag_group group, datum cache_datum, bool load_dependencies);
+datum tag_injection_load(tag_group group, char const* tag_name, bool load_dependencies);
+datum tag_injection_load(tag_group group, datum cache_datum, bool load_dependencies);
 
 void tag_injection_inject(void);
 

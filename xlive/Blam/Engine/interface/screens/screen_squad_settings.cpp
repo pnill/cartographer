@@ -8,7 +8,6 @@
 #include "bitmaps/bitmap_group.h"
 #include "cache/cache_files.h"
 #include "interface/user_interface_bitmap_block.h"
-#include "interface/user_interface_controller.h"
 #include "interface/user_interface_errors.h"
 #include "interface/user_interface_memory.h"
 #include "interface/user_interface_networking.h"
@@ -146,8 +145,8 @@ enum e_settings_variant_bitmap_type
 
 /* constants */
 
-static const char k_squad_setting_list_name[] = "squad setting list";
-
+static char const k_squad_setting_list_name[] = "squad setting list";
+static char const k_main_widget_tag_path[] = "ui\\screens\\game_shell\\pregame_lobby\\squad_settings_dialog";
 
 /* globals */
 
@@ -157,7 +156,6 @@ static datum variant_bitmap_datum = NONE;
 static wchar_t session_name_tmp[32] = L"<insert-name-here>";
 static c_maximum_interface_text rename_squad_header;
 static c_maximum_interface_text rename_squad_help;
-
 
 /* public code */
 
@@ -247,7 +245,7 @@ c_squad_settings_list::c_squad_settings_list(int16 user_flags) :
 	linker_type2.link(&this->m_slot);
 
 	const datum vkbd_screen_tag_index = user_interface_get_screen_tag_index_by_id(_screen_virtual_keyboard);
-	const s_user_interface_screen_widget_definition* vkbd_tag = (s_user_interface_screen_widget_definition*)tag_get_fast(vkbd_screen_tag_index);
+	const s_user_interface_screen_widget_definition* vkbd_tag = user_interface_screen_widget_definition_get(vkbd_screen_tag_index);
 
 	c_maximum_interface_text tmp_string;
 	string_list_get_normal_string(vkbd_tag->string_list_tag.index, _string_id_squad_name_entry, &tmp_string);
@@ -843,20 +841,24 @@ void c_screen_squad_settings::apply_patches_on_map_load()
 	xbox_live_menu_bitmap_datum = tag_loaded(_tag_group_bitmap, "ui\\screens\\game_shell\\xbox_live\\xbox_live_main_menu\\xbox_live_menu");
 	variant_bitmap_datum = tag_loaded(_tag_group_bitmap, "ui\\screens\\game_shell\\settings_screen\\variant_settings\\variant");
 
-	//shifting the help text to accomodate 7 list items 
-	//(top -30, bottom -30)
-	const char* main_widget_tag_path = "ui\\screens\\game_shell\\pregame_lobby\\squad_settings_dialog";
-	datum main_widget_datum_index = tag_loaded(_tag_group_user_interface_screen_widget_definition, main_widget_tag_path);
-	if (main_widget_datum_index == NONE)
+	// Shifting the help text to accomodate 7 list items 
+	// (top -30, bottom -30)
+
+	datum main_widget_datum_index = tag_loaded(_tag_group_user_interface_screen_widget_definition, k_main_widget_tag_path);
+
+	if (main_widget_datum_index != NONE)
+	{
+		s_user_interface_screen_widget_definition const* main_widget_tag = user_interface_screen_widget_definition_get(main_widget_datum_index);
+		s_window_pane_reference const* base_pane = TAG_BLOCK_GET_ELEMENT(&main_widget_tag->panes, 0, s_window_pane_reference);
+		s_text_block_reference* text = TAG_BLOCK_GET_ELEMENT(&base_pane->text_blocks, 0, s_text_block_reference);
+
+		text->text_bounds.top -= 30;
+		text->text_bounds.bottom -= 30;
+	}
+	else
 	{
 		error(_error_log, "bad datum found");
-		return;
 	}
-
-	s_user_interface_screen_widget_definition* main_widget_tag = (s_user_interface_screen_widget_definition*)tag_get_fast(main_widget_datum_index);
-	s_window_pane_reference* base_pane = main_widget_tag->panes[0];
-	base_pane->text_blocks[0]->text_bounds.top-=30;
-	base_pane->text_blocks[0]->text_bounds.bottom-=30;
 
 	return;
 }

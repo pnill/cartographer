@@ -7,6 +7,7 @@
 #include "game/game_globals.h"
 #include "items/weapon_definitions.h"
 #include "models/models.h"
+#include "models/model_definitions.h"
 #include "scenario/scenario.h"
 #include "scenario/scenario_definitions.h"
 #include "structures/structure_bsp_definitions.h"
@@ -78,21 +79,21 @@ void christmas_event_map_load(void)
 		if (datum flood_datum = game_globals_get_representation(_character_type_flood)->third_person_unit.index;
 			flood_datum != NONE)
 		{
-			biped_definition* flood_biped = (biped_definition*)tag_get_fast(flood_datum);
+			biped_definition* flood_biped = biped_definition_get(flood_datum);
 			add_hat_and_beard_to_model(flood_biped->object.model.index, santa_hat_datum, beard_datum, false);
 		}
 
 		// Change/Add weather system to bsp
 
-		const scenario* scenario = global_scenario_get();
-		const scenario_structure_bsp_reference* reference = TAG_BLOCK_GET_ELEMENT(&scenario->structure_bsp_references, 0, scenario_structure_bsp_reference);
-		structure_bsp* bsp_definition = (structure_bsp*)tag_get_fast(reference->structure_bsp.index);
+		scenario const* scenario = global_scenario_get();
+		scenario_structure_bsp_reference const* reference = TAG_BLOCK_GET_ELEMENT(&scenario->structure_bsp_references, 0, scenario_structure_bsp_reference);
+		structure_bsp* bsp_definition = structure_bsp_definition_get(reference->structure_bsp.index);
 
 		structure_weather_palette_entry* weat_block = (structure_weather_palette_entry*)tag_injection_extend_block(&bsp_definition->weather_palette, sizeof(structure_weather_palette_entry), 1);
 
 		const char new_name[] = "snow_cs";
 		csstrncpy(weat_block->name, new_name, NUMBEROF(new_name));
-		weat_block->weather_system.group.group = _tag_group_weather_system;
+		weat_block->weather_system.group = _tag_group_weather_system;
 		weat_block->weather_system.index = snow_datum;
 
 		for (int32 i = 0; i < bsp_definition->clusters.count; ++i)
@@ -102,10 +103,10 @@ void christmas_event_map_load(void)
 		}
 
 		// Change sword model to candy cane
-		weapon_definition* sword_weapon = (weapon_definition*)tag_get_fast(sword_weapon_datum);
+		weapon_definition* sword_weapon = weapon_definition_get(sword_weapon_datum);
 
 		datum sword_model_datum = sword_weapon->object.model.index;
-		s_model_definition* sword_model = (s_model_definition*)tag_get_fast(sword_model_datum);
+		s_model_definition* sword_model = model_definition_get(sword_model_datum);
 
 		sword_model->render_model.index = candy_cane_datum;
 
@@ -116,26 +117,27 @@ void christmas_event_map_load(void)
 
 		for (int32 i = 0; i < sword_weapon->object.attachments.count; ++i)
 		{
-			object_attachment_definition* attachment = sword_weapon->object.attachments[i];
+			object_attachment_definition* attachment = TAG_BLOCK_GET_ELEMENT(&sword_weapon->object.attachments, i, object_attachment_definition);
+
 			attachment->type.index = NONE;
-			attachment->type.group.group = _tag_group_none;
+			attachment->type.group = (uint32)_tag_group_none;
 			attachment->marker = _string_id_empty_string;
 			attachment->primary_scale = _string_id_empty_string;
 		}
 
 		// Change ghost to reindeer
-		unit_definition* ghost_vehicle = (unit_definition*)tag_get_fast(ghost_datum);
+		unit_definition* ghost_vehicle = unit_definition_get(ghost_datum);
 		ghost_vehicle->object.attachments.data = 0;
 		ghost_vehicle->object.attachments.count = 0;
 
 		datum ghost_model_datum = ghost_vehicle->object.model.index;
-		s_model_definition* ghost_model = (s_model_definition*)tag_get_fast(ghost_model_datum);
+		s_model_definition* ghost_model = model_definition_get(ghost_model_datum);
 		ghost_model->render_model.index = deer_datum;
 
-		s_model_definition* frag_model = (s_model_definition*)tag_get_fast(frag_model_datum);
+		s_model_definition* frag_model = model_definition_get(frag_model_datum);
 		frag_model->render_model.index = ornament_datum;
 
-		s_model_definition* plasma_model = (s_model_definition*)tag_get_fast(plasma_model_datum);
+		s_model_definition* plasma_model = model_definition_get(plasma_model_datum);
 		plasma_model->render_model.index = ornament_datum;
 
 		// Change the models for objectives to presents

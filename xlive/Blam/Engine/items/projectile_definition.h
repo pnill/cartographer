@@ -2,7 +2,24 @@
 #include "objects/damage_reporting.h"
 #include "objects/object_definition.h"
 
-#define k_maximum_material_responses 200
+/* constants */
+
+enum
+{
+	k_maximum_material_responses = 200,
+};
+
+enum
+{
+	PROJECTILE_DEFINITION_TAG = 'proj',
+	PROJECTILE_DEFINITION_VERSION = 5,		// TODO: verify
+};
+
+/* macros */
+
+#define projectile_definition_get(index)	((struct projectile_definition*)tag_get(PROJECTILE_DEFINITION_TAG, (index)))
+
+/* enums */
 
 enum e_projectile_material_response_flags : uint16
 {
@@ -34,17 +51,18 @@ enum e_projectile_material_response_scale_effects : uint16
 
 enum e_projectile_definition_flags : uint32
 {
-	_projectile_flag_oriented_along_velocity = FLAG(0),
-	_projectile_ai_must_use_ballistic_aiming = FLAG(1),
-	_projectile_detonation_max_time_if_attached = FLAG(2),
-	_projectile_has_super_combining_explosion = FLAG(3),
-	_projectile_damage_scales_based_on_distance = FLAG(4),
-	_projectile_travels_instantaneously = FLAG(5),
-	_projectile_steering_adjusts_orientation = FLAG(6),
-	_projectile_dont_noise_up_steering = FLAG(7),
-	_projectile_can_track_behind_itself = FLAG(8),
-	_projectile_ROBOTRON_STEERING = FLAG(9),
-	_projectile_faster_when_owned_by_player = FLAG(10)
+	_projectile_flag_oriented_along_velocity_bit = 0,
+	_projectile_ai_must_use_ballistic_aiming_bit,
+	_projectile_detonation_max_time_if_attached_bit,
+	_projectile_has_super_combining_explosion_bit,
+	_projectile_damage_scales_based_on_distance_bit,
+	_projectile_travels_instantaneously_bit,
+	_projectile_steering_adjusts_orientation_bit,
+	_projectile_dont_noise_up_steering_bit,
+	_projectile_can_track_behind_itself_bit,
+	_projectile_ROBOTRON_STEERING_bit,
+	_projectile_faster_when_owned_by_player_bit,
+	k_projectile_definition_flag_count
 };
 
 enum e_projectile_detonation_timer_starts : uint16
@@ -64,6 +82,7 @@ enum e_projectile_noise : uint16
 	_projectile_noise_quiet = 4
 };
 
+/* structures */
 
 struct s_projectile_material_response_definition
 {
@@ -110,7 +129,6 @@ ASSERT_STRUCT_SIZE(s_projectile_material_response_definition, 0x58);
 
 struct _projectile_definition
 {
-	object_definition object;
 	// Explaination("$$$ PROJECTILE $$$", "")
 
 	e_projectile_definition_flags flags;
@@ -202,4 +220,10 @@ struct _projectile_definition
 
 	tag_block< s_projectile_material_response_definition> material_responses;
 };
-ASSERT_STRUCT_SIZE(_projectile_definition, 0x1A4);
+
+struct projectile_definition
+{
+	_object_definition object;
+	_projectile_definition projectile;
+};
+ASSERT_STRUCT_SIZE(projectile_definition, 0x1A4);

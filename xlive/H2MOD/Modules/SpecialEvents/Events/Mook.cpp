@@ -24,10 +24,11 @@ void mook_event_map_load(void)
 	{
 		tag_injection_inject();
 
-		weapon_definition* mook_ball_weapon = (weapon_definition*)tag_get_fast(mook_ball_weapon_datum);
+		weapon_definition const* mook_ball_weapon = weapon_definition_get(mook_ball_weapon_datum);
 
 		replace_fp_and_3p_models_from_weapon(ball_weapon_datum, mook_ball_weapon->object.model.index, mook_ball_weapon->object.model.index);
 		replace_fp_and_3p_models_from_weapon(bomb_weapon_datum, mook_ball_weapon->object.model.index, mook_ball_weapon->object.model.index);
 	}
+
 	return;
 }

@@ -1,14 +1,22 @@
 #pragma once
-#include "game_engine.h"
-
-#include "tag_files/tag_block.h"
+#include "game/game_engine.h"
 
 /* constants */
 
 enum
 {
+	MULTIPLAYER_GLOBALS_DEFINITION_TAG = 'mulg',
+	MULTIPLAYER_GLOBALS_DEFINITION_VERSION = 1,
+};
+
+enum
+{
 	k_maximum_status_response_count = 32
 };
+
+/* macros */
+
+#define multiplayer_globals_definition_get(index)	((struct s_multiplayer_globals_definition*)tag_get(MULTIPLAYER_GLOBALS_DEFINITION_TAG, (index)))
 
 /* enums */
 
@@ -156,20 +164,20 @@ struct s_multiplayer_runtime_globals_definition
 	tag_reference unused[5];
 
 	// max: 20
-	tag_block<tag_reference> weapons;
+	s_tag_block weapons;	// tag_reference
 	// max: 20
-	tag_block<tag_reference> vehicles;
+	s_tag_block vehicles;	// tag_reference
 	// max: 20
-	tag_block<tag_reference> grenades;
+	s_tag_block grenades;	// tag_reference
 	// max: 20
-	tag_block<tag_reference> powerups;
+	s_tag_block powerups;	// tag_reference
 
 	tag_reference in_game_text;
 
 	// max: 60
-	tag_block<tag_reference> sounds;
+	s_tag_block sounds;		// tag_reference
 
-	tag_block<s_multiplayer_event_response_definition> events[k_multiplayer_event_response_game_type_count];
+	s_tag_block events[k_multiplayer_event_response_game_type_count];	// s_multiplayer_event_response_definition
 
 	tag_reference default_item_collection_1;
 	tag_reference default_item_collection_2;
@@ -188,8 +196,8 @@ struct s_multiplayer_runtime_globals_definition
 
 	int8 pad_3[608];
 
-	tag_block<s_multiplayer_constants> multiplayer_constants;
-	tag_block<s_game_engine_status_response> state_responses;
+	s_tag_block multiplayer_constants;	// s_multiplayer_constants
+	s_tag_block state_responses;		// s_game_engine_status_response
 
 	tag_reference scoreboard_hud_definition;
 	tag_reference scoreboard_emblem_shader;
@@ -201,7 +209,7 @@ ASSERT_STRUCT_SIZE(s_multiplayer_runtime_globals_definition, 1384);
 
 struct s_multiplayer_globals_definition
 {
-	tag_block<s_multiplayer_universal_globals_definition> universal;
-	tag_block<s_multiplayer_runtime_globals_definition> runtime;
+	s_tag_block universal;		// s_multiplayer_universal_globals_definition
+	s_tag_block runtime;		// s_multiplayer_runtime_globals_definition
 };
 ASSERT_STRUCT_SIZE(s_multiplayer_globals_definition, 16);

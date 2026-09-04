@@ -32,7 +32,7 @@ bool havok_can_allocate_space_for_instance_of_object_definition(datum tag_index)
 {
 	//return INVOKE(0x9FE55, 0x920B5, havok_can_allocate_space_for_instance_of_object_definition, tag_index);
 	
-	const object_definition* definition = (object_definition*)tag_get_fast(tag_index);
+	const object_definition* definition = object_definition_get(tag_index);
 
 	ASSERT(definition);
 	ASSERT(havok_can_modify_state());

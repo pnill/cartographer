@@ -33,7 +33,7 @@ struct tag_import_info
 	int8 pad[96];
 	char import_time[k_tag_string_length];
 	int32 pad1;
-	tag_block<tag_import_file> files;
+	s_tag_block files;	// tag_import_file
 	int8 pad2[128];
 };
 ASSERT_STRUCT_SIZE(tag_import_info, 592);

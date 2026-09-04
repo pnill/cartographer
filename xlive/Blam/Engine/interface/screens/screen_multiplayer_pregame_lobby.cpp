@@ -2,9 +2,10 @@
 #include "screen_multiplayer_pregame_lobby.h"
 
 #include "cache/cache_files.h"
+#include "interface/user_interface_networking.h"
+#include "interface/user_interface_shared_globals.h"
 #include "interface/user_interface_screen_widget_definition.h"
 #include "interface/user_interface_widget_window.h"
-#include "interface/user_interface_networking.h"
 #include "tag_files/tag_loader/tag_injection.h"
 
 
@@ -632,9 +633,9 @@ void c_screen_multiplayer_pregame_lobby::apply_instance_patches()
 
 void c_screen_multiplayer_pregame_lobby::apply_patches_on_map_load()
 {
-	const char* main_widget_tag_path = "ui\\screens\\game_shell\\pregame_lobby\\pregame_lobby";
+	const char* k_main_widget_tag_path = "ui\\screens\\game_shell\\pregame_lobby\\pregame_lobby";
 
-	datum main_widget_datum_index = tag_loaded(_tag_group_user_interface_screen_widget_definition, main_widget_tag_path);
+	datum main_widget_datum_index = tag_loaded(_tag_group_user_interface_screen_widget_definition, k_main_widget_tag_path);
 
 	if (main_widget_datum_index == NONE)
 	{
@@ -642,60 +643,80 @@ void c_screen_multiplayer_pregame_lobby::apply_patches_on_map_load()
 		return;
 	}
 
-	s_user_interface_screen_widget_definition* main_widget_tag = (s_user_interface_screen_widget_definition*)tag_get_fast(main_widget_datum_index);
+	s_user_interface_screen_widget_definition const* main_widget_tag = user_interface_screen_widget_definition_get(main_widget_datum_index);
+	s_window_pane_reference const* custom_games_pane = user_interface_widget_pane_get(&main_widget_tag->panes, 0);
+	s_window_pane_reference* coop_pane = user_interface_widget_pane_get(&main_widget_tag->panes, 1);
 
-	s_window_pane_reference* custom_games_pane = main_widget_tag->panes[0];
-	s_window_pane_reference* cooperative_pane = main_widget_tag->panes[1];
-
-	//	add missing text_chat block
-	tag_injection_extend_block(&cooperative_pane->text_blocks, cooperative_pane->text_blocks.type_size(), k_number_of_pregame_pane_1_text_addons);
+	// add missing text_chat block
+	
+	tag_injection_extend_block(&coop_pane->text_blocks, sizeof(s_text_block_reference), k_number_of_pregame_pane_1_text_addons);
 
 	//	fix bitmap offsets
+	
 	for (uint8 block_idx = 0; block_idx <= _pregame_lobby_pane_1_bitmap_game_settings; block_idx++)
 	{
-		cooperative_pane->bitmap_blocks[block_idx]->topleft = custom_games_pane->bitmap_blocks[block_idx]->topleft;
+		s_bitmap_block_reference* custom_games_bitmap = user_interface_widget_pane_get_bitmap(&custom_games_pane->bitmap_blocks, block_idx);
+		s_bitmap_block_reference* coop_bitmap = user_interface_widget_pane_get_bitmap(&coop_pane->bitmap_blocks, block_idx);
+
+		coop_bitmap->topleft = custom_games_bitmap->topleft;
 	}
+
 	//	_pregame_lobby_pane_1_bitmap_name_field bitmap is not used in h2v 
 	//	creates a big box in the middle so nopped the bitmap it references
 	//	edit : turns out its the remnant of y-menu
-	cooperative_pane->bitmap_blocks[_pregame_lobby_pane_1_bitmap_name_field]->bitmap_tag.index = NONE;
-	//copy data for broken bitmap blocks
-	csmemcpy(cooperative_pane->bitmap_blocks[_pregame_lobby_pane_1_bitmap_arrows_up], custom_games_pane->bitmap_blocks[_pregame_lobby_pane_0_bitmap_arrows_up], sizeof(s_bitmap_block_reference));
-	csmemcpy(cooperative_pane->bitmap_blocks[_pregame_lobby_pane_1_bitmap_arrows_down], custom_games_pane->bitmap_blocks[_pregame_lobby_pane_0_bitmap_arrows_down], sizeof(s_bitmap_block_reference));
-	csmemcpy(cooperative_pane->bitmap_blocks[_pregame_lobby_pane_1_bitmap_favorites_icon], custom_games_pane->bitmap_blocks[_pregame_lobby_pane_0_bitmap_favorites_icon], sizeof(s_bitmap_block_reference));
-
+	
+	user_interface_widget_pane_get_bitmap(&coop_pane->bitmap_blocks, _pregame_lobby_pane_1_bitmap_name_field)->bitmap_tag.index = NONE;
+	
+	// Copy data for broken bitmap blocks
+	
+	*user_interface_widget_pane_get_bitmap(&coop_pane->bitmap_blocks, _pregame_lobby_pane_1_bitmap_arrows_up) = *user_interface_widget_pane_get_bitmap(&custom_games_pane->bitmap_blocks, _pregame_lobby_pane_0_bitmap_arrows_up);
+	*user_interface_widget_pane_get_bitmap(&coop_pane->bitmap_blocks, _pregame_lobby_pane_1_bitmap_arrows_down) = *user_interface_widget_pane_get_bitmap(&custom_games_pane->bitmap_blocks, _pregame_lobby_pane_0_bitmap_arrows_down);
+	*user_interface_widget_pane_get_bitmap(&coop_pane->bitmap_blocks, _pregame_lobby_pane_1_bitmap_favorites_icon) = *user_interface_widget_pane_get_bitmap(&custom_games_pane->bitmap_blocks, _pregame_lobby_pane_0_bitmap_favorites_icon);
 
 	//	fix player fields
-	s_player_block_reference* custom_games_player_block = custom_games_pane->player_blocks[0];
-	s_player_block_reference* cooperative_player_block = cooperative_pane->player_blocks[0];
+
+	s_player_block_reference* custom_games_player_block = user_interface_widget_pane_get_player(&custom_games_pane->player_blocks, 0);
+	s_player_block_reference* cooperative_player_block = user_interface_widget_pane_get_player(&coop_pane->player_blocks, 0);
+
 	cooperative_player_block->bottomleft = custom_games_player_block->bottomleft;
 	cooperative_player_block->row_height = custom_games_player_block->row_height;
 
 	//	change "ui\player_skins\player_skin_default.skin" to "ui\player_skins\player_skin_lobby.skin"
+	
 	cooperative_player_block->skin.index = custom_games_player_block->skin.index;
 
-
-
-
 	//	fix button bounds
+
 	for (uint8 block_idx = 0; block_idx < k_pregame_lobby_pane_1_button_count; block_idx++)
 	{
-		cooperative_pane->buttons[block_idx]->bounds = custom_games_pane->buttons[block_idx]->bounds;
-		cooperative_pane->buttons[block_idx]->bitmap_offset = custom_games_pane->buttons[block_idx]->bitmap_offset;
+		s_button_widget_reference* custom_game_button = user_interface_widget_pane_get_button(&custom_games_pane->buttons, block_idx);
+		s_button_widget_reference* coop_button = user_interface_widget_pane_get_button(&coop_pane->buttons, block_idx);
+
+		coop_button->bounds = custom_game_button->bounds;
+		coop_button->bitmap_offset = custom_game_button->bitmap_offset;
 	}
 
 	//	fix text bounds
+
 	for (uint8 block_idx = 0; block_idx < k_pregame_lobby_pane_1_text_count_orignal; ++block_idx)
 	{
 		const uint8 custom_game_block_idx = (uint8)c_screen_pregame_lobby_text_pane_1_mapping((e_pregame_lobby_text_blocks)block_idx);
-		cooperative_pane->text_blocks[block_idx]->text_bounds = custom_games_pane->text_blocks[custom_game_block_idx]->text_bounds;
+		s_text_block_reference const* custom_games_text = user_interface_widget_pane_get_text(&custom_games_pane->text_blocks, custom_game_block_idx);
+		s_text_block_reference* coop_text = user_interface_widget_pane_get_text(&coop_pane->text_blocks, block_idx);
+
+		coop_text->text_bounds = custom_games_text->text_bounds;
 	}
 
 	//	_pregame_lobby_pane_1_text_level_description_placeholder bottom and right still need to be adjusted
-	cooperative_pane->text_blocks[_pregame_lobby_pane_1_text_level_description_placeholder]->text_bounds.right = -290;
-	cooperative_pane->text_blocks[_pregame_lobby_pane_1_text_level_description_placeholder]->text_bounds.bottom = -400;
+
+	s_text_block_reference* level_text = user_interface_widget_pane_get_text(&coop_pane->text_blocks, _pregame_lobby_pane_1_text_level_description_placeholder);
+
+	level_text->text_bounds.right = -290;
+	level_text->text_bounds.bottom = -400;
 
 	//copy data for _pregame_lobby_pane_1_text_text_chat_body block
-	csmemcpy(cooperative_pane->text_blocks[_pregame_lobby_pane_1_text_chat_body], custom_games_pane->text_blocks[_pregame_lobby_pane_0_text_chat_body], sizeof(s_text_block_reference));
 
+	*user_interface_widget_pane_get_text(&coop_pane->text_blocks, _pregame_lobby_pane_1_text_chat_body) = *user_interface_widget_pane_get_text(&custom_games_pane->text_blocks, _pregame_lobby_pane_0_text_chat_body);
+	
+	return;
 }

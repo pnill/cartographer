@@ -2,9 +2,13 @@
 #include "new_hud.h"
 
 #include "math/function_definitions.h"
-#include "text/text.h"
 
 /* constants */
+
+enum
+{
+	NEW_HUD_TAG = 'nhdt'
+};
 
 enum
 {
@@ -16,6 +20,10 @@ enum
 	k_maximum_hud_screen_effect_widgets_per_tag = 4,
 	k_maximum_hud_sounds = 6,
 };
+
+/* macros */
+
+#define new_hud_definition_get(index)	((struct s_new_hud_definition*)tag_get(NEW_HUD_TAG, (index)))
 
 /* enums */
 

@@ -2,6 +2,7 @@
 #include "screen_vsync_setting.h"
 
 #include "interface/user_interface_memory.h"
+#include "memory/data.h"
 #include "rasterizer/rasterizer_globals.h"
 #include "rasterizer/rasterizer_settings.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"

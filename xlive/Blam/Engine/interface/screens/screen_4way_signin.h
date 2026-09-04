@@ -1,5 +1,4 @@
 #pragma once
-
 #include "interface/user_interface_widget_window.h"
 
 /* enums */
@@ -26,8 +25,8 @@ public:
 	static void* load_for_splitscreen(class c_screen_parameters* parameters);
 	static void* load_for_campaign(class c_screen_parameters* parameters);
 	
-	static void apply_patches_on_map_load();
-	static void apply_instance_patches();
+	static void apply_patches_on_map_load(void);
+	static void apply_instance_patches(void);
 
 	c_screen_4way_signin(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags);
 

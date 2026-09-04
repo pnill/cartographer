@@ -5,6 +5,21 @@
 #include "saved_games/game_variant.h"
 #include "tag_files/tag_block.h"
 
+/* constants */
+
+enum
+{
+	k_multiplayer_variant_settings_interface_definition_tag = 'goof',
+	k_multiplayer_variant_settings_interface_definition_version = 1
+};
+
+enum
+{
+	k_text_value_pair_definition_tag = 'sily',
+	k_text_value_pair_definition_version = 1,
+	k_maximum_text_value_pairs_per_block = 32
+};
+
 enum
 {
 	k_maximum_game_setting_blocks = 40,
@@ -14,7 +29,6 @@ enum
 	k_number_of_editable_game_variant_parameters = 112
 };
 
-/* const */
 
 const static wchar_t* g_multiplayer_variant_interface_bool_value_strings[k_language_count][2] =
 {
@@ -65,6 +79,11 @@ const static wchar_t* g_multiplayer_variant_interface_bool_value_strings[k_langu
 	}
 };
 
+/* macros */
+
+#define multiplayer_variant_settings_interface_definition_get(index)	((struct s_multiplayer_variant_settings_interface_definition *)tag_get(k_multiplayer_variant_settings_interface_definition_tag, (index)))
+
+#define text_value_pair_definition_get(index)	((struct s_text_value_pair_definition *)tag_get(k_text_value_pair_definition_tag, (index)))
 
 /* enums */
 

@@ -3,8 +3,8 @@
 
 #include "interface/user_interface_memory.h"
 #include "interface/user_interface_shared_globals.h"
+#include "memory/data.h"
 #include "render/render.h"
-
 #include "text/text_group.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
@@ -30,15 +30,15 @@ static const char k_splitscreen_edit_list_name[] = "splitscreen edit list";
 
 static const wchar_t* const k_splitscreen_description_string[k_language_count] =
 {
-	L"Change the Display Layout when playing Splitscreen with buddies",         // English
-	L"フレンドと画面分割プレイ中に表示レイアウトを変更",                          // Japanese
-	L"Ändere das Anzeige-Layout beim Spielen im Splitscreen mit Freunden",      // German
-	L"Changer la disposition de l’affichage en jouant en écran partagé avec des amis", // French
-	L"Cambia el diseño de pantalla al jugar en pantalla dividida con amigos",   // Spanish
-	L"Cambia il layout dello schermo quando giochi in splitscreen con gli amici", // Italian
-	L"친구와 화면 분할로 플레이할 때 디스플레이 레이아웃 변경",                   // Korean
-	L"与好友进行分屏游戏时更改显示布局",                                           // Chinese
-	L"Altere o layout da tela ao jogar em tela dividida com os amigos"          // Portuguese
+	L"Change the Display Layout when playing Splitscreen with buddies",					// English
+	L"フレンドと画面分割プレイ中に表示レイアウトを変更",										// Japanese
+	L"Ändere das Anzeige-Layout beim Spielen im Splitscreen mit Freunden",				// German
+	L"Changer la disposition de l’affichage en jouant en écran partagé avec des amis",	// French
+	L"Cambia el diseño de pantalla al jugar en pantalla dividida con amigos",			// Spanish
+	L"Cambia il layout dello schermo quando giochi in splitscreen con gli amici",		// Italian
+	L"친구와 화면 분할로 플레이할 때 디스플레이 레이아웃 변경",									// Korean
+	L"与好友进行分屏游戏时更改显示布局",														// Chinese
+	L"Altere o layout da tela ao jogar em tela dividida com os amigos"					// Portuguese
 };
 
 const wchar_t* const k_splitscreen_options_string[k_no_of_visible_items_for_splitscren][k_language_count]
