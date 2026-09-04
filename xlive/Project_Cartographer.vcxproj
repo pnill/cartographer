@@ -3120,8 +3120,10 @@
     <ClInclude Include="Blam\Engine\math\real_math.h" />
     <ClInclude Include="Blam\Engine\memory\data.h" />
     <ClInclude Include="Blam\Engine\units\unit_action_system.h" />
+    <ClInclude Include="Blam\Engine\units\unit_control.h" />
     <ClInclude Include="Blam\Engine\units\unit_definitions.h" />
     <ClInclude Include="Blam\Engine\units\unit_dialogue.h" />
+    <ClInclude Include="Blam\Engine\units\unit_messages.h" />
     <ClInclude Include="Blam\Engine\units\unit_scenario_definitions.h" />
     <ClInclude Include="Blam\Engine\units\vehicles.h" />
     <ClInclude Include="Blam\Engine\units\vehicle_definitions.h" />

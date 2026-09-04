@@ -2,6 +2,7 @@
 #include "H2MOD.h"
 
 #include "ai/ai.h"
+#include "ai/ai_player.h"
 #include "cache/cache_files.h"
 #include "camera/camera.h"
 #include "camera/dead_camera.h"
@@ -586,6 +587,7 @@ static void h2mod_apply_hooks(void)
 	NopFill(Memory::GetAddress(0x4FA0A, 0x56C0A), 6);
 
 	ai_apply_patches();
+	ai_player_apply_patches();
 
 	cheats_apply_patches();
 	main_apply_patches();
@@ -607,6 +609,7 @@ static void h2mod_apply_hooks(void)
 	network_globals_apply_patches();
 	network_transport_apply_patches();
 	network_session_apply_patches();
+	network_session_interface_patches();
 	bitstream_serialization_apply_patches();
 	game_life_cycle_apply_patches();
 

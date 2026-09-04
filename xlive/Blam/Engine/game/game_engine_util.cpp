@@ -3,6 +3,7 @@
 
 #include "game/game.h"
 #include "game/game_engine.h"
+#include "networking/network_game_definitions.h"
 
 /* public code */
 
@@ -34,6 +35,29 @@ bool game_engine_has_teams(void)
 	if (current_game_engine())
 	{
 		result = current_game_variant()->game_engine_flags.test(_game_engine_teams_bit);
+	}
+
+	return result;
+}
+
+e_network_game_simulation_protocol game_engine_get_simulation_protocol(
+	struct s_game_variant const* variant)
+{
+	e_network_game_simulation_protocol result = _network_game_simulation_protocol_synchronous;
+
+	switch (variant->variant_game_engine_index)
+	{
+	case _game_engine_type_ctf:
+	case _game_engine_type_slayer:
+	case _game_engine_type_oddball:
+	case _game_engine_type_koth:
+	case _game_engine_type_juggernaut:
+	case _game_engine_type_territories:
+	case _game_engine_type_assault:
+		result = _network_game_simulation_protocol_distributed;
+		break;
+	default:
+		unreachable();
 	}
 
 	return result;

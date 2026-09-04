@@ -1,5 +1,6 @@
 #pragma once
 #include "items.h"
+#include "units/unit_messages.h"
 
 /* constants */
 
@@ -189,10 +190,15 @@ ASSERT_STRUCT_SIZE(weapon_datum, 604);
 
 /* prototypes */
 
+
+void weapons_apply_patches(void);
+
+void __cdecl weapon_send_message_to_unit(int32 weapon_index, e_unit_messages unit_message);
+
+void __cdecl weapon_send_message_to_unit_deterministic(int32 weapon_index, e_unit_messages unit_message);
+
 int32 __cdecl weapon_get_rounds_available(datum weapon_index, int32 magazine_index, bool a3);
 
 int32 __cdecl weapon_get_rounds_total(datum object_index, int32 magazine_index, bool a3);
 
 void __cdecl weapons_fire_barrels(void);
-
-void weapons_apply_patches();

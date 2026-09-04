@@ -2154,6 +2154,8 @@
     <ClInclude Include="Blam\Engine\game\player_training.h" />
     <ClInclude Include="Blam\Engine\game\multiplayer_definitions.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_errors.h" />
+    <ClInclude Include="Blam\Engine\units\unit_messages.h" />
+    <ClInclude Include="Blam\Engine\units\unit_control.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
