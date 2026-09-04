@@ -779,9 +779,10 @@ bool c_screen_squad_settings::handle_event(s_event_record* event)
 	return INVOKE_TYPE(0x24FE49, 0x0, bool(__thiscall*)(c_screen_widget*, s_event_record*), this, event);
 }
 
-void c_screen_squad_settings::initialize(c_screen_parameters* parameters)
+void c_screen_squad_settings::initialize(
+	c_screen_parameters const* parameters)
 {
-	INVOKE_TYPE(0x24F043, 0x0, void(__thiscall*)(c_screen_squad_settings*, c_screen_parameters*), this, parameters);
+	INVOKE_TYPE(0x24F043, 0x0, void(__thiscall*)(c_screen_squad_settings*, c_screen_parameters const*), this, parameters);
 }
 
 void* c_screen_squad_settings::load(c_screen_parameters* parameters)

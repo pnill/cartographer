@@ -12,14 +12,13 @@ struct s_current_objective_state
 
 /* globals */
 
-s_current_objective_state* g_objectives;
+static s_current_objective_state* g_objectives;
 
 /* public code */
 
 void user_interface_objectives_apply_patches(
 	void)
 {
-	
 	PatchCall(Memory::GetAddress(0x2277FA), user_interface_objectives_initialize);
 	PatchCall(Memory::GetAddress(0x227871), user_interface_objectives_initialize_for_new_map);
 	PatchCall(Memory::GetAddress(0xF1C7A), user_interface_objectives_clear); 

@@ -126,8 +126,7 @@ void c_simulation_world::simulation_queue_enqueue(s_simulation_queue_element* el
 }
 
 void c_simulation_world::apply_simulation_queue(
-	const c_simulation_queue* simulation_queue,
-	struct simulation_update const* update)
+	const c_simulation_queue* simulation_queue)
 {
 	ASSERT(simulation_queue != NULL);
 
@@ -160,7 +159,7 @@ void c_simulation_world::apply_simulation_queue(
 				simulation_queue_entity_promotion_apply(element);
 				break;
 			case _simulation_queue_element_type_game_global_event:
-				simulation_queue_game_global_event_apply(element, update);
+				simulation_queue_game_global_event_apply(element);
 				break;
 			case _simulation_queue_element_type_player_event:
 				simulation_queue_player_event_apply(element);

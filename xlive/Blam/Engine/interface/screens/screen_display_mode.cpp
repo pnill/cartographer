@@ -2,9 +2,9 @@
 #include "screen_display_mode.h"
 #include "screen_confirm_resolution.h"
 
-#include "interface/user_interface_controller.h"
 #include "interface/user_interface_errors.h"
 #include "interface/user_interface_memory.h"
+#include "main/game_preferences.h"
 #include "rasterizer/rasterizer_settings.h"
 
 /* constants */

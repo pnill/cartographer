@@ -1292,6 +1292,8 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_multiplayer_video_settings_menu.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_network_adapter.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_network_squad_browser.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_pause_game.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_pause_settings.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_postgame_statistics.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_press_start_introduction.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_resolution.cpp" />
@@ -1305,6 +1307,7 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_variant_game_engine_type.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_video_settings.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_vsync_setting.cpp" />
+    <ClCompile Include="Blam\Engine\interface\signal_slot.cpp" />
     <ClCompile Include="Blam\Engine\interface\terminal.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_bitmap_block.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_channel.cpp" />
@@ -1315,6 +1318,7 @@
     <ClCompile Include="Blam\Engine\interface\user_interface_model_block.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_single_player_profile_select.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_network_search.cpp" />
+    <ClCompile Include="Blam\Engine\interface\user_interface_objectives.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_player_widget.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_shared_globals.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_text_block.cpp" />
@@ -1724,10 +1728,15 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_gamma_setting.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_lod_setting.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_main_menu.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_multiplayer_audio_settings_menu.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_multiplayer_controller_settings_menu.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_multiplayer_keyboard_settings_menu.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_multiplayer_pregame_lobby.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_multiplayer_video_settings_menu.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_network_adapter.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_network_squad_browser.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_pause_game.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_pause_settings.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_postgame_statistics.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_press_start_introduction.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_resolution.h" />
@@ -1758,6 +1767,7 @@
     <ClInclude Include="Blam\Engine\interface\user_interface_networking.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_single_player_profile_select.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_network_search.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_objectives.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_player_widget.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_shared_globals.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_text.h" />

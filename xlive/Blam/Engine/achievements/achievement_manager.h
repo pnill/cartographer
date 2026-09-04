@@ -1,5 +1,4 @@
 #pragma once
-#include "networking/panorama/panorama_user_history.h"
 
 /* classes */
 
@@ -7,6 +6,7 @@ class c_achievement_manager
 {
 public:
 	void start_upload(void);
+	void submit_event(int32* event);
 
 	void handle_live_signin_notification(bool signed_in);
 	void start_level_chosen(int8 level);

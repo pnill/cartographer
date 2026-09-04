@@ -35,7 +35,7 @@ public:
 	virtual ~c_screen_4way_signin() = default;
 	virtual void update() override;
 	virtual bool handle_event(struct s_event_record* event) override;
-	virtual void initialize(class c_screen_parameters* parameters) override;
+	virtual void initialize(class c_screen_parameters const* parameters) override;
 	virtual const void* load_proc(void) const override;
 
 protected:

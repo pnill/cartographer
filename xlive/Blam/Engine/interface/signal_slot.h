@@ -99,21 +99,5 @@ public:
 		m_current = nullptr;
 	}
 
-	void link(_slot* slot)
-	{
-		//INVOKE_TYPE(0x2113D3, 0x0, void(__thiscall*)(_slot*, _slot*), this, slot);
-		slot->m_signal = this;
-		_slot* old = m_current;
-		if (m_current)
-		{
-			while (old->m_next)
-				old = old->m_next;
-			old->m_next = slot;
-			slot->m_previous = old;
-		}
-		else
-		{
-			m_current = slot;
-		}
-	}
+	void link(_slot* slot);
 };

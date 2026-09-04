@@ -420,7 +420,8 @@ bool c_screen_4way_signin::handle_event(s_event_record* event)
 	return c_screen_widget::handle_event(event);
 }
 
-void c_screen_4way_signin::initialize(c_screen_parameters* parameters)
+void c_screen_4way_signin::initialize(
+	c_screen_parameters const* parameters)
 {
 	s_interface_expected_screen_layout layout;
 	csmemset(&layout, 0, sizeof(layout));

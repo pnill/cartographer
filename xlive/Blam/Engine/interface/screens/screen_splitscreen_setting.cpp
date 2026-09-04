@@ -3,6 +3,7 @@
 
 #include "interface/user_interface_memory.h"
 #include "interface/user_interface_shared_globals.h"
+#include "main/game_preferences.h"
 #include "render/render.h"
 
 #include "text/text_group.h"
@@ -176,7 +177,8 @@ c_screen_splitscreen_menu::c_screen_splitscreen_menu(e_user_interface_channel_ty
 {
 }
 
-void c_screen_splitscreen_menu::initialize(c_screen_parameters* parameters)
+void c_screen_splitscreen_menu::initialize(
+	c_screen_parameters const* parameters)
 {
 	c_screen_with_menu::initialize(parameters);
 

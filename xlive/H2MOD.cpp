@@ -36,8 +36,8 @@
 #include "interface/first_person_weapons.h"
 #include "interface/new_hud.h"
 #include "interface/new_hud_draw.h"
-#include "interface/user_interface.h"
 #include "interface/user_interface_controller.h"
+#include "interface/user_interface_objectives.h"
 #include "interface/user_interface_text.h"
 #include "interface/user_interface_utilities.h"
 #include "interface/screens/screens_patches.h"
@@ -672,6 +672,7 @@ static void h2mod_apply_hooks(void)
 		unit_apply_patches();
 
 		user_interface_text_apply_hooks();
+		user_interface_objectives_apply_patches();
 		user_interface_controller_apply_patches();
 		hud_messaging_apply_hooks();
 		font_group_apply_hooks();

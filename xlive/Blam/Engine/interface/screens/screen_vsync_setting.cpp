@@ -2,6 +2,7 @@
 #include "screen_vsync_setting.h"
 
 #include "interface/user_interface_memory.h"
+#include "main/game_preferences.h"
 #include "rasterizer/rasterizer_globals.h"
 #include "rasterizer/rasterizer_settings.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
@@ -121,7 +122,8 @@ c_screen_vsync_menu::c_screen_vsync_menu(e_user_interface_channel_type channel_t
 {
 }
 
-void c_screen_vsync_menu::initialize(c_screen_parameters* parameters)
+void c_screen_vsync_menu::initialize(
+	c_screen_parameters const* parameters)
 {
 	c_screen_with_menu::initialize(parameters);
 

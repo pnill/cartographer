@@ -170,7 +170,8 @@ bool c_screen_virtual_keyboard::handle_event(s_event_record* event)
 	return INVOKE_TYPE(0x23D060, 0x0, bool(__thiscall*)(c_screen_virtual_keyboard*, s_event_record*), this, event);
 }
 
-void c_screen_virtual_keyboard::initialize(c_screen_parameters* parameters)
+void c_screen_virtual_keyboard::initialize(
+	c_screen_parameters const* parameters)
 {
 	e_vkbd_context_type old_context = m_context;
 	if (IN_RANGE(this->m_context, k_virtual_keyboard_custom_context_start, k_virtual_keyboard_custom_context_end))
@@ -191,7 +192,7 @@ void c_screen_virtual_keyboard::initialize(c_screen_parameters* parameters)
 	}
 
 	// call the orignal screen initializer
-	INVOKE_TYPE(0x23BF3E, 0x0, int(__thiscall*)(c_screen_virtual_keyboard*, c_screen_parameters*), this, parameters);
+	INVOKE_TYPE(0x23BF3E, 0x0, int(__thiscall*)(c_screen_virtual_keyboard*, c_screen_parameters const*), this, parameters);
 
 	update_custom_labels(old_context);
 }
