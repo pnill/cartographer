@@ -17,7 +17,22 @@ enum e_biped_physics_mode : uint8
 
 enum e_biped_flags : uint16
 {
-
+	_biped_flags_bit_1,
+	_biped_flags_bit_2,
+	_biped_flags_bit_3,
+	_biped_flags_bit_4,
+	_biped_flags_bit_5,
+	_biped_flags_bit_6,
+	_biped_flags_bit_7,
+	_biped_flags_bit_8,
+	_biped_flags_bit_9,
+	_biped_flags_bit_10,
+	_biped_flags_bit_11,
+	_biped_flags_bit_12,
+	_biped_flags_bit_13,
+	_biped_flags_bit_14,
+	_biped_flags_bit_15,
+	_biped_flag_is_falling_to_its_death
 };
 
 struct _biped_datum

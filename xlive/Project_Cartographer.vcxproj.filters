@@ -57,7 +57,6 @@
     <ClCompile Include="H2MOD\Modules\RenderHooks\RenderHooks.cpp" />
     <ClCompile Include="Util\Memory.cpp" />
     <ClCompile Include="Blam\Engine\game\game_time.cpp" />
-    <ClCompile Include="H2MOD\Modules\DirectorHooks\DirectorHooks.cpp" />
     <ClCompile Include="H2MOD\Modules\MainMenu\MapSlots.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\SpecialEvents.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\MessageBox.cpp" />
@@ -668,7 +667,6 @@
     <ClInclude Include="H2MOD\Modules\TagFixes\TagFixes.h" />
     <ClInclude Include="H2MOD\Modules\RenderHooks\RenderHooks.h" />
     <ClInclude Include="Util\Memory.h" />
-    <ClInclude Include="H2MOD\Modules\DirectorHooks\DirectorHooks.h" />
     <ClInclude Include="Blam\Engine\objects\damage.h" />
     <ClInclude Include="H2MOD\Modules\MainMenu\MapSlots.h" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\SpecialEvents.h" />

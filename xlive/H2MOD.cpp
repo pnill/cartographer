@@ -98,7 +98,6 @@
 #include "H2MOD/GUI/ImGui_Integration/Console/CommandCollection.h"
 #endif
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
-#include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/GamePhysics/Patches/ProjectileFix.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
@@ -301,7 +300,6 @@ void H2MOD::Initialize()
 		KeyboardInput::Initialize();
 		
 		RenderHooks::Initialize();
-		DirectorHooks::Initialize();
 		TEST_N_DEF(PC3);
 	}
 	else
@@ -704,7 +702,7 @@ static void h2mod_apply_hooks(void)
 
 		cinematics_apply_patches();
 		game_state_procs_apply_patches();
-		apply_dead_camera_patches();
+		dead_camera_apply_patches();
 		liquid_apply_patches();
 		contrails_apply_patches();
 		cloth_apply_patches();

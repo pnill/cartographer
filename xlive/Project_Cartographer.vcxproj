@@ -2017,7 +2017,6 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_virtual_keyboard.cpp" />
     <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.cpp" />
     <ClCompile Include="Blam\Engine\main\map_repository.cpp" />
-    <ClCompile Include="H2MOD\Modules\DirectorHooks\DirectorHooks.cpp" />
     <ClCompile Include="H2MOD\Modules\EventHandler\EventHandler.cpp" />
     <ClCompile Include="Blam\Engine\physics\character_physics_mode_melee.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\KeyboardInput.cpp" />
@@ -3148,7 +3147,6 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_virtual_keyboard.h" />
     <ClInclude Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.h" />
     <ClInclude Include="Blam\Engine\main\map_repository.h" />
-    <ClInclude Include="H2MOD\Modules\DirectorHooks\DirectorHooks.h" />
     <ClInclude Include="H2MOD\Modules\EventHandler\EventHandler.hpp" />
     <ClInclude Include="Blam\Engine\physics\character_physics_mode_melee.h" />
     <ClInclude Include="H2MOD\Modules\Input\ControllerInput.h" />
