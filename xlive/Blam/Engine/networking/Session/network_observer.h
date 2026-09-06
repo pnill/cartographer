@@ -33,6 +33,7 @@
 enum
 {
 	k_network_channel_count = 16,
+	k_network_channel_count_for_campaign = 4,
 	k_network_preferences_size = 108,		// network heap size
 	k_network_heap_size = 10485760,			// default: 1048576
 

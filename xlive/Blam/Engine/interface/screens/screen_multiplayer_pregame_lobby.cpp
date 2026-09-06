@@ -8,6 +8,17 @@
 #include "tag_files/tag_loader/tag_injection.h"
 
 
+/* constants */
+
+enum
+{
+	k_maximum_number_of_coop_players = 4,
+
+};
+
+
+/* enums */
+
 enum e_pregame_lobby_button_blocks
 {
 	// pane 0 : custom_games
@@ -257,7 +268,261 @@ enum e_pregame_lobby_bitmap_blocks
 	k_pregame_lobby_pane_1_bitmap_count,
 };
 
-const e_pregame_lobby_text_blocks c_screen_pregame_lobby_text_pane_1_mapping(const e_pregame_lobby_text_blocks pane_1)
+
+
+/* prototypes */
+
+static const e_pregame_lobby_text_blocks c_screen_pregame_lobby_text_pane_1_mapping(const e_pregame_lobby_text_blocks pane_1);
+static void fix_server_party_leader_texts(e_pregame_pane_type pane_type);
+static void force_online_coop_patches(void);
+
+
+/* public code */
+
+CLASS_HOOK_DECLARE_LABEL(c_screen_multiplayer_pregame_lobby__update_protocol, c_screen_multiplayer_pregame_lobby::update_protocol);
+void c_screen_multiplayer_pregame_lobby::update_protocol()
+{
+	//INVOKE_TYPE(0x24300D, 0x0, void(__thiscall*)(c_screen_multiplayer_pregame_lobby*), this);
+
+	e_pregame_pane_type pane_type = this->m_pregame_pane_type;
+	switch (user_interface_squad_get_active_protocol())
+	{
+	case _session_protocol_splitscreen_coop:
+	case _session_protocol_system_link_coop:
+	case _session_protocol_xbox_live_coop:
+		pane_type = _pregame_pane_cooperative;
+		break;
+	case _session_protocol_splitscreen_custom:
+	case _session_protocol_system_link_custom:
+	case _session_protocol_xbox_live_custom:
+		pane_type = _pregame_pane_custom_game;
+		break;
+	case _session_protocol_xbox_live_optimatch:
+		pane_type = _pregame_pane_optimatch;
+		break;
+	}
+
+	if (pane_type != this->m_pregame_pane_type)
+	{
+		int32 new_pane_type = (int32)pane_type;
+		this->switch_panes(&new_pane_type);
+		this->m_pregame_pane_type = pane_type;
+
+		// add lobby_switch_codes_here
+		initialize_long_text_chat();
+		fix_server_party_leader_texts(pane_type);
+		update_chat_icons();
+	}
+	update_favourites_icons();
+
+}
+
+__declspec(naked) void jmp_update_protocol()
+{
+	CLASS_HOOK_JMP(c_screen_multiplayer_pregame_lobby__update_protocol, c_screen_multiplayer_pregame_lobby::update_protocol);
+}
+
+
+void c_screen_multiplayer_pregame_lobby::apply_instance_patches()
+{
+	// should probably replace these with asserts
+	NopFill(Memory::GetAddress(0x244F0A), 4); //	vote_status_text_block->m_visible = 0; 
+	NopFill(Memory::GetAddress(0x244F0E), 4); //	vote_tally_text_block->m_visible = 0;
+	NopFill(Memory::GetAddress(0x244F15), 4); //	vote_countdown_text_block->m_visible = 0;
+
+	// fix chatbox for cooperative_pane
+	WriteValue<uint8>(Memory::GetAddress(0x2435AE) + 1, TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(_pregame_lobby_pane_1_text_chat_body));
+	PatchCall(Memory::GetAddress(0x24589A), jmp_update_protocol); //inside c_screen_multiplayer_pregame_lobby::update
+	force_online_coop_patches();
+}
+
+void c_screen_multiplayer_pregame_lobby::apply_patches_on_map_load()
+{
+	const char* main_widget_tag_path = "ui\\screens\\game_shell\\pregame_lobby\\pregame_lobby";
+
+	datum main_widget_datum_index = tag_loaded(_tag_group_user_interface_screen_widget_definition, main_widget_tag_path);
+
+	if (main_widget_datum_index == NONE)
+	{
+		error(_error_log, "bad datum found");
+		return;
+	}
+
+	s_user_interface_screen_widget_definition* main_widget_tag = (s_user_interface_screen_widget_definition*)tag_get_fast(main_widget_datum_index);
+
+	s_window_pane_reference* custom_games_pane = main_widget_tag->panes[0];
+	s_window_pane_reference* cooperative_pane = main_widget_tag->panes[1];
+
+	//	add missing text_chat block
+	tag_injection_extend_block(&cooperative_pane->text_blocks, cooperative_pane->text_blocks.type_size(), k_number_of_pregame_pane_1_text_addons);
+
+	//	fix bitmap offsets
+	for (uint8 block_idx = 0; block_idx <= _pregame_lobby_pane_1_bitmap_game_settings; block_idx++)
+	{
+		cooperative_pane->bitmap_blocks[block_idx]->topleft = custom_games_pane->bitmap_blocks[block_idx]->topleft;
+	}
+	//	_pregame_lobby_pane_1_bitmap_name_field bitmap is not used in h2v 
+	//	creates a big box in the middle so nopped the bitmap it references
+	//	edit : turns out its the remnant of y-menu
+	cooperative_pane->bitmap_blocks[_pregame_lobby_pane_1_bitmap_name_field]->bitmap_tag.index = NONE;
+	//copy data for broken bitmap blocks
+	csmemcpy(cooperative_pane->bitmap_blocks[_pregame_lobby_pane_1_bitmap_arrows_up], custom_games_pane->bitmap_blocks[_pregame_lobby_pane_0_bitmap_arrows_up], sizeof(s_bitmap_block_reference));
+	csmemcpy(cooperative_pane->bitmap_blocks[_pregame_lobby_pane_1_bitmap_arrows_down], custom_games_pane->bitmap_blocks[_pregame_lobby_pane_0_bitmap_arrows_down], sizeof(s_bitmap_block_reference));
+	csmemcpy(cooperative_pane->bitmap_blocks[_pregame_lobby_pane_1_bitmap_favorites_icon], custom_games_pane->bitmap_blocks[_pregame_lobby_pane_0_bitmap_favorites_icon], sizeof(s_bitmap_block_reference));
+
+
+	//	fix player fields
+	s_player_block_reference* custom_games_player_block = custom_games_pane->player_blocks[0];
+	s_player_block_reference* cooperative_player_block = cooperative_pane->player_blocks[0];
+	cooperative_player_block->bottomleft = custom_games_player_block->bottomleft;
+	cooperative_player_block->row_height = custom_games_player_block->row_height;
+
+	//	change "ui\player_skins\player_skin_default.skin" to "ui\player_skins\player_skin_lobby.skin"
+	cooperative_player_block->skin.index = custom_games_player_block->skin.index;
+
+
+
+
+	//	fix button bounds
+	for (uint8 block_idx = 0; block_idx < k_pregame_lobby_pane_1_button_count; block_idx++)
+	{
+		cooperative_pane->buttons[block_idx]->bounds = custom_games_pane->buttons[block_idx]->bounds;
+		cooperative_pane->buttons[block_idx]->bitmap_offset = custom_games_pane->buttons[block_idx]->bitmap_offset;
+	}
+
+	//	fix text bounds
+	for (uint8 block_idx = 0; block_idx < k_pregame_lobby_pane_1_text_count_orignal; ++block_idx)
+	{
+		const uint8 custom_game_block_idx = (uint8)c_screen_pregame_lobby_text_pane_1_mapping((e_pregame_lobby_text_blocks)block_idx);
+		cooperative_pane->text_blocks[block_idx]->text_bounds = custom_games_pane->text_blocks[custom_game_block_idx]->text_bounds;
+	}
+
+	//	_pregame_lobby_pane_1_text_level_description_placeholder bottom and right still need to be adjusted
+	cooperative_pane->text_blocks[_pregame_lobby_pane_1_text_level_description_placeholder]->text_bounds.right = -290;
+	cooperative_pane->text_blocks[_pregame_lobby_pane_1_text_level_description_placeholder]->text_bounds.bottom = -400;
+
+	//copy data for _pregame_lobby_pane_1_text_text_chat_body block
+	csmemcpy(cooperative_pane->text_blocks[_pregame_lobby_pane_1_text_chat_body], custom_games_pane->text_blocks[_pregame_lobby_pane_0_text_chat_body], sizeof(s_text_block_reference));
+
+}
+
+
+
+/* private code */
+
+void c_screen_multiplayer_pregame_lobby::initialize_long_text_chat()
+{
+	e_pregame_lobby_text_blocks chat_box_receiver = _pregame_lobby_pane_0_text_chat_body;
+	if (m_pregame_pane_type == _pregame_pane_cooperative)
+	{
+		chat_box_receiver = _pregame_lobby_pane_1_text_chat_body;
+
+	}
+	else if (m_pregame_pane_type == _pregame_pane_custom_game)
+	{
+		chat_box_receiver = _pregame_lobby_pane_0_text_chat_body;
+	}
+	else
+	{
+		// complete this once we have matchmaking lobby
+		return;
+	}
+
+	c_text_widget* chat_box_text = try_find_screen_text(chat_box_receiver);
+	if (chat_box_text && this->m_communications_allowed)
+	{
+		rectangle2d chat_text_bounds;
+		chat_box_text->get_unprojected_bounds(&chat_text_bounds);
+
+		const real_rgb_color* rgb_text_color = chat_box_text->get_interface()->get_color();
+		real_argb_color argb_text_color;
+		argb_text_color.alpha = 1.0f;
+		argb_text_color.red = rgb_text_color->red;
+		argb_text_color.blue = rgb_text_color->blue;
+		argb_text_color.green = rgb_text_color->green;
+
+		this->add_new_child(&this->m_long_chat_text);
+
+		this->m_long_chat_text.set_text_properties(
+			text_flag_left_justify_text,
+			chat_box_text->get_animation_type(),
+			&argb_text_color,
+			chat_box_text->get_interface()->get_font(),
+			&chat_text_bounds);
+
+		this->m_long_chat_text.set_field74();
+	}
+
+}
+
+void c_screen_multiplayer_pregame_lobby::update_chat_icons()
+{
+	e_pregame_lobby_bitmap_blocks up_arrow_icon_id = _pregame_lobby_pane_0_bitmap_arrows_up;
+	e_pregame_lobby_bitmap_blocks down_arrow_icon_id = _pregame_lobby_pane_0_bitmap_arrows_down;
+	if (m_pregame_pane_type == _pregame_pane_custom_game)
+	{
+		up_arrow_icon_id = _pregame_lobby_pane_0_bitmap_arrows_up;
+		down_arrow_icon_id = _pregame_lobby_pane_0_bitmap_arrows_down;
+
+		c_text_widget* map_download_progress_text = try_find_screen_text(_pregame_lobby_pane_0_text_map_download_progress);
+		if (map_download_progress_text)
+		{
+			rectangle2d new_bounds;
+			map_download_progress_text->get_bounds(&new_bounds);
+			new_bounds.bottom = 2 * new_bounds.bottom - new_bounds.top;
+			map_download_progress_text->set_bounds(&new_bounds);
+		}
+	}
+	else if (m_pregame_pane_type == _pregame_pane_cooperative)
+	{
+		up_arrow_icon_id = _pregame_lobby_pane_1_bitmap_arrows_up;
+		down_arrow_icon_id = _pregame_lobby_pane_1_bitmap_arrows_down;
+	}
+	else
+	{
+		// complete this once we have matchmaking lobby
+		return;
+	}
+
+	this->m_special_widgets[_special_widget_bitmap_arrow_up] = (c_user_interface_widget*)try_find_bitmap_widget(up_arrow_icon_id);
+	this->m_special_widgets[_special_widget_bitmap_arrow_down] = (c_user_interface_widget*)try_find_bitmap_widget(down_arrow_icon_id);
+
+	if (!this->m_communications_allowed)
+	{
+		if (this->m_special_widgets[_special_widget_bitmap_arrow_up])
+			this->m_special_widgets[_special_widget_bitmap_arrow_up]->set_visible(false);
+
+		if (this->m_special_widgets[_special_widget_bitmap_arrow_down])
+			this->m_special_widgets[_special_widget_bitmap_arrow_down]->set_visible(false);
+	}
+
+}
+
+void c_screen_multiplayer_pregame_lobby::update_favourites_icons()
+{
+	e_pregame_lobby_bitmap_blocks favourites_icon_id = _pregame_lobby_pane_0_bitmap_favorites_icon;
+	if (m_pregame_pane_type == _pregame_pane_custom_game)
+	{
+		favourites_icon_id = _pregame_lobby_pane_0_bitmap_favorites_icon;
+	}
+	else if (m_pregame_pane_type == _pregame_pane_cooperative)
+	{
+		favourites_icon_id = _pregame_lobby_pane_1_bitmap_favorites_icon;
+	}
+	else
+	{
+		// complete this once we have matchmaking lobby
+		return;
+	}
+	this->m_special_widgets[_special_widget_bitmap_favourites] = (c_user_interface_widget*)this->try_find_bitmap_widget(favourites_icon_id);
+	if (this->m_special_widgets[_special_widget_bitmap_favourites])
+	{
+		this->m_special_widgets[_special_widget_bitmap_favourites]->set_visible(user_interface_squad_session_is_xbox_live());
+	}
+}
+
+
+static const e_pregame_lobby_text_blocks c_screen_pregame_lobby_text_pane_1_mapping(const e_pregame_lobby_text_blocks pane_1)
 {
 	switch (pane_1)
 	{
@@ -441,7 +706,7 @@ const e_pregame_lobby_text_blocks c_screen_pregame_lobby_text_pane_1_mapping(con
 	return k_pregame_lobby_pane_1_text_count;
 }
 
-void fix_server_party_leader_texts(e_pregame_pane_type pane_type)
+static void fix_server_party_leader_texts(e_pregame_pane_type pane_type)
 {
 	e_pregame_lobby_text_blocks party_leader_text_id = _pregame_lobby_pane_0_text_party_leader;
 	e_pregame_lobby_text_blocks server_party_leader_text_id = _pregame_lobby_pane_0_text_server_party_leader;
@@ -462,240 +727,26 @@ void fix_server_party_leader_texts(e_pregame_pane_type pane_type)
 	WriteValue<uint8>(Memory::GetAddress(0x245275) + 1, (uint8)TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(server_party_leader_text_id));
 }
 
-void c_screen_multiplayer_pregame_lobby::initialize_long_text_chat()
+static void force_online_coop_patches(void)
 {
-	e_pregame_lobby_text_blocks chat_box_receiver = _pregame_lobby_pane_0_text_chat_body;
-	if (m_pregame_pane_type == _pregame_pane_cooperative)
-	{
-		chat_box_receiver = _pregame_lobby_pane_1_text_chat_body;
+	//#todo: move these out to respective files
 
-	}
-	else if (m_pregame_pane_type == _pregame_pane_custom_game)
-	{
-		chat_box_receiver = _pregame_lobby_pane_0_text_chat_body;
-	}
-	else
-	{
-		// complete this once we have matchmaking lobby
-		return;
-	}
+	//ui-game-patches
+	WriteValue<BYTE>(Memory::GetAddress(0x23EC55 + 1), 0);	// Prevent from pausing during the game
+	NopFill(Memory::GetAddress(0x7AE4), 0x5); // prevent pause menu from showing up when not in focus
 
-	c_text_widget* chat_box_text = try_find_screen_text(chat_box_receiver);
-	if (chat_box_text && this->m_communications_allowed)
-	{
-		rectangle2d chat_text_bounds;
-		chat_box_text->get_unprojected_bounds(&chat_text_bounds);
+	//lifecycle-game-patches
+	WriteValue<BYTE>(Memory::GetAddress(0x1D9A74 + 1), k_maximum_number_of_coop_players);	// increase max players to 4
+	WriteValue<BYTE>(Memory::GetAddress(0x1D9A7D + 1), k_maximum_number_of_coop_players);	// increase max peer-count to 4
+	WriteValue<BYTE>(Memory::GetAddress(0x4930C), 0xEB);	// remove game_options check
 
-		const real_rgb_color* rgb_text_color = chat_box_text->get_interface()->get_color();
-		real_argb_color argb_text_color;
-		argb_text_color.alpha = 1.0f;
-		argb_text_color.red = rgb_text_color->red;
-		argb_text_color.blue = rgb_text_color->blue;
-		argb_text_color.green = rgb_text_color->green;
-
-		this->add_new_child(&this->m_long_chat_text);
-
-		this->m_long_chat_text.set_text_properties(
-			text_flag_left_justify_text,
-			chat_box_text->get_animation_type(),
-			&argb_text_color,
-			chat_box_text->get_interface()->get_font(),
-			&chat_text_bounds);
-
-		this->m_long_chat_text.set_field74();
-	}
-
-}
-
-CLASS_HOOK_DECLARE_LABEL(c_screen_multiplayer_pregame_lobby__update_protocol, c_screen_multiplayer_pregame_lobby::update_protocol);
-void c_screen_multiplayer_pregame_lobby::update_protocol()
-{
-	//INVOKE_TYPE(0x24300D, 0x0, void(__thiscall*)(c_screen_multiplayer_pregame_lobby*), this);
-
-	e_pregame_pane_type pane_type = this->m_pregame_pane_type;
-	switch (user_interface_squad_get_active_protocol())
-	{
-	case _session_protocol_splitscreen_coop:
-	case _session_protocol_system_link_coop:
-	case _session_protocol_xbox_live_coop:
-		pane_type = _pregame_pane_cooperative;
-		break;
-	case _session_protocol_splitscreen_custom:
-	case _session_protocol_system_link_custom:
-	case _session_protocol_xbox_live_custom:
-		pane_type = _pregame_pane_custom_game;
-		break;
-	case _session_protocol_xbox_live_optimatch:
-		pane_type = _pregame_pane_optimatch;
-		break;
-	}
-
-	if (pane_type != this->m_pregame_pane_type)
-	{
-		int32 new_pane_type = (int32)pane_type;
-		this->switch_panes(&new_pane_type);
-		this->m_pregame_pane_type = pane_type;
-
-		// add lobby_switch_codes_here
-		initialize_long_text_chat();
-		fix_server_party_leader_texts(pane_type);
-		update_chat_icons();
-	}
-	update_favourites_icons();
-
-}
-
-__declspec(naked) void jmp_update_protocol()
-{
-	CLASS_HOOK_JMP(c_screen_multiplayer_pregame_lobby__update_protocol, c_screen_multiplayer_pregame_lobby::update_protocol);
-}
-
-void c_screen_multiplayer_pregame_lobby::update_chat_icons()
-{
-	e_pregame_lobby_bitmap_blocks up_arrow_icon_id = _pregame_lobby_pane_0_bitmap_arrows_up;
-	e_pregame_lobby_bitmap_blocks down_arrow_icon_id = _pregame_lobby_pane_0_bitmap_arrows_down;
-	if (m_pregame_pane_type == _pregame_pane_custom_game)
-	{
-		up_arrow_icon_id = _pregame_lobby_pane_0_bitmap_arrows_up;
-		down_arrow_icon_id = _pregame_lobby_pane_0_bitmap_arrows_down;
-
-		c_text_widget* map_download_progress_text = try_find_screen_text(_pregame_lobby_pane_0_text_map_download_progress);
-		if (map_download_progress_text)
-		{
-			rectangle2d new_bounds;
-			map_download_progress_text->get_bounds(&new_bounds);
-			new_bounds.bottom = 2 * new_bounds.bottom - new_bounds.top;
-			map_download_progress_text->set_bounds(&new_bounds);
-		}
-	}
-	else if (m_pregame_pane_type == _pregame_pane_cooperative)
-	{
-		up_arrow_icon_id = _pregame_lobby_pane_1_bitmap_arrows_up;
-		down_arrow_icon_id = _pregame_lobby_pane_1_bitmap_arrows_down;
-	}
-	else
-	{
-		// complete this once we have matchmaking lobby
-		return;
-	}
-
-	this->m_special_widgets[_special_widget_bitmap_arrow_up] = (c_user_interface_widget*)try_find_bitmap_widget(up_arrow_icon_id);
-	this->m_special_widgets[_special_widget_bitmap_arrow_down] = (c_user_interface_widget*)try_find_bitmap_widget(down_arrow_icon_id);
-	
-	if (!this->m_communications_allowed)
-	{
-		if (this->m_special_widgets[_special_widget_bitmap_arrow_up])
-			this->m_special_widgets[_special_widget_bitmap_arrow_up]->set_visible(false);
-
-		if (this->m_special_widgets[_special_widget_bitmap_arrow_down])
-			this->m_special_widgets[_special_widget_bitmap_arrow_down]->set_visible(false);
-	}
-
-}
-
-void c_screen_multiplayer_pregame_lobby::update_favourites_icons()
-{
-	e_pregame_lobby_bitmap_blocks favourites_icon_id = _pregame_lobby_pane_0_bitmap_favorites_icon;
-	if (m_pregame_pane_type == _pregame_pane_custom_game)
-	{
-		favourites_icon_id = _pregame_lobby_pane_0_bitmap_favorites_icon;
-	}
-	else if (m_pregame_pane_type == _pregame_pane_cooperative)
-	{
-		favourites_icon_id = _pregame_lobby_pane_1_bitmap_favorites_icon;
-	}
-	else
-	{
-		// complete this once we have matchmaking lobby
-		return;
-	}
-	this->m_special_widgets[_special_widget_bitmap_favourites] = (c_user_interface_widget*)this->try_find_bitmap_widget(favourites_icon_id);
-	if (this->m_special_widgets[_special_widget_bitmap_favourites])
-	{
-		this->m_special_widgets[_special_widget_bitmap_favourites]->set_visible(user_interface_squad_session_is_xbox_live());
-	}
-}
+	WriteValue<BYTE>(Memory::GetAddress(0x1D9280 + 2), k_maximum_number_of_coop_players);	// increase membership_player_count to 4
+	WriteValue<BYTE>(Memory::GetAddress(0x1D928A + 2), k_maximum_number_of_coop_players);	// increase membership_peer_count to 4
 
 
-void c_screen_multiplayer_pregame_lobby::apply_instance_patches()
-{
-	// should probably replace these with asserts
-	NopFill(Memory::GetAddress(0x244F0A), 4); //	vote_status_text_block->m_visible = 0; 
-	NopFill(Memory::GetAddress(0x244F0E), 4); //	vote_tally_text_block->m_visible = 0;
-	NopFill(Memory::GetAddress(0x244F15), 4); //	vote_countdown_text_block->m_visible = 0;
-
-	// fix chatbox for cooperative_pane
-	WriteValue<uint8>(Memory::GetAddress(0x2435AE) + 1, TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(_pregame_lobby_pane_1_text_chat_body));
-	PatchCall(Memory::GetAddress(0x24589A), jmp_update_protocol); //inside c_screen_multiplayer_pregame_lobby::update
-
-}
-
-void c_screen_multiplayer_pregame_lobby::apply_patches_on_map_load()
-{
-	const char* main_widget_tag_path = "ui\\screens\\game_shell\\pregame_lobby\\pregame_lobby";
-
-	datum main_widget_datum_index = tag_loaded(_tag_group_user_interface_screen_widget_definition, main_widget_tag_path);
-
-	if (main_widget_datum_index == NONE)
-	{
-		error(_error_log, "bad datum found");
-		return;
-	}
-
-	s_user_interface_screen_widget_definition* main_widget_tag = (s_user_interface_screen_widget_definition*)tag_get_fast(main_widget_datum_index);
-
-	s_window_pane_reference* custom_games_pane = main_widget_tag->panes[0];
-	s_window_pane_reference* cooperative_pane = main_widget_tag->panes[1];
-
-	//	add missing text_chat block
-	tag_injection_extend_block(&cooperative_pane->text_blocks, cooperative_pane->text_blocks.type_size(), k_number_of_pregame_pane_1_text_addons);
-
-	//	fix bitmap offsets
-	for (uint8 block_idx = 0; block_idx <= _pregame_lobby_pane_1_bitmap_game_settings; block_idx++)
-	{
-		cooperative_pane->bitmap_blocks[block_idx]->topleft = custom_games_pane->bitmap_blocks[block_idx]->topleft;
-	}
-	//	_pregame_lobby_pane_1_bitmap_name_field bitmap is not used in h2v 
-	//	creates a big box in the middle so nopped the bitmap it references
-	//	edit : turns out its the remnant of y-menu
-	cooperative_pane->bitmap_blocks[_pregame_lobby_pane_1_bitmap_name_field]->bitmap_tag.index = NONE;
-	//copy data for broken bitmap blocks
-	csmemcpy(cooperative_pane->bitmap_blocks[_pregame_lobby_pane_1_bitmap_arrows_up], custom_games_pane->bitmap_blocks[_pregame_lobby_pane_0_bitmap_arrows_up], sizeof(s_bitmap_block_reference));
-	csmemcpy(cooperative_pane->bitmap_blocks[_pregame_lobby_pane_1_bitmap_arrows_down], custom_games_pane->bitmap_blocks[_pregame_lobby_pane_0_bitmap_arrows_down], sizeof(s_bitmap_block_reference));
-	csmemcpy(cooperative_pane->bitmap_blocks[_pregame_lobby_pane_1_bitmap_favorites_icon], custom_games_pane->bitmap_blocks[_pregame_lobby_pane_0_bitmap_favorites_icon], sizeof(s_bitmap_block_reference));
-
-
-	//	fix player fields
-	s_player_block_reference* custom_games_player_block = custom_games_pane->player_blocks[0];
-	s_player_block_reference* cooperative_player_block = cooperative_pane->player_blocks[0];
-	cooperative_player_block->bottomleft = custom_games_player_block->bottomleft;
-	cooperative_player_block->row_height = custom_games_player_block->row_height;
-
-	//	change "ui\player_skins\player_skin_default.skin" to "ui\player_skins\player_skin_lobby.skin"
-	cooperative_player_block->skin.index = custom_games_player_block->skin.index;
-
-
-
-
-	//	fix button bounds
-	for (uint8 block_idx = 0; block_idx < k_pregame_lobby_pane_1_button_count; block_idx++)
-	{
-		cooperative_pane->buttons[block_idx]->bounds = custom_games_pane->buttons[block_idx]->bounds;
-		cooperative_pane->buttons[block_idx]->bitmap_offset = custom_games_pane->buttons[block_idx]->bitmap_offset;
-	}
-
-	//	fix text bounds
-	for (uint8 block_idx = 0; block_idx < k_pregame_lobby_pane_1_text_count_orignal; ++block_idx)
-	{
-		const uint8 custom_game_block_idx = (uint8)c_screen_pregame_lobby_text_pane_1_mapping((e_pregame_lobby_text_blocks)block_idx);
-		cooperative_pane->text_blocks[block_idx]->text_bounds = custom_games_pane->text_blocks[custom_game_block_idx]->text_bounds;
-	}
-
-	//	_pregame_lobby_pane_1_text_level_description_placeholder bottom and right still need to be adjusted
-	cooperative_pane->text_blocks[_pregame_lobby_pane_1_text_level_description_placeholder]->text_bounds.right = -290;
-	cooperative_pane->text_blocks[_pregame_lobby_pane_1_text_level_description_placeholder]->text_bounds.bottom = -400;
-
-	//copy data for _pregame_lobby_pane_1_text_text_chat_body block
-	csmemcpy(cooperative_pane->text_blocks[_pregame_lobby_pane_1_text_chat_body], custom_games_pane->text_blocks[_pregame_lobby_pane_0_text_chat_body], sizeof(s_text_block_reference));
+	// remove pregame lobby player check
+	NopFill(Memory::GetAddress(0x2165E9), 0x7);
+	uint8 pregame_lobby_patch_asm[] = { 0xE9 ,0x16 ,0x01 ,00 ,00 ,0x90 };
+	WriteBytes(Memory::GetAddress(0x2165F0), pregame_lobby_patch_asm, NUMBEROF(pregame_lobby_patch_asm));
 
 }

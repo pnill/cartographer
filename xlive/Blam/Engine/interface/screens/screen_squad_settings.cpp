@@ -460,14 +460,6 @@ void c_squad_settings_list::handle_item_switch_to_coop(
 	{
 		screen_error_ok_dialog_show(_user_interface_channel_type_game_error, _ui_error_beta_feature_disabled, _window_4, FLAG(event->controller), 0, 0);
 	}
-	else if (network_squad_session_get_session_class() == _network_session_class_system_link
-		|| network_squad_session_get_session_class() == _network_session_class_xbox_live)
-	{
-		screen_error_ok_dialog_with_custom_text(
-			_user_interface_channel_type_gameshell_dialog,
-			_ui_error_generic, _window_4,
-			FLAG(event->controller), NULL, NULL, L"Access Denied", L"Coming Soon....");
-	}
 	else
 	{
 		user_interface_squad_clear_game_settings();
