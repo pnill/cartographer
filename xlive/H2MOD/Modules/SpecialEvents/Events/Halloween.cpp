@@ -4,18 +4,24 @@
 #include "MapObjectPlacements/Halloween/Coagulation.h"
 #include "MapObjectPlacements/Halloween/Lockout.h"
 
-#include "structures/structure_lightmap.h"
 
 #include "cache/cache_files.h"
 #include "models/models.h"
+#include "models/model_definitions.h"
 #include "objects/objects.h"
 #include "objects/scenery.h"
-#include "networking/logic/life_cycle_manager.h"
+#include "networking/network_game_definitions.h"
+#include "scenario/scenario.h"
 #include "scenario/scenario_definitions.h"
+#include "structures/structure_lightmap.h"
 #include "structures/structure_bsp_definitions.h"
 #include "tag_files/tag_loader/tag_injection.h"
 
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
+
+/* prototypes */
+
+static void halloween_game_life_cycle_update(e_life_cycle_state state);
 
 /* globals */
 
@@ -25,10 +31,6 @@ static datum candle_datum = NONE;
 static datum candle_fire_datum = NONE;
 static datum large_candle_datum = NONE;
 static datum pump_datum = NONE;
-
-/* prototypes */
-
-static void halloween_game_life_cycle_update(e_life_cycle_state state);
 
 /* public code */
 
@@ -57,13 +59,13 @@ void halloween_event_map_load(void)
 
 		if(tag_injection_is_injected(lbitm_datum) && ltmp_datum != NONE)
 		{
-			structure_lightmap* ltmp = (structure_lightmap*)tag_get_fast(ltmp_datum);
+			structure_lightmap* ltmp = structure_lightmap_definition_get(ltmp_datum);
 			ltmp->lightmap_groups[0]->bitmap_group.index = lbitm_datum;
 		}
 
-		scenario* scenario_definition = (scenario*)tag_get_fast(cache_files_get_tags_header()->scenario_index);
-		const scenario_structure_bsp_reference* reference = TAG_BLOCK_GET_ELEMENT(&scenario_definition->structure_bsp_references, 0, scenario_structure_bsp_reference);
-		structure_bsp* bsp_definition = (structure_bsp*)tag_get_fast(reference->structure_bsp.index);
+		scenario const* scenario_definition = global_scenario_get();
+		scenario_structure_bsp_reference const* reference = TAG_BLOCK_GET_ELEMENT(&scenario_definition->structure_bsp_references, 0, scenario_structure_bsp_reference);
+		structure_bsp* bsp_definition = structure_bsp_definition_get(reference->structure_bsp.index);
 
 		if (tag_injection_is_injected(sky_datum))
 		{
@@ -72,7 +74,7 @@ void halloween_event_map_load(void)
 
 		if (ltmp_datum != NONE && lbitm_datum != NONE)
 		{
-			structure_lightmap* ltmp = (structure_lightmap*)tag_get_fast(ltmp_datum);
+			structure_lightmap* ltmp = structure_lightmap_definition_get(ltmp_datum);
 			ltmp->lightmap_groups[0]->bitmap_group.index = lbitm_datum;
 
 			// Null out decorator block since the colour for them is separate from the lightmap colour
@@ -114,8 +116,8 @@ static void halloween_game_life_cycle_update(e_life_cycle_state state)
 	{
 		object_placement_data placement;
 
-		scenery_definition* pump = (scenery_definition*)tag_get_fast(pump_datum);
-		s_model_definition* pump_hmlt = (s_model_definition*)tag_get_fast(pump->object.model.index);
+		scenery_definition* pump = scenery_definition_get(pump_datum);
+		s_model_definition* pump_hmlt = model_definition_get(pump->object.model.index);
 
 		const cache_file_header* cache_header = cache_files_get_header();
 		if (!strcmp(cache_header->name, "coagulation"))

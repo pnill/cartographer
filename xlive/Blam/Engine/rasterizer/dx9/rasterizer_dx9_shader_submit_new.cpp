@@ -52,8 +52,8 @@ void c_shader_submission_interface_new::stage_texture(
 
 	light_definition* light_def;
 	e_rasterizer_target target;
-	s_shader_definition* shader_def;
-	s_shader_postprocess_definition_new* pp_def;
+	s_shader_definition* shader_definition;
+	s_shader_postprocess_definition_new* shader_postprocess_definition;
 	bitmap_group* group;
 	uint32 convolution_target_index;
 	s_shader_postprocess_bitmap_new* bitmap;
@@ -162,11 +162,13 @@ void c_shader_submission_interface_new::stage_texture(
 			
 		if (hud_bitmap_tag_index_get() != NONE)
 		{
-			group = (bitmap_group*)tag_get_fast(hud_bitmap_tag_index_get());
+			group = bitmap_group_get(hud_bitmap_tag_index_get());
 			if (VALID_INDEX(hud_bitmap_data_index_get(), group->bitmaps.count))
 			{
 				ASSERT(group);
-				const bitmap_data* hud_bitmap = group->bitmaps[hud_bitmap_data_index_get()];
+
+				bitmap_data const* hud_bitmap = group->bitmaps[hud_bitmap_data_index_get()];
+
 				*res_x = hud_bitmap->width;
 				*res_y = hud_bitmap->height;
 			}
@@ -240,19 +242,19 @@ void c_shader_submission_interface_new::stage_texture(
 	case _shader_pass_texture_source_extern_shader_active_camo_bump:
 		ASSERT(m_extern_shader_index != NONE);
 			
-		shader_def = (s_shader_definition*)tag_get_fast(m_extern_shader_index);
-		pp_def = TAG_BLOCK_GET_ELEMENT(&shader_def->postprocess_definition, 0, s_shader_postprocess_definition_new);
-		bitmap_index = pp_def->bitmap_property_get(4)->bitmap_index;
+		shader_definition = shader_definition_get(m_extern_shader_index);
+		shader_postprocess_definition = TAG_BLOCK_GET_ELEMENT(&shader_definition->postprocess_definition, 0, s_shader_postprocess_definition_new);
+		bitmap_index = shader_postprocess_definition->bitmap_property_get(4)->bitmap_index;
 		if (bitmap_index == NONE)
 		{
-			shader_def = (s_shader_definition*)tag_get_fast(rasterizer_globals_get_data()->global_shader.index);
-			pp_def = TAG_BLOCK_GET_ELEMENT(&shader_def->postprocess_definition, 0, s_shader_postprocess_definition_new);
-			bitmap_index = pp_def->bitmap_property_get(4)->bitmap_index;
+			shader_definition = shader_definition_get(rasterizer_globals_get_data()->global_shader.index);
+			shader_postprocess_definition = TAG_BLOCK_GET_ELEMENT(&shader_definition->postprocess_definition, 0, s_shader_postprocess_definition_new);
+			bitmap_index = shader_postprocess_definition->bitmap_property_get(4)->bitmap_index;
 
 			ASSERT(bitmap_index != NONE);
 		}
 
-		bitmap = pp_def->bitmap_get(bitmap_index);
+		bitmap = shader_postprocess_definition->bitmap_get(bitmap_index);
 		rasterizer_dx9_set_texture_direct(stage, bitmap->bitmap_group, (int16)bitmap->bitmap_index, 0.f);
 		break;
 

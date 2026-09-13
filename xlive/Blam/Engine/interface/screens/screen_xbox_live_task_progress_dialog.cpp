@@ -2,10 +2,10 @@
 #include "screen_xbox_live_task_progress_dialog.h"
 
 #include "cache/cache_files.h"
-#include "interface/user_interface_screen_widget_definition.h"
-#include "interface/user_interface_utilities.h"
+#include "interface/user_interface.h"
+#include "interface/user_interface_shared_globals.h"
 #include "interface/user_interface_memory.h"
-#include "interface/user_interface_controller.h"
+#include "interface/user_interface_screen_widget_definition.h"
 #include "networking/online/online_task_xbox.h"
 
 c_screen_xbox_live_task_progress_dialog::c_screen_xbox_live_task_progress_dialog(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags):
@@ -204,18 +204,20 @@ void c_screen_xbox_live_task_progress_dialog::apply_patches_on_map_load()
 	// Get tag definition
 	datum task_progress_dialog_datum_index = tag_loaded(_tag_group_user_interface_screen_widget_definition, "ui\\screens\\game_shell\\xbox_live\\task_progress_dialog\\task_progress_dialog");
 	if (task_progress_dialog_datum_index == NONE) { return;	}
-	s_user_interface_screen_widget_definition* task_progress_dialog_definition = (s_user_interface_screen_widget_definition*)tag_get_fast(task_progress_dialog_datum_index);
+	s_user_interface_screen_widget_definition* task_progress_dialog_definition = user_interface_screen_widget_definition_get(task_progress_dialog_datum_index);
 	
 	// Sanity checks
 	if (task_progress_dialog_definition == nullptr) { return; }
 	if (task_progress_dialog_definition->panes.count == 0) { return; }
 
-	s_window_pane_reference* pane_definition = task_progress_dialog_definition->panes[0];
+	s_window_pane_reference* pane_definition = user_interface_widget_pane_get(&task_progress_dialog_definition->panes, 0);
 	
 	// Fix the text placement
 	if (pane_definition->text_blocks.count > 0)
 	{
-		pane_definition->text_blocks[0]->text_bounds = { 144, -244, -38, 244 };
+		s_text_block_reference* reference = TAG_BLOCK_GET_ELEMENT(&pane_definition->text_blocks, 0, s_text_block_reference);
+
+		reference->text_bounds = { 144, -244, -38, 244 };
 	}
 
 	// Fix the placement of the 4 UI bitmaps
@@ -223,17 +225,21 @@ void c_screen_xbox_live_task_progress_dialog::apply_patches_on_map_load()
 	{
 		point2d fixed_bitmaps_placements[4] = { {-288, 218}, {148, -66}, {-278, 208}, {-234, 306} };
 
-		for (int i = 0; i < 4; ++i)
+		for (int32 i = 0; i < 4; ++i)
 		{
+			s_bitmap_block_reference* reference = TAG_BLOCK_GET_ELEMENT(&pane_definition->bitmap_blocks, i, s_bitmap_block_reference);
+
 			// fix the ui bitmap elements position
-			pane_definition->bitmap_blocks[i]->topleft = fixed_bitmaps_placements[i];
+			reference->topleft = fixed_bitmaps_placements[i];
 		}
 	}
 
 	// Fix the model viewport bounds
 	if (pane_definition->model_scene_blocks.count > 0)
 	{
-		pane_definition->model_scene_blocks[0]->ui_viewport = { 78, -110, -174, 110 };
+		s_ui_model_scene_reference* scene = TAG_BLOCK_GET_ELEMENT(&pane_definition->model_scene_blocks, 0, s_ui_model_scene_reference);
+
+		scene->ui_viewport = { 78, -110, -174, 110 };
 	}
 	return;
 }

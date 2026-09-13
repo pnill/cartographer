@@ -1151,12 +1151,12 @@ static void hs_enumerate_navpoints(void)
 {
 	if (global_scenario_index_get() != NONE && interface_get_tag_index(_interface_hud_globals) != NONE)
 	{
-		const datum hud_globals_index = interface_get_tag_index(_interface_hud_globals);
-		const hud_globals_definition* hud_globals = (hud_globals_definition*)tag_get_fast(/*_tag_group_hud_globals,*/ hud_globals_index);
+		datum const hud_globals_index = interface_get_tag_index(_interface_hud_globals);
+		hud_globals_definition const* hud_globals = hud_globals_definition_get(hud_globals_index);
 		
 		ASSERT(hud_globals);
 
-		hs_enumerate_block_data((s_tag_block*)&hud_globals->waypoint_arrows, 0, sizeof(s_waypoint_arrows_block));
+		hs_enumerate_block_data(&hud_globals->waypoint_arrows, 0, sizeof(s_waypoint_arrows_block));
 	}
 	return;
 }
@@ -1168,8 +1168,9 @@ static void hs_enumerate_hud_messages(void)
 		int32 index = global_scenario_get()->hud_messages.index;
 		if (index != NONE)
 		{
-			const hud_state_messages* hud_message = (hud_state_messages*)tag_get_fast(/*_tag_group_hud_message_text, */ index);
-			hs_enumerate_block_data((s_tag_block*)&hud_message->messages, 0, sizeof(hud_state_message_definition));
+			hud_state_messages const* hud_message = hud_state_messages_get(index);
+			
+			hs_enumerate_block_data(&hud_message->messages, 0, sizeof(hud_state_message_definition));
 		}
 	}
 	return;

@@ -3,28 +3,43 @@
 
 #include "physics/character_physics_definitions.h"
 
-enum e_biped_definition_flags : uint32
+/* constants */
+
+enum
 {
-	_biped_definition_turns_without_animating = FLAG(0),
-	_biped_definition_passes_through_other_bipeds = FLAG(1),
-	_biped_definition_immune_to_falling_damage = FLAG(2),
-	_biped_definition_rotate_while_airborne = FLAG(3),
-	_biped_definition_uses_limp_body_physics = FLAG(4),
-	_biped_definition_unused = FLAG(5),
-	_biped_definition_random_speed_increase = FLAG(6),
-	_biped_definition_unused_1 = FLAG(7),
-	_biped_definition_spawn_death_children_on_destroy = FLAG(8),
-	_biped_definition_stunned_by_emp_damage = FLAG(9),
-	_biped_definition_dead_physics_when_stunned = FLAG(10),
-	_biped_definition_always_ragdoll_when_dead = FLAG(11)
+	BIPED_DEFINITION_TAG = 'bipd',
 };
 
-enum e_biped_lock_on_data_flags : uint32
+/* macros */
+
+#define biped_definition_get(index) ((struct biped_definition *)tag_get(BIPED_DEFINITION_TAG, (index)))
+
+/* enums */
+
+enum e_biped_definition_flags
 {
-	_biped_lock_on_locked_by_human_targeting = FLAG(0),
-	_biped_lock_on_locked_by_plasma_targeting = FLAG(1),
-	_biped_lock_on_always_locked_by_plasma_targeting = FLAG(2)
+	_biped_turns_without_animating_bit = 0,
+	_biped_passes_through_bipeds_bit,
+	_biped_immune_to_falling_damage_bit,
+	_biped_rotate_while_airborne_bit,
+	_biped_uses_limp_body_physics_bit,
+	_biped_unused,
+	_biped_random_speed_increase_bit,
+	_biped_unused_1,
+	_biped_spawn_death_children_on_destroy,
+	_biped_stunned_by_emp_damage,
+	_biped_dead_physics_when_stunned,
+	_biped_always_ragdoll_when_dead
 };
+
+enum e_biped_lock_on_data_flags
+{
+	_biped_lock_on_locked_by_human_targeting = 0,
+	_biped_lock_on_locked_by_plasma_targeting,
+	_biped_lock_on_always_locked_by_plasma_targeting
+};
+
+/* structures */
 
 struct s_biped_lock_on_data
 {
@@ -88,7 +103,8 @@ struct _biped_definition
 	tag_reference area_damage_effect;           // effe
 	s_character_physics_definition physics;
 
-	tag_block<biped_contact_point> contact_points;  // these are the points where the biped touches the ground
+	// these are the points where the biped touches the ground
+	s_tag_block contact_points;					// biped_contact_point
 
 	// char
 	tag_reference reanimation_character;        // when the flood reanimate this guy, he turns into a ...
@@ -104,5 +120,7 @@ struct biped_definition
 	_biped_definition biped;
 };
 ASSERT_STRUCT_SIZE(biped_definition, 788)
+
+/* prototypes */
 
 void __cdecl biped_definitions_fixup(datum biped_datum);

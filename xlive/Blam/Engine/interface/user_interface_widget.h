@@ -1,13 +1,6 @@
 #pragma once
 #include "input/controllers.h"
 
-/* constants */
-
-enum
-{
-	k_maximum_number_of_screen_widgets = 256
-};
-
 /* enums */
 
 enum e_user_interface_widget_type 

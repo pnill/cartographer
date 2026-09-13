@@ -3,6 +3,7 @@
 
 #include "interface/user_interface.h"
 #include "interface/user_interface_network_search.h"
+#include "memory/data.h"
 #include "networking/logic/network_logic.h"
 #include "networking/transport/transport_security.h"
 

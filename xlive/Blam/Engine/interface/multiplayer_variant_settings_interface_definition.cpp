@@ -335,17 +335,16 @@ void multiplayer_variant_settings_interface_on_map_load()
 		{
 			tag_injection_inject();
 
-			s_game_globals* globals = scenario_get_game_globals();
+			s_game_globals const* globals = scenario_get_game_globals();
 
 			if (globals)
 			{
-
 				s_game_globals_interface_tag_references* interface_globals = ((s_game_globals_interface_tag_references*)tag_block_get_element_with_size(&globals->interface_tags, 0, sizeof(s_game_globals_interface_tag_references)));
 
-				s_user_interface_tag_globals* interface_tag_globals = (s_user_interface_tag_globals*)tag_get_fast(interface_globals->multiplayer_ui_globals.index);
+				s_user_interface_tag_globals* interface_tag_globals = user_interface_tag_globals_get(interface_globals->multiplayer_ui_globals.index);
 
 				interface_tag_globals->mp_variant_settings_ui.index = goof_datum;
-				interface_tag_globals->mp_variant_settings_ui.group.group = _tag_group_multiplayer_variant_settings_interface_definition;
+				interface_tag_globals->mp_variant_settings_ui.group = _tag_group_multiplayer_variant_settings_interface_definition;
 			}
 		}
 	}
@@ -520,7 +519,7 @@ void multiplayer_variant_settings_interface_get_variant_setting_string(s_game_va
 			case 0: // Score to Win Round
 			{
 				// use slayer reference parsing because the scoring for head hunter is not time based.
-				option = (s_text_value_pair_definition*)tag_get_fast(slayer_reference->options[setting_index]->index);
+				option = text_value_pair_definition_get(slayer_reference->options[setting_index]->index);
 				break;
 			}
 			case 4: // Max Heads Carried
@@ -532,7 +531,7 @@ void multiplayer_variant_settings_interface_get_variant_setting_string(s_game_va
 			}
 			default:
 			{
-				option = (s_text_value_pair_definition*)tag_get_fast(king_reference->options[setting_index]->index);
+				option = text_value_pair_definition_get(king_reference->options[setting_index]->index);
 				break;
 			}
 			}
@@ -563,7 +562,7 @@ void multiplayer_variant_settings_interface_get_variant_setting_string(s_game_va
 
 		if (reference && setting_index >= 0 && setting_index < reference->options.count)
 		{
-			s_text_value_pair_definition* option = (s_text_value_pair_definition*)tag_get_fast(reference->options[setting_index]->index);
+			s_text_value_pair_definition* option = text_value_pair_definition_get(reference->options[setting_index]->index);
 
 			c_maximum_interface_text label_buffer;
 			c_maximum_interface_text value_buffer;

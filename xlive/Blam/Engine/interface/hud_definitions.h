@@ -1,6 +1,19 @@
 #pragma once
 #include "interface/new_hud_definitions.h"
 
+/* constants */
+
+enum
+{
+	HUD_GLOBALS_TAG = 'hudg',
+};
+
+/* macros */
+
+#define hud_globals_definition_get(index)	((struct hud_globals_definition*)tag_get(HUD_GLOBALS_TAG, (index)))
+
+/* enums */
+
 enum e_scaling_flags : short
 {
 	scaling_flag_dont_scale_offset = FLAG(0),
@@ -130,7 +143,7 @@ struct hud_globals_definition
 	int pad_FC[8];
 
 	tag_reference arrow_bitmap;
-	tag_block<s_waypoint_arrows_block> waypoint_arrows;
+	s_tag_block waypoint_arrows;	// s_waypoint_arrows_block
 
 	int pad_12C[20];
 	float hud_scale_in_multiplayer;

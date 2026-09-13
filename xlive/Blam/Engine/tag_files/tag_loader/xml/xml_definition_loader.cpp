@@ -147,8 +147,10 @@ void c_xml_definition_loader::initialize_arrays_internal(c_xml_definition_loader
 		for (uint32 i = 0; i < definition->get_tag_references_count(); i++)
 		{
 			file_seek_and_read(loader->m_file_handle, base_offset + definition->get_tag_reference_offset(i), sizeof(tag_reference), 1, &t_tag_reference);
-			if (t_tag_reference.group.group != _tag_group_none && t_tag_reference.index != NONE)
-				loader->m_tag_reference_offset_count++;
+			if (t_tag_reference.group != _tag_group_none && t_tag_reference.index != NONE)
+			{
+				++loader->m_tag_reference_offset_count;
+			}
 		}
 
 		for (uint32 i = 0; i < definition->get_classless_tag_references_count(); i++)
@@ -263,7 +265,7 @@ void c_xml_definition_loader::load_tag_data_internal(c_xml_definition_loader* lo
 			uint32 calc_offset = definition->get_tag_reference_offset(i) + definition->get_size() * block_index;
 
 			file_seek_and_read(loader->m_file_handle, file_offset + calc_offset, sizeof(tag_reference), 1, &t_tag_reference);
-			if (t_tag_reference.group.group != _tag_group_none && t_tag_reference.index != NONE)
+			if (t_tag_reference.group != _tag_group_none && t_tag_reference.index != NONE)
 			{
 				s_offset_link* link = &loader->m_tag_reference_offsets[loader->m_tag_reference_offset_count];
 				link->cache_offset = file_offset + calc_offset;

@@ -1,76 +1,87 @@
 #pragma once
-#include "tag_files/tag_block.h"
+
+/* constants */
+
+enum
+{
+	SOUND_CLASS_TAG = 'sncl',
+};
+
+/* macros */
+
+#define sound_classes_definition_get(index)	((struct s_sound_classes_definition*)tag_get(SOUND_CLASS_TAG, (index)))
+#define sound_class_get(block, index)		(TAG_BLOCK_GET_ELEMENT((block), (index), sound_class_definition))
 
 /* enums */
 
-enum e_sound_class_type : int32
+enum e_sound_class_type
 {
 	_sound_class_projectile_impact = 0,
-	_sound_class_projectile_detonation = 1,
-	_sound_class_projectile_flyby = 2,
-	_sound_class_projectile_unused1 = 3,
+	_sound_class_projectile_detonation,
+	_sound_class_projectile_flyby,
+	_sound_class_projectile_unused1,
 	
-	_sound_class_weapon_fire = 4,
-	_sound_class_weapon_ready = 5,
-	_sound_class_weapon_reload = 6,
-	_sound_class_weapon_empty = 7,
-	_sound_class_weapon_charge = 8,
-	_sound_class_weapon_overheat = 9,
-	_sound_class_weapon_idle = 10,
-	_sound_class_weapon_melee = 11,
-	_sound_class_weapon_animation = 12,
+	_sound_class_weapon_fire,
+	_sound_class_weapon_ready,
+	_sound_class_weapon_reload,
+	_sound_class_weapon_empty,
+	_sound_class_weapon_charge,
+	_sound_class_weapon_overheat,
+	_sound_class_weapon_idle,
+	_sound_class_weapon_melee,
+	_sound_class_weapon_animation,
 
-	_sound_class_object_impacts = 13,
-	_sound_class_particle_impacts = 14,
-	_sound_class_slow_impacts = 15,
-	_sound_class_effect_unused2 = 16,
-	_sound_class_effect_unused3 = 17,
+	_sound_class_object_impacts,
+	_sound_class_particle_impacts,
+	_sound_class_slow_impacts,
+	_sound_class_effect_unused2,
+	_sound_class_effect_unused3,
 	
-	_sound_class_footstep = 18,
+	_sound_class_footstep,
 	
-	_sound_class_unit_dialog = 19,
-	_sound_class_unit_animation = 20,
-	_sound_class_unit_unused1 = 21,
+	_sound_class_unit_dialog,
+	_sound_class_unit_animation,
+	_sound_class_unit_unused1,
 	
-	_sound_class_vehicle_impact = 22,
-	_sound_class_vehicle_engine = 23,
-	_sound_class_vehicle_animation = 24,
-	_sound_class_vehicle_unused1 = 25,
+	_sound_class_vehicle_impact,
+	_sound_class_vehicle_engine,
+	_sound_class_vehicle_animation,
+	_sound_class_vehicle_unused1,
 	
-	_sound_class_device_door = 26,
-	_sound_class_device_force_field = 27,
-	_sound_class_device_machinery = 28,
-	_sound_class_device_stationary = 29,
-	_sound_class_device_computers = 30,
-	_sound_class_device_unused1 = 31,
+	_sound_class_device_door,
+	_sound_class_device_force_field,
+	_sound_class_device_machinery,
+	_sound_class_device_stationary,
+	_sound_class_device_computers,
+	_sound_class_device_unused1,
 	
-	_sound_class_music = 32,
+	_sound_class_music,
 
-	_sound_class_ambient_nature = 33,
-	_sound_class_ambient_machinery = 34,
-	_sound_class_ambient_computers = 35,
+	_sound_class_ambient_nature,
+	_sound_class_ambient_machinery,
+	_sound_class_ambient_computers,
 	
-	_sound_class_marty_huge_ass = 36,
-	_sound_class_marty_object_looping = 37,
-	_sound_class_marty_cinematic_music = 38,
+	_sound_class_marty_huge_ass,
+	_sound_class_marty_object_looping,
+	_sound_class_marty_cinematic_music,
 	
-	_sound_class_player_hurt = 39,
-	_sound_class_player_unused0 = 40,
-	_sound_class_player_unused1 = 41,
-	_sound_class_player_unused2 = 42,
-	_sound_class_player_unused3 = 43,
+	_sound_class_player_hurt,
+	_sound_class_player_unused0,
+	_sound_class_player_unused1,
+	_sound_class_player_unused2,
+	_sound_class_player_unused3,
 
-	_sound_class_scripted_dialog_to_player = 44,
-	_sound_class_scripted_cortana_mission = 45,
-	_sound_class_scripted_cortana_cinematic = 46,
-	_sound_class_scripted_mission_dialog = 47,
-	_sound_class_scripted_cinematic_dialog = 48,
-	_sound_class_scripted_cinematic_foley = 49,
+	_sound_class_scripted_dialog_to_player,
+	_sound_class_scripted_cortana_mission,
+	_sound_class_scripted_cortana_cinematic,
+	_sound_class_scripted_mission_dialog,
+	_sound_class_scripted_cinematic_dialog,
+	_sound_class_scripted_cinematic_foley,
 	
-	_sound_class_game_event = 50,
-	_sound_class_ui = 51,
-	_sound_class_test = 52,
-	_sound_class_multilingual_test = 53,
+	_sound_class_game_event,
+	_sound_class_ui,
+	_sound_class_test,
+	_sound_class_multilingual_test,
 	NUMBER_OF_SOUND_CLASSES,
 };
 
@@ -160,6 +171,6 @@ ASSERT_STRUCT_SIZE(sound_class_definition, 92);
 
 struct s_sound_classes_definition
 {
-	tag_block<sound_class_definition> sound_classes;
+	s_tag_block sound_classes;	// sound_class_definition
 };
 ASSERT_STRUCT_SIZE(s_sound_classes_definition, 8);

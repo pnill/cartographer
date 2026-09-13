@@ -16,8 +16,24 @@
 #include "render/render.h"
 #include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
 #include "text/draw_string.h"
+#include "text/text.h"
 
-/* type definitions */
+/* constants */
+
+static const pixel32 k_draw_hud_bitmap_widget_shield_pixel_colors[9]
+{
+	PIXEL32_ARGB(0, 0, 0, 0),
+	PIXEL32_ARGB(0, 255, 0, 0),
+	PIXEL32_ARGB(0, 0, 255, 0),
+	PIXEL32_ARGB(0, 255, 255, 0),
+	PIXEL32_ARGB(0, 127, 0, 255),
+	PIXEL32_ARGB(0, 69, 5, 154),
+	PIXEL32_ARGB(0, 156, 70, 193),
+	PIXEL32_ARGB(0, 00, 85, 170),
+	PIXEL32_ARGB(0, 0,120,240),
+};
+
+/* typedefs */
 
 typedef void(__cdecl* t_render_ingame_user_interface_hud_element)(
 	real32 left,
@@ -38,20 +54,6 @@ typedef void(__cdecl* t_render_ingame_user_interface_hud_indicators_element_hook
 	int32* a4,
 	datum shader_index);
 
-/* constants */
-
-static const pixel32 k_draw_hud_bitmap_widget_shield_pixel_colors[9]
-{
-	PIXEL32_ARGB(0, 0, 0, 0),
-	PIXEL32_ARGB(0, 255, 0, 0),
-	PIXEL32_ARGB(0, 0, 255, 0),
-	PIXEL32_ARGB(0, 255, 255, 0),
-	PIXEL32_ARGB(0, 127, 0, 255),
-	PIXEL32_ARGB(0, 69, 5, 154),
-	PIXEL32_ARGB(0, 156, 70, 193),
-	PIXEL32_ARGB(0, 00, 85, 170),
-	PIXEL32_ARGB(0, 0,120,240),
-};
 
 /* globals */
 
@@ -287,7 +289,7 @@ static void draw_hud_get_bitmap_data(
 	if (bitmap_widget->shader.index == NONE || bitmap_widget->bitmap.index == NONE || sequence_index < 0)
 		return;
 
-	bitmap_group* bitmap = (bitmap_group*)tag_get_fast(bitmap_widget->bitmap.index);
+	bitmap_group const* bitmap = bitmap_group_get(bitmap_widget->bitmap.index);
 
 	if (sequence_index >= bitmap->sequences.count)
 	{

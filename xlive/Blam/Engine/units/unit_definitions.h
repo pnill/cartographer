@@ -5,6 +5,8 @@
 #include "interface/motion_sensor.h"
 #include "objects/object_definition.h"
 
+/* constants */
+
 enum
 {
 	UNIT_DEFINITION_TAG = 'unit',
@@ -27,6 +29,12 @@ enum
 	_unit_hud_multiplayer,
 	NUMBER_OF_UNIT_HUD_TYPES,
 };
+
+/* macros */
+
+#define unit_definition_get(index) ((struct unit_definition*)tag_get(UNIT_DEFINITION_TAG, (index)))
+
+/* enums */
 
 enum e_unit_definition_flags
 {
@@ -88,6 +96,8 @@ enum e_unit_seat_definition_flags
 	k_unit_seat_definition_flag_count
 };
 
+/* structures */
+
 // max count: MAXIMUM_NUMBER_OF_UNIT_CAMERA_TRACKS 2
 struct s_unit_camera_track
 {
@@ -101,7 +111,7 @@ struct s_unit_camera
 	string_id camera_submerged_marker_name;
 	real32 pitch_auto_level;
 	real_bounds pitch_range;
-	tag_block<s_unit_camera_track> camera_tracks;
+	s_tag_block camera_tracks;	// s_unit_camera_track
 };
 ASSERT_STRUCT_SIZE(s_unit_camera, 28);
 

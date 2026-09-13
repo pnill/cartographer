@@ -263,7 +263,7 @@ void c_tag_injecting_manager::load_raw_data_from_cache(datum injected_index) con
 
 	*g_cache_handle = new_file_handle;
 
-	switch (tag_info->group_tag.group)
+	switch (tag_info->group_tag)
 	{
 		case _tag_group_render_model:
 		{
@@ -324,7 +324,9 @@ void c_tag_injecting_manager::load_raw_data_from_cache(datum injected_index) con
 	return;
 }
 
-void c_tag_injecting_manager::apply_definition_fixup(e_tag_group group, datum injected_index)
+void c_tag_injecting_manager::apply_definition_fixup(
+	tag_group group,
+	datum injected_index)
 {
 	switch(group)
 	{
@@ -363,7 +365,7 @@ void c_tag_injecting_manager::initialize_shader_template(datum injected_datum)
 	return;
 }
 
-datum c_tag_injecting_manager::get_tag_datum_by_name(e_tag_group group, const char* tag_name) const
+datum c_tag_injecting_manager::get_tag_datum_by_name(tag_group group, const char* tag_name) const
 {
 	if(!m_active_map_verified)
 	{
@@ -414,7 +416,7 @@ datum c_tag_injecting_manager::get_tag_datum_by_name(e_tag_group group, const ch
 		{
 			cache_file_tag_instance temp_instance;
 			file_seek_and_read(m_active_map_file_handle, m_active_map_instance_table_offset + (current_index * sizeof(cache_file_tag_instance)), sizeof(cache_file_tag_instance), 1, &temp_instance);
-			if (temp_instance.group_tag.group == group)
+			if (temp_instance.group_tag == group)
 			{
 				result = temp_instance.tag_index;
 				break;
@@ -425,7 +427,10 @@ datum c_tag_injecting_manager::get_tag_datum_by_name(e_tag_group group, const ch
 	return result;
 }
 
-void c_tag_injecting_manager::get_name_by_tag_datum(e_tag_group group, datum cache_datum, char* out_name) const
+void c_tag_injecting_manager::get_name_by_tag_datum(
+	tag_group group,
+	datum cache_datum, 
+	char* out_name) const
 {
 	if (!m_active_map_verified)
 	{
@@ -439,7 +444,7 @@ void c_tag_injecting_manager::get_name_by_tag_datum(e_tag_group group, datum cac
 	cache_file_tag_instance temp_instance;
 	file_seek_and_read(m_active_map_file_handle, m_active_map_instance_table_offset + (absolute_index * sizeof(cache_file_tag_instance)), sizeof(cache_file_tag_instance), 1, &temp_instance);
 
-	if(temp_instance.tag_index != cache_datum || temp_instance.group_tag.group != group)
+	if(temp_instance.tag_index != cache_datum || temp_instance.group_tag != group)
 	{
 		out_name[0] = '\0';
 		return;
@@ -489,15 +494,10 @@ bool c_tag_injecting_manager::initialize_agent(tag_group group)
 	const bool agent_initialized = m_agents_initialized.test(tag_group_index);	// check static flags if agent is already initialized
 	if (tag_group_index != NONE && !agent_initialized)
 	{
-		// non-terminated sting correction
-		// flip string and terminate
 		char tag_class[5];
-		tag_class[0] = group.string[3];
-		tag_class[1] = group.string[2];
-		tag_class[2] = group.string[1];
-		tag_class[3] = group.string[0];
-		tag_class[4] = '\0';
+		tag_to_string(group, tag_class);
 
+		// non-terminated sting correction
 		tag_class[3] = (tag_class[3] == ' ' ? '\0' : tag_class[3]);
 
 		wchar_t wide_tag_class[5];
@@ -534,21 +534,14 @@ c_xml_definition_agent* c_tag_injecting_manager::get_agent(tag_group group)
 	c_xml_definition_agent* result = nullptr;
 	if (!initialize_agent(group))
 	{
+		char tag_class[5];
+		tag_to_string(group, tag_class);
+
 		// non-terminated sting correction
-		// flip string and terminate
-		char null_terminated_class[5];
-		null_terminated_class[0] = group.string[3];
-		null_terminated_class[1] = group.string[2];
-		null_terminated_class[2] = group.string[1];
-		null_terminated_class[3] = group.string[0];
-		null_terminated_class[4] = '\0';
+		tag_class[3] = (tag_class[3] == ' ' ? '\0' : tag_class[3]);
 
-		if (null_terminated_class[3] == ' ')
-		{
-			null_terminated_class[3] = '\0';
-		}
 
-		error(_error_log, "%s: failed to initialize agent for %s", __FUNCTION__, null_terminated_class);
+		error(_error_log, "%s: failed to initialize agent for %s", __FUNCTION__, tag_class);
 	}
 	else
 	{
@@ -557,11 +550,14 @@ c_xml_definition_agent* c_tag_injecting_manager::get_agent(tag_group group)
 	return result;
 }
 
-datum c_tag_injecting_manager::load_tag(e_tag_group group, const char* tag_name, bool load_dependencies)
+datum c_tag_injecting_manager::load_tag(
+	tag_group group,
+	char const* tag_name,
+	bool load_dependencies)
 {
 	const datum cache_datum = get_tag_datum_by_name(group, tag_name);
-	
 	datum result = NONE;
+
 	if (cache_datum != NONE)
 	{
 #if TAG_INJECTION_DEBUG
@@ -573,7 +569,10 @@ datum c_tag_injecting_manager::load_tag(e_tag_group group, const char* tag_name,
 	return result;
 }
 
-datum c_tag_injecting_manager::load_tag(e_tag_group group, datum cache_datum, bool load_dependencies)
+datum c_tag_injecting_manager::load_tag(
+	tag_group group,
+	datum cache_datum,
+	bool load_dependencies)
 {
 	datum result = NONE;
 	if (m_table.has_entry_by_cache_index(cache_datum))
@@ -583,7 +582,7 @@ datum c_tag_injecting_manager::load_tag(e_tag_group group, datum cache_datum, bo
 	else
 	{
 		const s_tag_injecting_table_entry* new_entry = m_table.init_entry(cache_datum, group);
-		const c_xml_definition_agent* agent = get_agent({ group });
+		const c_xml_definition_agent* agent = get_agent(group);
 
 		if (agent)
 		{
@@ -620,7 +619,7 @@ void c_tag_injecting_manager::load_tag_internal(
 	const cache_file_tag_instance inst = manager->get_tag_instance_from_cache(cache_datum);
 
 	if (
-		inst.tag_index == cache_datum && inst.group_tag.group == group.group &&
+		inst.tag_index == cache_datum && inst.group_tag == group &&
 		inst.size != 0 && inst.data_offset != 0 && 
 		!manager->m_table.has_entry_by_cache_index(cache_datum)
 	)
@@ -639,7 +638,7 @@ void c_tag_injecting_manager::load_tag_internal(
 		event(_event_verbose, "tags:injection: [%s] loading dependency %s %s", __FUNCTION__, name.get_string(), tag_class);
 #endif
 
-		const s_tag_injecting_table_entry* new_entry = manager->m_table.init_entry(cache_datum, group.group);
+		const s_tag_injecting_table_entry* new_entry = manager->m_table.init_entry(cache_datum, group);
 		const c_xml_definition_agent* agent = manager->get_agent(group);
 		ASSERT(agent);
 		new_entry->loaded_data->init(
@@ -669,7 +668,7 @@ void c_tag_injecting_manager::load_dependencies(c_tag_injecting_manager* manager
 	{
 		datum tag_index = new_entry->loaded_data->get_tag_reference(i);
 		tag_group t_group = manager->get_tag_group_by_datum(tag_index);
-		if (t_group.group != _tag_group_sound)
+		if (t_group != _tag_group_sound)
 		{
 			load_tag_internal(manager, t_group, tag_index, true);
 		}
@@ -750,16 +749,18 @@ void c_tag_injecting_manager::inject_tags(void)
 
 		entry->loaded_data->copy_tag_data((int8*)(cache_get_tag_data() + injection_offset), injection_offset);
 
-		if(entry->type.group == _tag_group_bitmap || entry->type.group == _tag_group_render_model || entry->type.group == _tag_group_weather_system)
+		if (entry->type == _tag_group_bitmap || entry->type == _tag_group_render_model || entry->type == _tag_group_weather_system)
+		{
 			load_raw_data_from_cache(entry->injected_index);
+		}
 
-		apply_definition_fixup(entry->type.group, entry->injected_index);
+		apply_definition_fixup(entry->type, entry->injected_index);
 
-		if (entry->type.group == _tag_group_shader_template)
+		if (entry->type == _tag_group_shader_template)
 			initialize_shader_template(entry->injected_index);
 
 		char tag_name[MAX_PATH];
-		get_name_by_tag_datum(entry->type.group, entry->cache_index, tag_name);
+		get_name_by_tag_datum(entry->type, entry->cache_index, tag_name);
 
 		tag_add_name(entry->injected_index, tag_name);
 
@@ -869,7 +870,7 @@ void c_tag_injecting_manager::load_unicode_strings() const
 	{
 		s_tag_injecting_table_entry* unic_entry = this->m_table.get_entry(entry_index);
 
-		if (unic_entry->type.group != _tag_group_multilingual_unicode_string_list)
+		if (unic_entry->type != _tag_group_multilingual_unicode_string_list)
 			continue;
 
 		if (unic_entry->is_post_processed)
@@ -880,36 +881,34 @@ void c_tag_injecting_manager::load_unicode_strings() const
 
 		s_multilingual_unicode_string_list_group_header* unic_tag = (s_multilingual_unicode_string_list_group_header*)unic_entry->loaded_data->get_data();
 
-		s_unicode_string_list_reference* unic_str = &unic_tag->strings[language];
+		s_language_pack_offsets* unic_str = &unic_tag->langue_pack_offsets[language];
 
-		if (unic_str->strings_count == 0)
+		if (unic_str->string_count == 0)
 			continue;
 
-		if ((uint32)unic_str->strings_index + unic_str->strings_count > (uint32)donor_pack.get_number_of_strings())
+		if (unic_str->start_index+ unic_str->string_count > donor_pack.get_number_of_strings())
 		{
 			event(_event_warning, "tags:injection: [%s] unic tag %08x string %d +%d exceeds language pack count %d skip",
-				__FUNCTION__, unic_entry->cache_index, unic_str->strings_index, unic_str->strings_count, donor_pack.get_number_of_strings());
+				__FUNCTION__, unic_entry->cache_index, unic_str->start_index, unic_str->string_count, donor_pack.get_number_of_strings());
 			continue;
 		}
 
 		// read the references block plus the one following it so the end of the last string is known without scanning for its terminator
 
 		// check for if the reference block being read is at the end of the table
-		const bool has_next_reference = unic_str->strings_index + unic_str->strings_count < donor_pack.get_number_of_strings();
-		const uint32 read_count = unic_str->strings_count + (has_next_reference ? 1 : 0);
+		const bool has_next_reference = unic_str->start_index + unic_str->string_count < donor_pack.get_number_of_strings();
+		const uint32 read_count = unic_str->string_count + (has_next_reference ? 1 : 0);
 
-		const uint32 reference_offset = reference_cache_offset + unic_str->strings_index * sizeof(s_string_reference);
+		const uint32 reference_offset = reference_cache_offset + unic_str->start_index * sizeof(s_string_reference);
 
 		s_string_reference* references = (s_string_reference*)calloc(read_count, sizeof(s_string_reference));
 
 		file_seek_and_read(this->m_active_map_file_handle, reference_offset, sizeof(s_string_reference), read_count, references);
 
-		const uint32 first_string_offset = references[0].buffer_offset;
-		const uint32 end_string_offset = has_next_reference
-			? references[unic_str->strings_count].buffer_offset
-			: (uint32)donor_pack.get_string_data_size();
+		const int32 first_string_offset = references[0].offset;
+		const int32 end_string_offset = has_next_reference ? references[unic_str->string_count].offset : donor_pack.get_string_data_size();
 
-		if (end_string_offset <= first_string_offset || end_string_offset > (uint32)donor_pack.get_string_data_size())
+		if (end_string_offset <= first_string_offset || end_string_offset > donor_pack.get_string_data_size())
 		{
 			event(_event_warning, "tags:injection: [%s] unic tag %08x invalid string range %x, %x, skipped",
 				__FUNCTION__, unic_entry->cache_index, first_string_offset, end_string_offset);
@@ -921,7 +920,7 @@ void c_tag_injecting_manager::load_unicode_strings() const
 
 		pending_string_item->unic_str = unic_str;
 		pending_string_item->references = references;
-		pending_string_item->strings_count = unic_str->strings_count;
+		pending_string_item->strings_count = unic_str->string_count;
 		pending_string_item->first_string_offset = first_string_offset;
 
 		pending_string_item->buffer_length = end_string_offset - first_string_offset;
@@ -952,7 +951,7 @@ void c_tag_injecting_manager::load_unicode_strings() const
 			for (uint32 str_index = 0; str_index < pending_string_item->strings_count; ++str_index)
 			{
 				merged_reference_buffer[pending_string_item->base_index + str_index].string_id = pending_string_item->references[str_index].string_id;
-				merged_reference_buffer[pending_string_item->base_index + str_index].buffer_offset = (pending_string_item->references[str_index].buffer_offset - pending_string_item->first_string_offset) + current_buffer_offset;
+				merged_reference_buffer[pending_string_item->base_index + str_index].offset = (pending_string_item->references[str_index].offset - pending_string_item->first_string_offset) + current_buffer_offset;
 			}
 
 			current_buffer_offset += pending_string_item->buffer_length;
@@ -966,7 +965,9 @@ void c_tag_injecting_manager::load_unicode_strings() const
 
 		// remap each loaded tag to its new base index
 		for (uint32 pending_index = 0; pending_index < pending_count; ++pending_index)
-			pending_string_item_buffer[pending_index].unic_str->strings_index = base_index + (uint16)pending_string_item_buffer[pending_index].base_index;
+		{
+			pending_string_item_buffer[pending_index].unic_str->start_index = base_index + (uint16)pending_string_item_buffer[pending_index].base_index;
+		}
 
 		free(merged_reference_buffer);
 		free(merged_string_buffer);

@@ -45,7 +45,7 @@ void H2X::ApplyMapLoadPatches(bool enable)
 		
 		if (weapon_datum != NONE)
 		{
-			struct weapon_definition const* weapon_definition = (struct weapon_definition*)tag_get_fast(weapon_datum);
+			struct weapon_definition const* weapon_definition = weapon_definition_get(weapon_datum);
 			
 			weapon_barrel_definition* barrel = TAG_BLOCK_GET_ELEMENT(&weapon_definition->weapon.barrels, weapon.barrel_data_block_index, weapon_barrel_definition);
 			

@@ -1,10 +1,22 @@
 #pragma once
 #include "tag_files/tag_block.h"
 
+/* constants */
+
 enum
 {
+	BITMAP_GROUP_TAG = 'bitm',
+	BITMAP_GROUP_VERSION = 7,					// TODO: verify
 	MAXIMUM_BITMAPS_PER_BITMAP_GROUP = 65536,
+	MAXIMUM_SEQUENCES_PER_BITMAP_GROUP = 256,
+	MAXIMUM_SPRITES_PER_SEQUENCE = 64,
 };
+
+/* macros */
+
+#define bitmap_group_get(index)	((struct bitmap_group*)tag_get(BITMAP_GROUP_TAG, (index)))
+
+/* enums */
 
 enum e_bitmap_tag_type : int16
 {
@@ -85,28 +97,6 @@ enum e_force_format : short
 	force_format_force_a4r4g4b4 = 6,
 };
 
-#define MAXIMUM_SPRITES_PER_SEQUENCE 64
-struct bitmap_group_sprite
-{
-	int16 bitmap_index;
-	int16 pad0;
-	uint32 pad1;
-	real_rectangle2d bounds;
-	real_point2d registrationPoint;
-};
-ASSERT_STRUCT_SIZE(bitmap_group_sprite, 32);
-
-#define MAXIMUM_SEQUENCES_PER_BITMAP_GROUP 256
-struct bitmap_group_sequence
-{
-	char name[k_tag_string_length];
-	short first_bitmap_index;
-	short bitmap_count;
-	uint32 pad[4];
-	tag_block<bitmap_group_sprite> sprites;
-};
-ASSERT_STRUCT_SIZE(bitmap_group_sequence, 0x3C);
-
 enum e_more_bitmap_data_flags : uint8
 {
 	more_bitmap_data_flag_delete_from_cache_file = FLAG(0),
@@ -177,6 +167,28 @@ enum e_bitmap_cache_usage : uint8
 	bitmap_cache_usage_first_person = 18,
 	bitmap_cache_usage_rasterizer = 19
 };
+
+/* structures */
+
+struct bitmap_group_sprite
+{
+	int16 bitmap_index;
+	int16 pad0;
+	uint32 pad1;
+	real_rectangle2d bounds;
+	real_point2d registrationPoint;
+};
+ASSERT_STRUCT_SIZE(bitmap_group_sprite, 32);
+
+struct bitmap_group_sequence
+{
+	char name[k_tag_string_length];
+	short first_bitmap_index;
+	short bitmap_count;
+	uint32 pad[4];
+	tag_block<bitmap_group_sprite> sprites;
+};
+ASSERT_STRUCT_SIZE(bitmap_group_sequence, 0x3C);
 
 // force 4 byte alignment because (int64 frame_cached) causes it to become 8 byte aligned
 #pragma pack(push, 4)

@@ -3,9 +3,26 @@
 #include "havok/physics/collide/shape/compund/list/hkListShape.h"
 #include "havok/physics/collide/shape/multishpere/hkMultiSphere.h"
 
-#define k_vehicle_gear_count_max = 16
-#define k_maximum_anti_gravity_points_per_vehicle_physics_definition = 16
-#define k_maximum_friction_points_per_vehicle_physics_definition = 16
+/* constants */
+
+enum
+{
+	k_vehicle_gear_count_max = 16,
+	k_maximum_anti_gravity_points_per_vehicle_physics_definition = 16,
+	k_maximum_friction_points_per_vehicle_physics_definition = 16,
+};
+
+enum
+{
+	VEHICLE_DEFINITION_TAG = 'vehi',
+	VEHICLE_DEFINITION_VERSION = 1,					// TODO: verify
+	VEHICLE_COLLECTION_DEFINITION_TAG = 'vehc',
+	VEHICLE_COLLECTION_DEFINITION_VERSION = 0,		// TODO: verify
+};
+
+/* macros */
+
+#define vehicle_definition_get(index)	((struct vehicle_definition*)tag_get(VEHICLE_DEFINITION_TAG, (index)))
 
 enum e_vehicle_definition_flags : uint32
 {

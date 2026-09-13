@@ -1,12 +1,25 @@
 #pragma once
-#include "shader_postprocess_definitions.h"
-
-#include "cache/predicted_resources.h"
 #include "math/function_definitions.h"
 
-#define k_number_of_shader_animation_property_types 14
-#define k_maximum_parameters_per_shader 64
-#define k_shader_bitmap_property_count 5
+/* constants */
+
+enum
+{
+	SHADER_DEFINITION_TAG = 'shad',
+};
+
+enum
+{
+	k_number_of_shader_animation_property_types = 14,
+	k_maximum_parameters_per_shader = 64,
+	k_shader_bitmap_property_count = 5,
+};
+
+/* macros */
+
+#define shader_definition_get(index)	((struct s_shader_definition*)tag_get(SHADER_DEFINITION_TAG, (index)))
+
+/* enums */
 
 enum e_shader_definition_flags : int16
 {
@@ -68,6 +81,8 @@ enum e_shader_animation_property_type : int16
 	_shader_animation_property_bitmap_index
 };
 
+/* structures */
+
 // max_count: 1
 struct s_shader_properties
 {
@@ -111,7 +126,7 @@ struct s_shader_parameter
 	tag_reference bitmap; // bitm
 	real32 const_value;
 	real_rgb_color const_color;
-	tag_block<s_shader_animation_property> animation_properties;
+	s_tag_block animation_properties;	// s_shader_animation_property
 };
 ASSERT_STRUCT_SIZE(s_shader_parameter, 40);
 
@@ -119,14 +134,14 @@ struct s_shader_definition
 {
 	tag_reference shader_template;	// stem
 	string_id material_name;
-	tag_block<s_shader_properties> runtime_properties;
+	s_tag_block runtime_properties;		// s_shader_properties
 	int16 pad;
 
 	e_shader_definition_flags flags;
-	tag_block<s_shader_parameter> parameters;
-	s_tag_block postprocess_definition;	// struct: s_shader_postprocess_definition_new
+	s_tag_block parameters;				// s_shader_parameter
+	s_tag_block postprocess_definition;	// s_shader_postprocess_definition_new
 	int32 pad1;
-	tag_block<predicted_resource> predicted_resources;
+	s_tag_block predicted_resources;	// predicted_resource
 	tag_reference light_response;	// slit
 
 	e_shader_lod_bias shader_lod_bias;
@@ -136,7 +151,9 @@ struct s_shader_definition
 	
 	real32 lightmap_specular_brightness;
 	real32 lightmap_ambient_bias;
-	tag_block<datum> bitmap_group_index;	// max_count: k_shader_bitmap_property_count 5
+
+	// max_count: k_shader_bitmap_property_count
+	s_tag_block bitmap_group_index;	// datum
 	
 	real32 added_depth_bias_offset;
 	real32 added_depth_bias_slope_scale;

@@ -17,6 +17,15 @@ enum
 	k_maximum_lightmap_objects_per_lightmap_group = 2000
 };
 
+enum
+{
+	STRUCTURE_LIGHTMAP_TAG = 'ltmp'
+};
+
+/* macros */
+
+#define structure_lightmap_definition_get(index) ((struct structure_lightmap *)tag_get(STRUCTURE_LIGHTMAP_TAG, (index)))
+
 /* enums */
 
 enum e_structure_lightmap_type : int16

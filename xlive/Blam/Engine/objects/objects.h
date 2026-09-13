@@ -6,6 +6,13 @@
 
 /* constants */
 
+/* macros */
+
+#define object_header_get(index)			((struct object_header_datum*)datum_get(object_header_data_get(), index))
+#define object_header_try_and_get(index)	((struct object_header_datum*)datum_try_and_get(object_header_data, (index)))
+
+#define object_get(index)			((struct object_datum*)(object_get_and_verify_type((index), _object_mask_all)))
+#define object_try_and_get(index)	((struct object_datum*)(object_try_and_get_and_verify_type((index), _object_mask_all)))
 
 /* enums */
 
@@ -461,11 +468,3 @@ datum object_override_get_shader(datum object_index);
 #ifdef OBJECT_DEBUG
 void objects_dump_memory(void);
 #endif
-
-/* macros */
-
-#define object_header_get(index) ((object_header_datum*)datum_get(object_header_data_get(), index))
-
-#define object_get(index) ((struct object_datum*)(object_get_and_verify_type((index), _object_mask_all)))
-
-#define object_try_and_get(index) ((struct object_datum*)(object_try_and_get_and_verify_type((index), _object_mask_all)))

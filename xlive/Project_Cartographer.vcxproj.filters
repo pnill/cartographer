@@ -1027,7 +1027,7 @@
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_fullscreen_passes.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_shader_submit.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_lens_flares.h" />
-    <ClInclude Include="Blam\Engine\effects\lens_flares.h" />
+    <ClInclude Include="Blam\Engine\effects\lens_flare_definitions.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_submit.h" />
     <ClInclude Include="Blam\Engine\saved_games\player_profile.h" />
     <ClInclude Include="Blam\Engine\saved_games\saved_game_files.h" />
@@ -1180,7 +1180,6 @@
     <ClInclude Include="Blam\Engine\devices\device_light_fixture.h" />
     <ClInclude Include="Blam\Engine\items\equipment.h" />
     <ClInclude Include="Blam\Engine\items\garbage.h" />
-    <ClInclude Include="Blam\Engine\items\item_collection_definition.h" />
     <ClInclude Include="Blam\Engine\objects\crates.h" />
     <ClInclude Include="Blam\Engine\sound\sound_classes.h" />
     <ClInclude Include="Blam\Engine\devices\device_controls.h" />
@@ -2154,6 +2153,14 @@
     <ClInclude Include="Blam\Engine\game\player_training.h" />
     <ClInclude Include="Blam\Engine\game\multiplayer_definitions.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_errors.h" />
+    <ClInclude Include="Blam\Engine\structures\structure_bsp_constants.h" />
+    <ClInclude Include="Blam\Engine\units\unit_control.h" />
+    <ClInclude Include="Blam\Engine\animations\animation_constants.h" />
+    <ClInclude Include="Blam\Engine\devices\device_definitions.h" />
+    <ClInclude Include="Blam\Engine\sound\sound_definition_globals.h" />
+    <ClInclude Include="Blam\Engine\sound\sound_effect_definitions.h" />
+    <ClInclude Include="Blam\Engine\sound\game_sound_definitions.h" />
+    <ClInclude Include="Blam\Engine\sound\platform_sound_effect_definitions.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
