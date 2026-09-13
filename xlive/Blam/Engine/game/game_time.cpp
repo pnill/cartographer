@@ -5,6 +5,18 @@
 #include "game_options.h"
 #include "saved_games/game_variant.h"
 
+/* constants */
+
+static const real32 k_game_time_variant_game_speed[k_game_speed_modifier_count]
+{
+	k_game_time_default_game_speed,
+	0.5f,
+	1.5f,
+	2.f,
+	5.f
+};
+
+
 /* structures */
 
 struct game_time_globals_definition
@@ -29,13 +41,18 @@ static game_time_globals_definition* time_globals_get(void);
 
 static void game_time_statistics_start(void);
 
-static void game_time_set_variant_speed(void);
+static int32 game_time_get_native_tickrate();
+
+/* globals */
+
+static int32 g_game_time_native_tickrate = 60;
 
 /* public code */
 
 void game_time_apply_patches(void)
 {
 	WritePointer(Memory::GetAddress(0x3A06F8, 0x35D428), game_time_initialize_for_new_map);
+	PatchCall(Memory::GetAddress(0x28707, 0x2489B), game_time_get_native_tickrate);
 	return;
 }
 
@@ -228,7 +245,7 @@ void __cdecl game_time_initialize_for_new_map(void)
 	// Updated method for allowing variants with custom speeds
 	if (true)
 	{
-		game_time_set_variant_speed();
+		game_time_globals->speed = game_time_get_variant_speed();
 	}
 	// Old method of setting game speed
 	else
@@ -241,6 +258,28 @@ void __cdecl game_time_initialize_for_new_map(void)
 	game_time_globals->initialized = true;
 
 	return;
+}
+
+real32 game_time_get_variant_speed(void)
+{
+	s_game_variant const* variant = get_game_variant();
+
+	real32 result = k_game_time_default_game_speed;
+
+	if (game_is_multiplayer() && variant)
+	{
+		if(IN_RANGE(variant->cartographer_settings.game_speed, _game_speed_modifier_none, _game_speed_modifier_ludicrous))
+		{
+			result = k_game_time_variant_game_speed[variant->cartographer_settings.game_speed];
+		}
+	}
+
+	return result;
+}
+
+void game_time_set_native_tickrate(int32 tickrate)
+{
+	g_game_time_native_tickrate = tickrate;
 }
 
 /* private code */
@@ -256,37 +295,7 @@ static void game_time_statistics_start(void)
 	return;
 }
 
-static void game_time_set_variant_speed(void)
+static int32 game_time_get_native_tickrate()
 {
-	game_time_globals_definition* game_time_globals = time_globals_get();
-	s_game_variant const* variant = get_game_variant();
-
-	if (game_is_multiplayer() && variant)
-	{
-		switch (variant->cartographer_settings.game_speed)
-		{
-		case _game_speed_modifier_half:
-			game_time_globals->speed = 0.5f;
-			break;
-		case _game_speed_modifier_hundred_fifty:
-			game_time_globals->speed = 1.5f;
-			break;
-		case _game_speed_modifier_double:
-			game_time_globals->speed = 2.f;
-			break;
-		case _game_speed_modifier_ludicrous:
-			game_time_globals->speed = 5.f;
-			break;
-		case _game_speed_modifier_none:
-		default:
-			game_time_globals->speed = k_game_time_default_game_speed;
-			break;
-		}
-	}
-	else
-	{
-		game_time_globals->speed = k_game_time_default_game_speed;
-	}
-
-	return;
+	return g_game_time_native_tickrate;
 }

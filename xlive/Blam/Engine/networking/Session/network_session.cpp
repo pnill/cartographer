@@ -135,7 +135,7 @@ int8 NetworkSession::GetPlayerTeam(datum player_index)
 void NetworkSession::KickPeer(int32 peer_index)
 {
 	typedef void(__thiscall* game_session_boot_t)(c_network_session*, int, bool);
-	auto p_game_session_boot = Memory::GetAddress<game_session_boot_t>(0x1CCE9B);
+	auto p_game_session_boot = Memory::GetAddress<game_session_boot_t>(0x1CCE9B, 0x1A441B);
 
 	if (peer_index < GetPeerCount())
 	{

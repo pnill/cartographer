@@ -61,8 +61,8 @@ static const char* k_network_message_type_collection_description[] = {
 	"map_file_name",
 	"team_change",
 	"rank_change",
-	"anti_cheat",
-	"custom_variant_settings",
+	TEST_N_DEF(PC13)
+	TEST_N_DEF(PC14)
 
 	"end"
 };

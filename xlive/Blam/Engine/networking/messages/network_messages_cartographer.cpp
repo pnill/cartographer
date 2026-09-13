@@ -62,16 +62,7 @@ void network_message_types_register_cartographer_types(c_network_message_type_co
 		decode_rank_change_message,
 		NULL);
 
-	message_collection->register_message_type(
-		_network_message_type_anti_cheat,
-		"",
-		0,
-		sizeof(s_network_message_anti_cheat),
-		sizeof(s_network_message_anti_cheat),
-		encode_anti_cheat_message,
-		decode_anti_cheat_message,
-		NULL);
-
+	TEST_N_DEF(PC7);
 	return;
 }
 
@@ -130,28 +121,6 @@ void network_message_cartographer_send_rank_change(int32 peer_index, int8 rank)
 	return;
 }
 
-void network_message_cartographer_send_anti_cheat(int32 peer_index)
-{
-	c_network_session* session = NULL;
-	s_network_message_anti_cheat data;
-
-	if (network_life_cycle_in_squad_session(&session)
-		&& session->is_host()
-		&& session->get_transport_session_id(&data.session_data.identifier))
-	{
-		c_network_observer* observer = session->m_network_observer;
-		s_session_peer* peer = session->get_session_peer(peer_index);
-
-		data.enabled = g_twizzler_status;
-		if (peer_index != NONE && !session->is_peer_local(peer_index)) {
-			if (peer->is_remote_peer) {
-				observer->send_message(session->m_session_index, peer->observer_channel_index, false, _network_message_type_anti_cheat, sizeof(s_network_message_anti_cheat), &data);
-			}
-		}
-	}
-	return;
-}
-
 /* private code */
 
 static void encode_map_file_name_message(c_bitstream* stream, int a2, const s_network_message_custom_map_filename* data)
@@ -196,18 +165,5 @@ static bool decode_rank_change_message(c_bitstream* stream, int a2, s_network_me
 {
 	stream->read_raw_data("session-id", &data->session_data.identifier, SIZEOF_BITS(data->session_data.identifier));
 	data->rank = (int8)stream->read_integer("rank", SIZEOF_BITS(data->rank));
-	return stream->error_occurred() == false;
-}
-
-static void encode_anti_cheat_message(c_bitstream* stream, int a2, const s_network_message_anti_cheat* data)
-{
-	stream->write_raw_data("session-id", &data->session_data.identifier, SIZEOF_BITS(data->session_data.identifier));
-	stream->write_bool("", data->enabled);
-	return;
-}
-static bool decode_anti_cheat_message(c_bitstream* stream, int a2, s_network_message_anti_cheat* data)
-{
-	stream->read_raw_data("session-id", &data->session_data.identifier, SIZEOF_BITS(data->session_data.identifier));
-	data->enabled = stream->read_bool("");
 	return stream->error_occurred() == false;
 }

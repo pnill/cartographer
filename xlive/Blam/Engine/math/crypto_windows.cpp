@@ -61,3 +61,31 @@ bool crypto_windows_sha256_hash_data(
 	
 	return success;
 }
+
+bool crypto_windows_random_bytes(
+	void* buffer,
+	uint32 size)
+{
+	HCRYPTPROV provider = NULL;
+	bool success = false;
+
+	if (!CryptAcquireContextW(&provider, NULL, k_crypto_provider, PROV_RSA_AES, CRYPT_VERIFYCONTEXT | CRYPT_SILENT))
+	{
+		error(_error_delayed, "CryptAcquireContext (random) failed: 0x%x", GetLastError());
+	}
+	else if (!CryptGenRandom(provider, size, (BYTE*)buffer))
+	{
+		error(_error_delayed, "CryptGenRandom failed: 0x%x", GetLastError());
+	}
+	else
+	{
+		success = true;
+	}
+
+	if (provider)
+	{
+		CryptReleaseContext(provider, 0);
+	}
+
+	return success;
+}
