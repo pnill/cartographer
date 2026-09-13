@@ -18,8 +18,11 @@
 #include "screen_multiplayer_video_settings_menu.h"
 #include "screen_video_settings.h"
 #include "screen_resolution.h"
+#include "screen_pause_game.h"
 
-void screens_apply_patches_on_map_load()
+/* public code */
+
+void screens_apply_patches_on_map_load(void)
 {
 	c_screen_xbox_live_task_progress_dialog::apply_patches_on_map_load();
 	c_screen_4way_signin::apply_patches_on_map_load();
@@ -28,14 +31,16 @@ void screens_apply_patches_on_map_load()
 	c_screen_settings::apply_patches_on_map_load();
 	c_screen_button_settings_menu::apply_patches_on_ui_map_load();
 	c_screen_video_settings::apply_patches_on_map_load();
+	return;
 }
 
-void screens_apply_patches_on_mp_map_load()
+void screens_apply_patches_on_mp_map_load(void)
 {
 	c_screen_button_settings_menu::apply_patches_on_mp_map_load();
+	return;
 }
 
-void screens_apply_patches()
+void screens_apply_patches(void)
 {
 	c_screen_esrb_warning::apply_patches();
 	c_screen_4way_signin::apply_instance_patches();
@@ -52,4 +57,6 @@ void screens_apply_patches()
 	c_controller_settings_edit_list::apply_instance_patches();
 	c_screen_multiplayer_video_settings::apply_instance_patches();
 	c_screen_resolution_menu::apply_instance_patches();
+	screen_pause_game_apply_patches();
+	return;
 }

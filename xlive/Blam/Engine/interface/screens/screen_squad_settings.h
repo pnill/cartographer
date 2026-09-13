@@ -67,7 +67,7 @@ public:
 	virtual ~c_screen_squad_settings() = default;
 	virtual void update() override;
 	virtual bool handle_event(s_event_record* event) override;
-	virtual void initialize(c_screen_parameters* parameters) override;
+	virtual void initialize(c_screen_parameters const* parameters) override;
 	virtual const void* load_proc(void) const override;
 };
 ASSERT_STRUCT_SIZE(c_screen_squad_settings, 0xEC4);

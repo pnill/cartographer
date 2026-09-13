@@ -179,9 +179,9 @@ public:
 		INVOKE_VFPTR_FN(_get_vfptr_table, 21, void(class_type::**)());
 	}
 
-	virtual void initialize(c_screen_parameters* parameters) override
+	virtual void initialize(c_screen_parameters const* parameters) override
 	{
-		INVOKE_VFPTR_FN(_get_vfptr_table, 22, void(class_type::**)(c_screen_parameters*), parameters);
+		INVOKE_VFPTR_FN(_get_vfptr_table, 22, void(class_type::**)(c_screen_parameters const*), parameters);
 	}
 
 	virtual void post_initialize() override
