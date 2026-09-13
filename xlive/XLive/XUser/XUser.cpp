@@ -61,7 +61,7 @@ void XUserSetupGuests(XUID primary_xuid, bool online)
 		g_xUserSignInInfo[dwUserIndex].dwGuestNumber = dwUserIndex;
 		g_xUserSignInInfo[dwUserIndex].dwSponsorUserIndex = 0;
 		g_xUserSignInInfo[dwUserIndex].xuid = primary_xuid | ((unsigned long long)dwUserIndex << 62);
-		g_xUserSignInInfo[dwUserIndex].xuid |= ((unsigned long long)0xC << 48);
+		g_xUserSignInInfo[dwUserIndex].xuid |= ((unsigned long long)0xC0 << 48);
 		
 		if (online)
 		{
