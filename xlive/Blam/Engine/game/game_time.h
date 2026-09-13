@@ -45,3 +45,7 @@ real32 game_time_get_max_frame_time(void);
 real32 game_time_get_leftover(void);
 
 void __cdecl game_time_initialize_for_new_map(void);
+
+real32 game_time_get_variant_speed(void);
+
+void game_time_set_native_tickrate(int32 tickrate);

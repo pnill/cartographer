@@ -108,15 +108,7 @@ void __stdcall read_channel_message_hook(c_network_message_handler* thisx, int32
 		break;
 	}
 
-	case _network_message_type_anti_cheat:
-	{
-		if (peer_network_channel->is_channel_state_5()
-			&& peer_network_channel->get_network_address(&addr))
-		{
-			thisx->handle_session_anticheat_status(&addr, network_channel_index, (s_network_message_anti_cheat*)packet);
-		}
-		break;
-	}
+	TEST_N_DEF(PC8)
 
 	default:
 		break;
@@ -326,18 +318,6 @@ void c_network_message_handler::handle_player_property_rank(
 	return;
 }
 
-void c_network_message_handler::handle_session_anticheat_status(const transport_address* address, int32 channel_index, const s_network_message_anti_cheat* received_data)
-{
-	c_network_session* session = m_session_manager->get_session(&received_data->session_data.identifier);
-	if (session)
-	{
-		if (session->channel_is_authoritative(channel_index))
-		{
-			twizzler_set_status(received_data->enabled);
-		}
-	}
-}
-
 void c_network_message_handler::handle_membership_update(const transport_address* address, int32 channel_index, const s_network_message_session_data* received_data)
 {
 	c_network_session* session = m_session_manager->get_session(&received_data->identifier);
@@ -362,7 +342,7 @@ void c_network_message_handler::handle_player_add(const transport_address* addre
 		{
 			if (session->is_host())
 			{
-				network_message_cartographer_send_anti_cheat(sender_peer_index);
+				TEST_N_DEF(PC9);
 			}
 		}
 	}

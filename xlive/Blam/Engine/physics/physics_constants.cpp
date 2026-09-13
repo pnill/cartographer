@@ -5,6 +5,22 @@
 #include "game/game.h"
 #include "saved_games/game_state.h"
 
+/* constants */
+
+static const real32 k_physics_constants_variant_graivty[k_game_gravity_modifier_count]
+{
+	k_physics_constants_default_gravity,
+	k_physics_constants_default_gravity * .25f,
+	k_physics_constants_default_gravity * .50f,
+	k_physics_constants_default_gravity * .75f,
+	k_physics_constants_default_gravity * 1.25f,
+	k_physics_constants_default_gravity * 1.50f,
+	k_physics_constants_default_gravity * 1.75f,
+	k_physics_constants_default_gravity * 2.f
+};
+
+/* public code */
+
 s_physics_constants* physics_constants_get()
 {
 	return *Memory::GetAddress<s_physics_constants**>(0x4D2AB4, 0x4f696C);
@@ -27,38 +43,11 @@ void physics_constants_reset()
 {
 	s_physics_constants* physics_constants = physics_constants_get();
 
-	s_game_variant* variant = get_game_variant();
+	
 
-	if (game_is_multiplayer() && variant)
+	if (game_is_multiplayer())
 	{
-		switch (variant->cartographer_settings.gravity)
-		{
-			case _game_gravity_modifier_twenty_five_percent:
-				physics_constants->gravity = k_physics_constants_default_gravity * 0.25f;
-				break;
-			case _game_gravity_modifier_fifty_percent:
-				physics_constants->gravity = k_physics_constants_default_gravity * 0.5f;
-				break;
-			case _game_gravity_modifier_seventy_five_percent:
-				physics_constants->gravity = k_physics_constants_default_gravity * 0.75f;
-				break;
-			case _game_gravity_modifier_hundred_twenty_five_percent:
-				physics_constants->gravity = k_physics_constants_default_gravity * 1.25f;
-				break;
-			case _game_gravity_modifier_hundred_fifty_percent:
-				physics_constants->gravity = k_physics_constants_default_gravity * 1.50f;
-				break;
-			case _game_gravity_modifier_hundred_seventy_five_percent:
-				physics_constants->gravity = k_physics_constants_default_gravity * 1.75f;
-				break;
-			case _game_gravity_modifier_two_hundred:
-				physics_constants->gravity = k_physics_constants_default_gravity * 2.f;
-				break;
-			case _game_gravity_modifier_none:
-			default:
-				physics_constants->gravity = k_physics_constants_default_gravity;
-				break;
-		}
+		physics_constants->gravity = physics_constants_get_variant_gravity();
 	}
 	else
 		physics_constants->gravity = k_physics_constants_default_gravity;
@@ -72,6 +61,20 @@ void physics_constants_reset()
 void physics_constants_setup_scenario()
 {
 	physics_constants_reset();
+}
+
+real32 physics_constants_get_variant_gravity()
+{
+	const s_game_variant* variant = get_game_variant();
+
+	real32 result = k_physics_constants_default_gravity;
+
+	if (IN_RANGE(variant->cartographer_settings.gravity, _game_gravity_modifier_none, _game_gravity_modifier_two_hundred))
+	{
+		result = k_physics_constants_variant_graivty[variant->cartographer_settings.gravity];
+	}
+
+	return result;
 }
 
 void physics_constants_apply_patches()

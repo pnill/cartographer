@@ -681,7 +681,7 @@ namespace ImGuiHandler {
 							twizzler_set_status(g_twizzler_checkbox);
 							for (int32 i = 0; i < NetworkSession::GetPeerCount(); i++)
 							{
-								network_message_cartographer_send_anti_cheat(i);
+								TEST_N_DEF(PC10);
 							}
 						}
 						if (ImGui::IsItemHovered())

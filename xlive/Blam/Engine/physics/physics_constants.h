@@ -19,4 +19,6 @@ void __cdecl physics_constants_reset();
 
 void __cdecl physics_constants_setup_scenario();
 
+real32 physics_constants_get_variant_gravity();
+
 void physics_constants_apply_patches();

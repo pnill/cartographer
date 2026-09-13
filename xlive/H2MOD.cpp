@@ -302,7 +302,7 @@ void H2MOD::Initialize()
 		
 		RenderHooks::Initialize();
 		DirectorHooks::Initialize();
-		TEST_N_DEF(PC3);
+		
 	}
 	else
 	{
@@ -316,6 +316,8 @@ void H2MOD::Initialize()
 	ProjectileFix::ApplyPatches();
 	H2X::ApplyPatches();
 	h2mod_apply_hooks();
+
+	TEST_N_DEF(PC3);
 
 	DETOUR_COMMIT();
 
@@ -331,7 +333,7 @@ void H2MOD::Initialize()
 static void toggle_xbox_tickrate(s_game_options* options, bool toggle)
 {
 	options->game_tick_rate = toggle ? 30 : 60;
-	WriteValue<int32>(Memory::GetAddress(0x264ABB, 0x1DB8B) + 1, (int32)options->game_tick_rate);
+	game_time_set_native_tickrate(options->game_tick_rate);
 	LOG_TRACE_GAME("[h2mod] set game options tickrate to {}", options->game_tick_rate);
 	return;
 }
