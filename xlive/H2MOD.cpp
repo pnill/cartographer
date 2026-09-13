@@ -364,15 +364,29 @@ static bool __cdecl OnPlayerSpawn(datum player_index)
 
 	s_game_variant* variant = get_game_variant();
 
-	if (game_is_multiplayer() && variant && variant->cartographer_settings.flags.test(_cartographer_variant_invincible_players))
+	if (game_is_multiplayer() && variant)
 	{
 		player_datum* player = player_get(player_index);
-		object_datum* object = object_get(player->unit_index);
-		
-		ASSERT(player);
-		ASSERT(object);
+		unit_datum* unit = unit_get(player->unit_index);
 
-		object->object.object_damage_flags.set(_object_is_immune_to_damage, true);
+		ASSERT(player);
+
+		if (unit)
+		{
+			if (variant->cartographer_settings.flags.test(_cartographer_variant_invincible_players))
+			{
+				unit->object.object_damage_flags.set(_object_is_immune_to_damage, true);
+			}
+
+			if (variant->cartographer_settings.flags.test(_cartographer_variant_infinite_grenades))
+			{
+				s_game_globals_grenade const* frag_grenade_globals = TAG_BLOCK_GET_ELEMENT(&scenario_get_game_globals()->grenades, _unit_grenade_human_fragmentation, s_game_globals_grenade);
+				s_game_globals_grenade const* plasma_grenade_globals = TAG_BLOCK_GET_ELEMENT(&scenario_get_game_globals()->grenades, _unit_grenade_covenant_plasma, s_game_globals_grenade);
+
+				unit->unit.grenade_counts[_unit_grenade_human_fragmentation] = (int8)frag_grenade_globals->maximum_count;
+				unit->unit.grenade_counts[_unit_grenade_covenant_plasma] = (int8)plasma_grenade_globals->maximum_count;
+			}
+		}
 	}
 
 	// check if the spawn was successful
