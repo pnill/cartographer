@@ -119,6 +119,7 @@ void hotkeyFuncGuide() {
 void hotkeyFuncConsole() {
 #ifdef TERMINAL_ENABLED
 	ImGuiHandler::ToggleWindow(k_cartographer_console_window_name);
+	GetMainConsoleInstance()->SwitchToTab(_console_tab_commands);
 #endif
 }
 
