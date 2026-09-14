@@ -17,11 +17,10 @@
 #include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 
-
-#include "imgui.h"
-
 /* prototypes */
 #ifndef IMGUI_DISABLE
+#include "imgui.h"
+
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 #endif
 
