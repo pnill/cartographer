@@ -17,21 +17,32 @@
 #include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 
-#ifndef IMGUI_DISABLE
 
 #include "imgui.h"
 
 /* prototypes */
-
+#ifndef IMGUI_DISABLE
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
 #endif
+
+typedef BOOL(WINAPI* set_process_information_t)(HANDLE, int, LPVOID, DWORD);
+
+
 
 /* constants */
 
 enum
 {
 	k_max_monitor_count = 9
+};
+
+enum : ULONG
+{
+	k_power_throttling_current_version = 1,
+	k_throttling_execution_speed = 0x1, // EcoQoS / efficiency mode
+	k_throttling_ignore_timer_resolution = 0x4, // Win11 21H2+ timer coalescing
+
+	k_throttling_qos_mask = k_throttling_execution_speed | k_throttling_ignore_timer_resolution
 };
 
 /* globals */
@@ -112,6 +123,8 @@ static void shell_windows_setup_cartographer_protocol();
 
 static void shell_windows_affix_processor_priority();
 
+static void shell_windows_disable_eco_qos();
+
 /* public code */
 
 s_window_globals* window_globals_get(void)
@@ -141,6 +154,8 @@ bool shell_platform_initialize(void)
 	}
 
 	shell_windows_affix_processor_priority();
+
+	shell_windows_disable_eco_qos();
 
 	shell_windows_initialize_arguments();
 
@@ -942,5 +957,33 @@ void shell_windows_affix_processor_priority()
 	else
 	{
 		error(_error_delayed, "Failed to get processor affinity mask");
+	}
+}
+
+static void shell_windows_disable_eco_qos()
+{
+	set_process_information_t set_process_info_proc = nullptr;
+
+	HMODULE kernel32 = GetModuleHandleW(L"Kernel32.dll");
+
+	if (kernel32)
+	{
+		set_process_info_proc = (set_process_information_t)GetProcAddress(kernel32, "SetProcessInformation");
+	}
+
+	if (set_process_info_proc)
+	{
+		PROCESS_POWER_THROTTLING_STATE state = {};
+		state.Version = k_power_throttling_current_version;
+		state.StateMask = 0;
+		state.ControlMask = k_throttling_qos_mask;
+
+		if (!set_process_info_proc(GetCurrentProcess(), ProcessPowerThrottling, &state, sizeof(state)))
+		{
+			// windows 10 builds don't support the timer resolution bit and error our retry without
+
+			state.ControlMask = k_throttling_execution_speed;
+			set_process_info_proc(GetCurrentProcess(), ProcessPowerThrottling, &state, sizeof(state));
+		}
 	}
 }
