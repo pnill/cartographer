@@ -122,13 +122,13 @@ static void weapon_take_inventory_rounds(datum weapon_index, int32 magazine_inde
 		// and take the ammo from that (dual wielding)
 		if (weapon->item.inventory_owner_unit_index != NONE && rounds_total < round_count)
 		{
-			unit_datum* owning_unit = unit_get(weapon->item.inventory_owner_unit_index);
+			unit_datum* owning_unit = unit_try_and_get(weapon->item.inventory_owner_unit_index);
 
 			if (owning_unit)
 			{
 				for (uint32 index = 0; index < NUMBEROF(owning_unit->unit.weapon_object_indices); ++index)
 				{
-					weapon_datum* unit_weapon = weapon_get(owning_unit->unit.weapon_object_indices[index]);
+					weapon_datum* unit_weapon = weapon_try_and_get(owning_unit->unit.weapon_object_indices[index]);
 
 					if (unit_weapon && unit_weapon->definition_index == weapon->definition_index)
 					{
