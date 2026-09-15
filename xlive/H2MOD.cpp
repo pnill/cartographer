@@ -367,7 +367,7 @@ static bool __cdecl OnPlayerSpawn(datum player_index)
 	if (game_is_multiplayer() && variant)
 	{
 		player_datum* player = player_get(player_index);
-		unit_datum* unit = unit_get(player->unit_index);
+		unit_datum* unit = unit_try_and_get(player->unit_index);
 
 		ASSERT(player);
 
