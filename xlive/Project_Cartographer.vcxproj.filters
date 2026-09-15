@@ -2161,6 +2161,7 @@
     <ClInclude Include="Blam\Engine\sound\sound_effect_definitions.h" />
     <ClInclude Include="Blam\Engine\sound\game_sound_definitions.h" />
     <ClInclude Include="Blam\Engine\sound\platform_sound_effect_definitions.h" />
+    <ClInclude Include="Blam\Engine\widgets\cloth_definitions.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
