@@ -259,6 +259,39 @@ real_point3d* points_interpolate(const real_point3d* a, const real_point3d* b, r
 	return result;
 }
 
+void rotate_vector_about_axis(real_vector3d* v, const real_vector3d* axis, real32 sine_angle, real32 cosine_angle)
+{
+	real_vector3d axis_component;
+	real_vector3d cross;
+	real_vector3d rotated;
+
+	scale_vector3d(axis, dot_product3d(axis, v) * (1.f - cosine_angle), &axis_component);
+	cross_product3d(axis, v, &cross);
+	scale_vector3d(&cross, sine_angle, &cross);
+	scale_vector3d(v, cosine_angle, &rotated);
+	add_vectors3d(&rotated, &cross, &rotated);
+	add_vectors3d(&rotated, &axis_component, v);
+	return;
+}
+
+real_vector3d* decompose_vector_to_parallel_perpendicular(const real_vector3d* vector, const real_vector3d* normal, real_vector3d* parallel, real_vector3d* perpendicular)
+{
+	real_vector3d parallel_component;
+	scale_vector3d(normal, dot_product3d(vector, normal), &parallel_component);
+
+	if (parallel)
+	{
+		*parallel = parallel_component;
+	}
+
+	if (perpendicular)
+	{
+		subtract_vectors3d(vector, &parallel_component, perpendicular);
+	}
+
+	return parallel;
+}
+
 real_vector3d* __cdecl perpendicular3d(const real_vector3d* in, real_vector3d* out)
 {
 	return INVOKE(0x344c9, 0x27B46, perpendicular3d, in, out);
