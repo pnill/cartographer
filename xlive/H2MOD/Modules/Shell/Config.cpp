@@ -212,8 +212,6 @@ bool H2Config_force_off_d3d9ex = false;
 bool H2Config_force_off_sm3 = false;
 bool H2Config_use_vsync = false;
 
-WPARAM H2Config_hotkeyIdHelp = VK_F2;
-WPARAM H2Config_hotkeyIdToggleHideIngameChat = VK_F9;
 WPARAM H2Config_hotkeyIdGuide = VK_HOME;
 WPARAM H2Config_hotkeyIdConsole = VK_F10;
 
@@ -532,13 +530,6 @@ void SaveH2Config()
 		else
 		{
 			c_static_string<64> vkstring;
-			vkstring.set("#");
-			GetVKeyCodeString(H2Config_hotkeyIdHelp, &vkstring);
-			CONFIG_SET_C(&ini, "hotkey_help", H2Config_hotkeyIdHelp, vkstring.get_string());
-
-			vkstring.set("#");
-			GetVKeyCodeString(H2Config_hotkeyIdToggleHideIngameChat, &vkstring);
-			CONFIG_SET_C(&ini, "hotkey_hide_ingame_chat", H2Config_hotkeyIdToggleHideIngameChat, vkstring.get_string());
 
 			vkstring.set("#");
 			GetVKeyCodeString(H2Config_hotkeyIdGuide, &vkstring);
@@ -674,8 +665,6 @@ void ReadH2Config()
 				CONFIG_GET(&ini, "disable_ingame_keyboard", "false", &H2Config_disable_ingame_keyboard);
 				CONFIG_GET(&ini, "hide_ingame_chat", "false", &H2Config_hide_ingame_chat);
 
-				CONFIG_GET(&ini, "hotkey_help", "0x72", &H2Config_hotkeyIdHelp); // VK_F2
-				CONFIG_GET(&ini, "hotkey_hide_ingame_chat", "0x78", &H2Config_hotkeyIdToggleHideIngameChat); // VK_F9
 				CONFIG_GET(&ini, "hotkey_guide", "0x24", &H2Config_hotkeyIdGuide); // VK_HOME
 				CONFIG_GET(&ini, "hotkey_console", "0x79", &H2Config_hotkeyIdConsole); // VK_F10
 
