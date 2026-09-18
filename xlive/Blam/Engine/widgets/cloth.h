@@ -12,8 +12,8 @@
 
 enum
 {
-	k_cloth_maximum_vertex_count = 128,
-	k_cloth_maximum_attachment_count = 6,
+	k_maximum_vertices_per_cloth = 128,
+	k_maximum_attachments_per_cloth = 6,
 
 	k_cloth_minimum_relaxation_iterations = 1,
 	k_cloth_maximum_relaxation_iterations = 15,
@@ -57,9 +57,9 @@ struct cloth_datum
 	real32 time_accumulator;
 	real_point3d last_attached_object_position;
 	real32 object_velocity;
-	cloth_vertex dynamic_vertices[k_cloth_maximum_vertex_count];
-	uint32 attached_bit_vector[BIT_VECTOR_SIZE_IN_LONGS(k_cloth_maximum_vertex_count)];
-	cloth_vertex_attachment attachments[k_cloth_maximum_attachment_count];
+	cloth_vertex dynamic_vertices[k_maximum_vertices_per_cloth];
+	uint32 attached_bit_vector[BIT_VECTOR_SIZE_IN_LONGS(k_maximum_vertices_per_cloth)];
+	cloth_vertex_attachment attachments[k_maximum_attachments_per_cloth];
 	int16 attachment_count;
 	int16 pad2;
 };

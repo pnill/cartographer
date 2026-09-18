@@ -17,17 +17,17 @@ t_cloth_update p_cloth_update;
 
 static real32 cloth_approximate_square_root(real32 f);
 
-static void __cdecl cloth_enforce_attachments(datum cloth_index);
+static void __cdecl cloth_enforce_attachments(datum cloth_datum_index);
 
-static void __cdecl cloth_reset_flag_to_default_positions(datum cloth_index);
+static void __cdecl cloth_reset_flag_to_default_positions(datum cloth_datum_index);
 
-static void __cdecl cloth_update_positions_verlet(datum cloth_index);
+static void __cdecl cloth_update_positions_verlet(datum cloth_datum_index);
 
-static void __cdecl cloth_constrain_positions_relaxation(datum cloth_index);
+static void __cdecl cloth_constrain_positions_relaxation(datum cloth_datum_index);
 
-static void __cdecl cloth_calculate_normals(datum cloth_index);
+static void __cdecl cloth_calculate_normals(datum cloth_datum_index);
 
-static void __cdecl cloth_check_for_delete(datum cloth_index);
+static void __cdecl cloth_check_for_delete(datum cloth_datum_index);
 
 /* public code */
 
@@ -83,13 +83,13 @@ static real32 cloth_approximate_square_root(real32 f)
 	return *(real32*)&bits;
 }
 
-void __cdecl cloth_enforce_attachments(datum cloth_index)
+void __cdecl cloth_enforce_attachments(datum cloth_datum_index)
 {
-	cloth_datum* cloth = cloth_get(cloth_index);
+	cloth_datum* cloth = cloth_get(cloth_datum_index);
 	const cloth_definition* definition = cloth_definition_get(cloth->definition_index);
 	const object_datum* object = object_get(cloth->object_index);
 
-	object_marker markers[k_cloth_maximum_attachment_count];
+	object_marker markers[k_maximum_attachments_per_cloth];
 	const bool markers_valid = cloth->attachment_count > 0
 		&& object_get_markers_by_string_id(cloth->object_index, definition->marker_attachment_name, markers, NUMBEROF(markers)) > 0;
 
@@ -152,12 +152,12 @@ void __cdecl cloth_reset_flag_to_default_positions(datum cloth_index)
 	return;
 }
 
-void __cdecl cloth_constrain_positions_relaxation(datum cloth_index)
+void __cdecl cloth_constrain_positions_relaxation(datum cloth_datum_index)
 {
-	cloth_datum* cloth = cloth_get(cloth_index);
+	cloth_datum* cloth = cloth_get(cloth_datum_index);
 	const cloth_definition* definition = cloth_definition_get(cloth->definition_index);
 
-	cloth_enforce_attachments(cloth_index);
+	cloth_enforce_attachments(cloth_datum_index);
 
 	int32 iteration_count = (int32)((real32)definition->properties.number_iterations + cloth->object_velocity * 3.0f);
 	iteration_count = PIN(iteration_count, k_cloth_minimum_relaxation_iterations, k_cloth_maximum_relaxation_iterations);
@@ -217,9 +217,9 @@ void __cdecl cloth_constrain_positions_relaxation(datum cloth_index)
 				}
 			}
 
-			if (::abs(correction) > k_cloth_maximum_link_correction && !reset_this_update)
+			if (fabs(correction) > k_cloth_maximum_link_correction && !reset_this_update)
 			{
-				cloth_reset_flag_to_default_positions(cloth_index);
+				cloth_reset_flag_to_default_positions(cloth_datum_index);
 				reset_this_update = true;
 				restart_iteration = true;
 			}
@@ -231,7 +231,7 @@ void __cdecl cloth_constrain_positions_relaxation(datum cloth_index)
 			continue;
 		}
 
-		cloth_enforce_attachments(cloth_index);
+		cloth_enforce_attachments(cloth_datum_index);
 	}
 
 	return;
@@ -240,13 +240,13 @@ void __cdecl cloth_constrain_positions_relaxation(datum cloth_index)
 void cloth_wind_exclude_from_pole_by_angle(real_vector3d* direction, real32 angle)
 {
 	const real32 cosine_angle = cosine(angle);
-	if (::abs(direction->k) > cosine_angle)
+	if (fabs(direction->k) > cosine_angle)
 	{
 		direction->k = (direction->k >= 0.f) ? cosine_angle : -cosine_angle;
 	}
 
 	real_vector2d* horizontal = (real_vector2d*)direction;
-	if ((::abs(horizontal->i) < 0.01f && ::abs(horizontal->j) < 0.01f) || ::abs(normalize2d(horizontal)) < k_real_epsilon)
+	if ((fabs(horizontal->i) < 0.01f && ::abs(horizontal->j) < 0.01f) || ::abs(normalize2d(horizontal)) < k_real_epsilon)
 	{
 		horizontal->i = 1.f;
 		horizontal->j = 0.f;
@@ -258,20 +258,20 @@ void cloth_wind_exclude_from_pole_by_angle(real_vector3d* direction, real32 angl
 	return;
 }
 
-void __cdecl cloth_update_positions_verlet(datum cloth_index)
+void __cdecl cloth_update_positions_verlet(datum cloth_datum_index)
 {
 	void* func = Memory::GetAddress<void*>(0x18E82F);
 	__asm
 	{
-		lea eax, cloth_index
+		lea eax, cloth_datum_index
 		mov eax, dword ptr[eax]
 		call func
 	}
 }
 
-void __cdecl cloth_calculate_normals(datum cloth_index)
+void __cdecl cloth_calculate_normals(datum cloth_datum_index)
 {
-	cloth_datum* cloth = cloth_get(cloth_index);
+	cloth_datum* cloth = cloth_get(cloth_datum_index);
 	const cloth_definition* definition = cloth_definition_get(cloth->definition_index);
 
 	for (int32 index = 0; index < definition->indices.count; index += 3)
@@ -306,9 +306,9 @@ void __cdecl cloth_calculate_normals(datum cloth_index)
 	return;
 }
 
-void __cdecl cloth_check_for_delete(datum cloth_index)
+void __cdecl cloth_check_for_delete(datum cloth_datum_index)
 {
-	const cloth_datum* cloth = cloth_get(cloth_index);
+	const cloth_datum* cloth = cloth_get(cloth_datum_index);
 	if (cloth->object_index == NONE)
 	{
 		return;
@@ -322,7 +322,7 @@ void __cdecl cloth_check_for_delete(datum cloth_index)
 			const real32 ticks_since_motion = (real32)(int32)(game_time_get() - object->object.last_motion_time);
 			if (game_ticks_to_seconds(ticks_since_motion) > k_cloth_dead_object_delete_seconds)
 			{
-				widget_delete_type_datum(cloth->object_index, cloth_index);
+				widget_delete_type_datum(cloth->object_index, cloth_datum_index);
 			}
 		}
 	}

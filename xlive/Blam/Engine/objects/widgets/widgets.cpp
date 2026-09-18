@@ -21,8 +21,8 @@ void __cdecl widgets_update(real32 dt)
 	return;
 }
 
-void __cdecl widget_delete_type_datum(datum object_index, datum widget_index)
+void __cdecl widget_delete_type_datum(datum object_index, datum delete_widget_type_index)
 {
-	INVOKE(0x14FEBF, 0x0, widget_delete_type_datum, object_index, widget_index);
+	INVOKE(0x14FEBF, 0x0, widget_delete_type_datum, object_index, delete_widget_type_index);
 	return;
 }

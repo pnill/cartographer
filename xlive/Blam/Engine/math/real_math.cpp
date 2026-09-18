@@ -259,22 +259,21 @@ real_point3d* points_interpolate(const real_point3d* a, const real_point3d* b, r
 	return result;
 }
 
-void rotate_vector_about_axis(real_vector3d* v, const real_vector3d* axis, real32 sine_angle, real32 cosine_angle)
+real_vector3d* rotate_vector_about_axis(real_vector3d* v, const real_vector3d* n, real32 sine, real32 cosine)
 {
-	real_vector3d axis_component;
-	real_vector3d cross;
-	real_vector3d rotated;
+	real32 one_minus_cosine_times_v_dot_n = (1.f - cosine) * dot_product3d(v, n);
+	real32 v_cross_n_i = v->j * n->k - v->k * n->j;
+	real32 v_cross_n_j = v->k * n->i - v->i * n->k;
+	real32 v_cross_n_k = v->i * n->j - v->j * n->i;
 
-	scale_vector3d(axis, dot_product3d(axis, v) * (1.f - cosine_angle), &axis_component);
-	cross_product3d(axis, v, &cross);
-	scale_vector3d(&cross, sine_angle, &cross);
-	scale_vector3d(v, cosine_angle, &rotated);
-	add_vectors3d(&rotated, &cross, &rotated);
-	add_vectors3d(&rotated, &axis_component, v);
-	return;
+	v->i = n->i * one_minus_cosine_times_v_dot_n + v->i * cosine - v_cross_n_i * sine;
+	v->j = n->j * one_minus_cosine_times_v_dot_n + v->j * cosine - v_cross_n_j * sine;
+	v->k = n->k * one_minus_cosine_times_v_dot_n + v->k * cosine - v_cross_n_k * sine;
+
+	return v;
 }
 
-real_vector3d* decompose_vector_to_parallel_perpendicular(const real_vector3d* vector, const real_vector3d* normal, real_vector3d* parallel, real_vector3d* perpendicular)
+real_vector3d* component_vectors_from_normal3d(const real_vector3d* vector, const real_vector3d* normal, real_vector3d* parallel, real_vector3d* perpendicular)
 {
 	real_vector3d parallel_component;
 	scale_vector3d(normal, dot_product3d(vector, normal), &parallel_component);

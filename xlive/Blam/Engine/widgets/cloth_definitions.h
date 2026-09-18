@@ -11,7 +11,7 @@ enum e_cloth_integration_type : int16
 	_cloth_integration_type_verlet
 };
 
-enum e_cloth_flags : uint32
+enum e_cloth_flags
 {
 	_cloth_flag_doesnt_use_wind,
 	_cloth_flag_uses_grid_attach_top,

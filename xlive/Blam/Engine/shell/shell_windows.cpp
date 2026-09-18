@@ -38,8 +38,9 @@ enum
 enum : ULONG
 {
 	k_power_throttling_current_version = 1,
-	k_throttling_execution_speed = 0x1, // EcoQoS / efficiency mode
-	k_throttling_ignore_timer_resolution = 0x4, // Win11 21H2+ timer coalescing
+
+	k_throttling_execution_speed = FLAG(0),// EcoQoS / efficiency mode
+	k_throttling_ignore_timer_resolution = FLAG(2), // Win11 21H2+ timer coalescing
 
 	k_throttling_qos_mask = k_throttling_execution_speed | k_throttling_ignore_timer_resolution
 };
