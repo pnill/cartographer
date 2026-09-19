@@ -142,7 +142,7 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum player_index)
 			{
 				int level = 0;
 				uint64 id;
-				s_player_identifier identifier = NetworkSession::GetPlayerId(player_abs_index);
+				s_player_identifier identifier = NetworkSession::GetPlayerId(player_index);
 				csmemcpy(&id, &identifier, sizeof(uint64));
 
 				auto gungamePlayer = gungamePlayers.find(id);
@@ -172,7 +172,7 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum player_index)
 				}
 				else
 				{
-					call_give_player_weapon(player_abs_index, (datum)k_level_weapons[level], 1);
+					call_give_player_weapon(player_index, (datum)k_level_weapons[level], 1);
 				}
 			}
 		}
@@ -188,7 +188,10 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum player_index)
 
 bool GunGame::c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_statborg* statborg, datum player_index, e_statborg_entry statistic, short count, int game_results_statistic, bool adjust_team_stat)
 {
-	player_datum const* player = player_get(player_index);
+	player_datum const* player = player_try_and_get_absolute(player_index);
+
+	if (!player)
+		return false;
 
 	uint64 id;
 	s_player_identifier identifier = NetworkSession::GetPlayerId(player_index);

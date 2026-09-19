@@ -63,6 +63,8 @@ void* datum_try_and_get(const data_array* data, int32 datum_index);
 
 void* datum_get_absolute(const data_array* data, int32 index);
 
+void* datum_try_and_get_absolute(const data_array* data, int32 datum_index);
+
 void __cdecl datum_delete(data_array* data, datum datum_index);
 
 int32 data_allocation_size(int32 maximum_count, int32 size, int32 alignment_bits);

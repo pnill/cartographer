@@ -18,6 +18,10 @@ enum
 
 #define player_get(index) ((struct player_datum*)datum_get(player_data_get(), index))
 
+#define player_try_and_get(index) ((struct player_datum*)datum_try_and_get(player_data_get(), index))
+
+#define player_try_and_get_absolute(index) ((struct player_datum*)datum_try_and_get_absolute(player_data_get(), index))
+
 /* enums */
 
 enum e_player_flags

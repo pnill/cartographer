@@ -192,6 +192,8 @@ SOCKET WINAPI XSocketCreate(int af, int type, int protocol);
 
 int WINAPI XSocketSendTo(SOCKET s, const char* buf, int len, int flags, sockaddr *to, int tolen);
 
+u_long WINAPI XSocketHTONL(u_long hostlong);
+
 u_long WINAPI XSocketNTOHL(u_long netlong);
 
 u_short WINAPI XSocketHTONS(u_short hostshort);

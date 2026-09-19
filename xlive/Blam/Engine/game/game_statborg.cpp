@@ -41,7 +41,7 @@ void c_game_statborg::adjust_team_stat(int32 team_index, e_statborg_entry statis
 
 // Cartographer handler for adjust_player_stat member function
 // TODO Revamp so we don't need to do this
-void __fastcall c_game_statborg__adjust_player_stat(c_game_statborg* thisptr, DWORD _edx, datum player_datum, e_statborg_entry statistic, short count, int game_result_statistic, bool adjust_team_stat)
+void __fastcall c_game_statborg__adjust_player_stat(c_game_statborg* thisptr, DWORD _edx, int16 player_datum, e_statborg_entry statistic, short count, int game_result_statistic, bool adjust_team_stat)
 {
 	bool handled = CustomVariantHandler::c_game_statborg__adjust_player_stat(ExecTime::_preEventExec, thisptr, player_datum, statistic, count, game_result_statistic, adjust_team_stat);
 	if (!handled)
