@@ -115,6 +115,7 @@
 #include "halo_playlist/halo_playlist.h"
 #include "interface/multiplayer_variant_settings_interface_definition.h"
 #include "items/weapons.h"
+#include "objects/widgets/antenna.h"
 #include "physics/physics_constants.h"
 #include "units/unit_action_system.h"
 
@@ -733,6 +734,7 @@ static void h2mod_apply_hooks(void)
 		liquid_apply_patches();
 		contrails_apply_patches();
 		cloth_apply_patches();
+		antenna_apply_patches();
 		camera_apply_patches();
 		player_control_apply_patches();
 		effects_apply_patches();

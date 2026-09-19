@@ -3,6 +3,17 @@
 
 /* public code */
 
+widget_type_definition* widget_type_definition_get(e_widget_type type)
+{
+	ASSERT(VALID_INDEX(type, k_number_of_widget_types));
+	return &Memory::GetAddress<widget_type_definition*>(0x41E3C8)[type];
+}
+
+data_array* widget_data_get(void)
+{
+	return *Memory::GetAddress<data_array**>(0x4E6678);
+}
+
 void __cdecl widgets_initialize_for_new_map(void)
 {
 	INVOKE(0x14FDB5, 0x14CB4D, widgets_initialize_for_new_map);
