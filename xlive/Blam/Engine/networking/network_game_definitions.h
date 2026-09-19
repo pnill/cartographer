@@ -26,6 +26,15 @@ enum e_network_session_qos_status_data_type
 	k_network_session_qos_status_data_type_bits = 2,
 };
 
+enum e_network_game_simulation_protocol
+{
+	_network_game_simulation_protocol_offline = 0,
+	_network_game_simulation_protocol_synchronous,
+	_network_game_simulation_protocol_distributed,
+
+	k_network_game_simulation_protocol_count
+};
+
 /* structures */
 
 #pragma pack(push, 1)

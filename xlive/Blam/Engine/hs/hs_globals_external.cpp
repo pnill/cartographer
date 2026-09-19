@@ -7,6 +7,7 @@
 #include "main/main_game.h"
 #include "main/main_render.h"
 #include "main/main_time.h"
+#include "networking/logic/network_session_interface.h"
 #include "render/render.h"
 
 /* macros */
@@ -59,6 +60,10 @@ HS_GLOBAL_EXTERNAL_CREATE(console_dump_to_debug_display_definition, "console_dum
 HS_GLOBAL_EXTERNAL_CREATE(render_patchy_fog_definition, "render_patchy_fog", _hs_type_boolean, &render_patchy_fog_enabled);
 HS_GLOBAL_EXTERNAL_CREATE(render_lens_flares_definition, "render_lens_flares", _hs_type_boolean, &render_lens_flares_enabled);
 HS_GLOBAL_EXTERNAL_CREATE(render_decals_definition, "render_decals", _hs_type_boolean, &render_decals_enabled);
+
+
+HS_GLOBAL_EXTERNAL_CREATE(net_distributed_always_definition, "net_distributed_always", _hs_type_boolean, &debug_net_distributed_always);
+HS_GLOBAL_EXTERNAL_CREATE(net_distributed_never_definition, "net_distributed_never", _hs_type_boolean, &debug_net_distributed_never);
 
 HS_GLOBAL_EXTERNAL_CREATE(console_status_string_render_definition, "console_status_string_render", _hs_type_boolean, NULL);	// Unused
 
@@ -975,8 +980,11 @@ const hs_global_external* hs_external_globals[] =
 	&off_CE881C,
 	&off_CE8828,
 	&off_CE8834,
-	&off_CE8840,
-	&off_CE884C,
+*/
+	&net_distributed_always_definition,
+	&net_distributed_never_definition,
+
+/*
 	&off_CE8858,
 	&off_CE8864,
 	&off_CE8870,

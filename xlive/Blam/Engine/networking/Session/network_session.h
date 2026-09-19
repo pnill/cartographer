@@ -181,7 +181,7 @@ struct s_session_parameters
 {
 	uint32 parameters_update_number;
 	uint8 gap_4C64[4];
-	int32 session_mode;
+	e_network_session_mode session_mode;
 	uint32 gap_4C6C;
 	uint32 system_language_id;
 	bool dedicated_server;
@@ -653,6 +653,12 @@ public:
 		return peer_index;
 	}
 
+	e_network_session_class get_session_class(void) const
+	{
+		ASSERT(m_session_class >= _network_session_class_offline && m_session_class < k_network_session_class_count);
+		return m_session_class;
+	}
+
 	bool is_session_class_online() const
 	{
 		return m_session_class == _network_session_class_xbox_live;
@@ -679,6 +685,11 @@ public:
 	bool handle_leave_request(const struct transport_address* incoming_address);
 
 	bool handle_leave_internal(int32 peer_index);
+
+	bool parameters_game_variant_request_change(s_game_variant* variant);
+	bool parameters_simulation_protocol_request_change(enum e_network_game_simulation_protocol protocol);
+	bool parameters_countdown_timer_request_change(int8 mode, int32 countdown_timer, int8 dedicated_server_host, uint32 delay_reason, s_player_identifier* responsible_player);
+
 private:
 	const char* get_peer_description(int32 peer_index) const;
 
@@ -694,8 +705,10 @@ ASSERT_STRUCT_OFFSET(c_network_session, m_session_parameters, 0x4C60);
 
 /* prototypes */
 
-void network_session_apply_patches();
+void network_session_apply_patches(void);
 
 void network_session_membership_update_local_players_teams();
 
 void __cdecl network_globals_switch_environment(int32 a1, bool a2);
+
+bool network_squad_session_can_set_game_settings(void);
