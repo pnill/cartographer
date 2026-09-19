@@ -7,4 +7,3 @@ namespace KeyboardInput
 	void ExecuteHotkey(WPARAM message);
 }
 
-void hotkeyFuncToggleHideIngameChat();

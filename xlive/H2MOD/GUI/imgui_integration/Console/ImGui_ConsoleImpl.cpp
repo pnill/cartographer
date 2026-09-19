@@ -13,8 +13,6 @@
 const char command_error_bad_arg[] = "# exception catch (bad arg): ";
 const char* k_cartographer_console_window_name = "console";
 
-ConsoleCommand console_opacity_var_cmd("var_console_opacity", "set console opacity, 1 parameter(s): <float>", 1, 1, CartographerConsole::set_opacity_cb);
-
 CartographerConsole* GetMainConsoleInstance()
 {
 	static std::unique_ptr<CartographerConsole> console(std::make_unique<CartographerConsole>());
@@ -41,14 +39,15 @@ CartographerConsole::CartographerConsole() :
 		m_output.emplace_back(256, MAX_CONSOLE_INPUT_BUFFER);
 	}
 
-	// you can pass nullptr to ImGui_ConsoleVar if you can get the variable from context data
-	console_opacity_var_cmd.SetCommandVarPtr(&m_console_opacity_comvar);
-
 	InitializeCriticalSection(&g_command_insert_section);
 
-	CommandCollection::InsertCommand(&console_opacity_var_cmd);
-	CommandCollection::InsertCommand(new ConsoleCommand("clear", "clear the output of the current console and history, 0 parameter(s)", 0, 0, CartographerConsole::clear_cb));
+	CommandCollection::InsertCommand(new ConsoleCommand("var_console_opacity", "set console opacity, 1 parameter(s): <float>", 1, 1, CartographerConsole::set_opacity_cb));
 	
+	// you can pass nullptr to ImGui_ConsoleVar if you can get the variable from context data
+	CommandCollection::commandTable.back()->SetCommandVarPtr(&m_console_opacity_comvar);
+	
+	CommandCollection::InsertCommand(new ConsoleCommand("clear", "clear the output of the current console and history, 0 parameter(s)", 0, 0, CartographerConsole::clear_cb));
+
 	DeleteCriticalSection(&g_command_insert_section);
 	return;
 }

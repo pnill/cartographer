@@ -12,7 +12,7 @@
 /* enums */
 enum
 {
-	k_number_of_global_hotkeys = 4
+	k_number_of_global_hotkeys = 2
 };
 
 
@@ -73,42 +73,6 @@ void KeyboardInput::ExecuteHotkey(WPARAM message)
 	return;
 }
 
-void hotkeyFuncHelp() {
-	addDebugText("------------------------------");
-	addDebugText("Options:");
-
-	c_static_string<64> vkstring;
-	GetVKeyCodeString(H2Config_hotkeyIdHelp, &vkstring);
-	addDebugText("%s - Print and show this help text.", vkstring.get_string());
-	vkstring.clear();
-
-	GetVKeyCodeString(H2Config_hotkeyIdToggleHideIngameChat, &vkstring);
-	addDebugText("%s - Toggles hiding the in-game chat menu.", vkstring.get_string());
-	vkstring.clear();
-
-	GetVKeyCodeString(H2Config_hotkeyIdConsole, &vkstring);
-	addDebugText("%s - Toggles hiding the Console Menu.", vkstring.get_string());
-
-	addDebugText("------------------------------");
-
-#ifdef TERMINAL_ENABLED
-	if (!ImGuiHandler::IsWindowActive(k_cartographer_console_window_name))
-	{
-		ImGuiHandler::ToggleWindow(k_cartographer_console_window_name);
-	}
-	GetMainConsoleInstance()->SwitchToTab(_console_tab_logs);
-#endif
-}
-
-void hotkeyFuncToggleHideIngameChat() {
-	H2Config_hide_ingame_chat = !H2Config_hide_ingame_chat;
-	if (H2Config_hide_ingame_chat) {
-		addDebugText("Hiding in-game chat menu.");
-	}
-	else {
-		addDebugText("Showing in-game chat menu.");
-	}
-}
 void hotkeyFuncGuide() {
 #ifndef IMGUI_DISABLE
 	ImGuiHandler::ImAdvancedSettings::set_controller_index(_controller0);
@@ -132,9 +96,7 @@ void KeyboardInput::Initialize()
 	}
 	ToggleKeyboardInput();
 
-	g_keyboard_hotkey_data[0] = { &H2Config_hotkeyIdHelp, hotkeyFuncHelp };
-	g_keyboard_hotkey_data[1] = { &H2Config_hotkeyIdGuide, hotkeyFuncGuide };
-	g_keyboard_hotkey_data[2] = { &H2Config_hotkeyIdConsole, hotkeyFuncConsole };
-	g_keyboard_hotkey_data[3] = { &H2Config_hotkeyIdToggleHideIngameChat, []() { H2Config_hide_ingame_chat = !H2Config_hide_ingame_chat; } };
+	g_keyboard_hotkey_data[0] = { &H2Config_hotkeyIdGuide, hotkeyFuncGuide };
+	g_keyboard_hotkey_data[1] = { &H2Config_hotkeyIdConsole, hotkeyFuncConsole };
 	return;
 }

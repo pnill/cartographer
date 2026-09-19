@@ -149,12 +149,6 @@ bool __cdecl render_ingame_chat_check(void)
 {
 	if (H2Config_hide_ingame_chat)
 	{
-		player_datum const* player = player_get(player_index_from_user_index(0));
-
-		if (player->is_chatting == 2)
-		{
-			hotkeyFuncToggleHideIngameChat();
-		}
 		return true;
 	}
 

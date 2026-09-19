@@ -606,6 +606,10 @@ real_point3d* points_interpolate(const real_point3d* a, const real_point3d* b, r
 
 real_vector3d* __cdecl perpendicular3d(const real_vector3d* in, real_vector3d* out);
 
+real_vector3d* rotate_vector_about_axis(real_vector3d* v, real_vector3d const* n, real32 sine, real32 cosine);
+
+real_vector3d* component_vectors_from_normal3d(const real_vector3d* vector, const real_vector3d* normal, real_vector3d* parallel, real_vector3d* perpendicular);
+
 real_vector3d* __cdecl generate_up_vector3d(const real_vector3d* forward, real_vector3d* up);
 
 void vectors3d_from_euler_angles3d(real_vector3d* forward, real_vector3d* up, const real_euler_angles3d* angles);
