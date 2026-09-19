@@ -23,7 +23,9 @@ struct antenna_vertex
 	/// color at this vertex for the low-LOD line primitives
 	real_argb_color lod_color;
 
-	int8 pad_3[52];
+	int8 pad_3[40];
+
+	real_vector3d next_vertex; // runtime offset to next vertex
 };
 ASSERT_STRUCT_SIZE(antenna_vertex, 128);
 

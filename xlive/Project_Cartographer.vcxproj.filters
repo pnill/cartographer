@@ -588,6 +588,7 @@
     <ClCompile Include="Blam\Engine\interface\cartographer_variant_settings.cpp" />
     <ClCompile Include="Blam\Engine\interface\multiplayer_variant_interface_cartographer_strings.cpp" />
     <ClCompile Include="Blam\Engine\memory\ring_buffer.cpp" />
+    <ClCompile Include="Blam\Engine\objects\widgets\antenna.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -2162,6 +2163,7 @@
     <ClInclude Include="Blam\Engine\sound\game_sound_definitions.h" />
     <ClInclude Include="Blam\Engine\sound\platform_sound_effect_definitions.h" />
     <ClInclude Include="Blam\Engine\widgets\cloth_definitions.h" />
+    <ClInclude Include="Blam\Engine\objects\widgets\antenna.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
