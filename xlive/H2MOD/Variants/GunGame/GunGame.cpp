@@ -142,7 +142,7 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum player_index)
 			{
 				int level = 0;
 				uint64 id;
-				s_player_identifier identifier = NetworkSession::GetPlayerId(player_abs_index);
+				s_player_identifier identifier = NetworkSession::GetPlayerId(player_index);
 				csmemcpy(&id, &identifier, sizeof(uint64));
 
 				auto gungamePlayer = gungamePlayers.find(id);
@@ -172,7 +172,7 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum player_index)
 				}
 				else
 				{
-					call_give_player_weapon(player_abs_index, (datum)k_level_weapons[level], 1);
+					call_give_player_weapon(player_index, (datum)k_level_weapons[level], 1);
 				}
 			}
 		}
