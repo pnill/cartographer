@@ -1,15 +1,12 @@
 #pragma once
+#include "cseries/language.h"
 #include "interface/user_interface.h"
 #include "interface/user_interface_widget_list.h"
 #include "interface/user_interface_widget_list_item.h"
 #include "interface/user_interface_widget_window.h"
-#include "main/game_preferences.h"
-
-/* macro defines */
 
 /* constants */
 
-/* enums */
 enum
 {
 	k_no_of_visible_items_for_display_mode = (2+1)

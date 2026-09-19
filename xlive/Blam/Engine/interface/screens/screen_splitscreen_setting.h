@@ -1,8 +1,8 @@
 #pragma once
+#include "cseries/language.h"
 #include "interface/user_interface_widget_list.h"
 #include "interface/user_interface_widget_list_item.h"
 #include "interface/user_interface_widget_window.h"
-#include "main/game_preferences.h"
 
 /* constants */
 enum
@@ -48,7 +48,7 @@ public:
 	// c_screen_splitscreen_menu virtual functions
 
 	virtual ~c_screen_splitscreen_menu() = default;
-	virtual void initialize(c_screen_parameters* parameters) override;
+	virtual void initialize(c_screen_parameters const* parameters) override;
 	virtual void post_initialize() override;
 	virtual const void* load_proc() const override;
 

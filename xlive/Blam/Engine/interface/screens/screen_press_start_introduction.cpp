@@ -29,15 +29,17 @@ bool c_screen_press_start_introduction::handle_event(s_event_record* event)
 }
 
 CLASS_HOOK_DECLARE_LABEL(c_screen_press_start_introduction__initialize, c_screen_press_start_introduction::initialize);
-void c_screen_press_start_introduction::initialize(c_screen_parameters* parameters)
+void c_screen_press_start_introduction::initialize(
+	c_screen_parameters const* parameters)
 {
-	if (XUserSignedIn(0)) {
+	if (XUserSignedIn(0))
+	{
 		XUserSignOut(0);
 		UpdateMasterLoginStatus();
 	}
 	
 	//orignal c_screen_press_start_introduction::initialize
-	INVOKE_TYPE(0x23F180, 0x0, void(__thiscall*)(c_screen_press_start_introduction*, c_screen_parameters*), this, parameters);
+	INVOKE_TYPE(0x23F180, 0x0, void(__thiscall*)(c_screen_press_start_introduction*, c_screen_parameters const*), this, parameters);
 }
 
 void c_screen_press_start_introduction::sub_60EBC2(int32 a1)

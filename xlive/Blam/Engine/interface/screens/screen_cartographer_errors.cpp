@@ -214,7 +214,7 @@ bool c_cartographer_error_menu::handle_event(s_event_record* event)
 	return result;
 }
 
-void c_cartographer_error_menu::initialize(c_screen_parameters* screen_parameters)
+void c_cartographer_error_menu::initialize(c_screen_parameters const* parameters)
 {
 	s_interface_expected_screen_layout layout;
 	csmemset(&layout, 0, sizeof(layout));

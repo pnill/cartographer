@@ -288,9 +288,10 @@ void* c_cartographer_guide_menu::load(c_screen_parameters* parameters)
 	return guide_menu;
 }
 
-void c_cartographer_guide_menu::initialize(c_screen_parameters* screen_parameters)
+void c_cartographer_guide_menu::initialize(
+	c_screen_parameters const* parameters)
 {
-	c_screen_with_menu::initialize(screen_parameters);
+	c_screen_with_menu::initialize(parameters);
 
 	//update header and subheader labels
 
@@ -400,9 +401,10 @@ const void* c_cartographer_credits_menu::load_proc(void) const
 	return c_cartographer_credits_menu::load;
 }
 
-void c_cartographer_credits_menu::initialize(c_screen_parameters* screen_parameters)
+void c_cartographer_credits_menu::initialize(
+	c_screen_parameters const* parameters)
 {
-	c_screen_with_menu::initialize(screen_parameters);
+	c_screen_with_menu::initialize(parameters);
 
 	const wchar_t* header_text = NULL;
 	const wchar_t* subheader_text = NULL;
@@ -586,9 +588,10 @@ const void* c_cartographer_update_menu::load_proc(void) const
 	return c_cartographer_update_menu::load;
 }
 
-void c_cartographer_update_menu::initialize(c_screen_parameters* screen_parameters)
+void c_cartographer_update_menu::initialize(
+	c_screen_parameters const* parameters)
 {
-	c_screen_with_menu::initialize(screen_parameters);
+	c_screen_with_menu::initialize(parameters);
 
 	const wchar_t* header_text = nullptr;
 	const wchar_t* subheader_text = nullptr;
@@ -704,9 +707,10 @@ const void* c_cartographer_update_notice_menu::load_proc(void) const
 	return c_cartographer_update_notice_menu::load;
 }
 
-void c_cartographer_update_notice_menu::initialize(c_screen_parameters* screen_parameters)
+void c_cartographer_update_notice_menu::initialize(
+	c_screen_parameters const* parameters)
 {
-	c_screen_with_menu::initialize(screen_parameters);
+	c_screen_with_menu::initialize(parameters);
 
 	const wchar_t* header_text = NULL;
 	const wchar_t* subheader_text = NULL;

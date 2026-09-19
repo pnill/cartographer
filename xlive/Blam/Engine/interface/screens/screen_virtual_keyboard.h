@@ -154,7 +154,7 @@ public:
 	virtual void update() override;
 	virtual void render_widget(rectangle2d* viewport_bounds) override;
 	virtual bool handle_event(s_event_record* event) override;
-	virtual void initialize(c_screen_parameters* parameters) override;
+	virtual void initialize(c_screen_parameters const* parameters) override;
 	virtual const void* load_proc(void) const override;
 };
 ASSERT_STRUCT_SIZE(c_screen_virtual_keyboard, 0x3B80);

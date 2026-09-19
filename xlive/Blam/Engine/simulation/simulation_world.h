@@ -130,7 +130,7 @@ public:
 	void simulation_queue_enqueue(s_simulation_queue_element* element);
 
 	void queues_initialize(void);
-	void apply_simulation_queue(c_simulation_queue const* queue, struct simulation_update const* update);
+	void apply_simulation_queue(c_simulation_queue const* queue);
 
 	void attach_simulation_queues_to_update(c_simulation_queue* out_bookkeepin_queue, c_simulation_queue* out_game_simulation_queue);
 

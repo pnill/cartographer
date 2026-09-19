@@ -190,42 +190,26 @@ void c_multiplayer_video_settings_list::handle_item_pressed_event(
 // c_screen_multiplayer_video_settings class starts here
 // 
 
+c_screen_multiplayer_video_settings::c_screen_multiplayer_video_settings(
+	c_screen_parameters const* parameters) :
+	c_screen_multiplayer_video_settings(parameters->get_channel_type(), parameters->get_window_index(), parameters->get_user_flags())
+{
+	return;
+}
 
-c_screen_multiplayer_video_settings::c_screen_multiplayer_video_settings(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, uint16 user_flags) :
+c_screen_multiplayer_video_settings::c_screen_multiplayer_video_settings(
+	e_user_interface_channel_type channel_type,
+	e_user_interface_render_window window_index,
+	uint16 user_flags) :
 	c_screen_with_menu(_screen_video_settings_mp, channel_type, window_index, user_flags, &m_mp_video_settings_list),
 	m_mp_video_settings_list(user_flags)
 {
+	return;
 }
 
 const void* c_screen_multiplayer_video_settings::load_proc() const
 {
 	return &c_screen_multiplayer_video_settings::load;
-}
-
-void* c_screen_multiplayer_video_settings::load(c_screen_parameters* parameters)
-{
-	//return INVOKE(0x24DCD9, 0x0, c_screen_multiplayer_video_settings::load, parameters);
-
-	c_screen_multiplayer_video_settings* screen;
-
-	void* pool = ui_pool_allocate_space(sizeof(c_screen_multiplayer_video_settings), 0);
-	if (pool)
-	{
-		screen = new (pool) c_screen_multiplayer_video_settings(
-			parameters->get_channel_type(),
-			parameters->get_window_index(),
-			parameters->get_user_flags()
-		);
-
-		screen->m_allocated = true;
-		user_interface_register_screen_to_channel(screen, parameters);
-	}
-	else
-	{
-		screen = nullptr;
-	}
-
-	return screen;
 }
 
 void c_screen_multiplayer_video_settings::apply_instance_patches()

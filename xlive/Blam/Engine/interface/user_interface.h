@@ -17,6 +17,8 @@ enum e_user_interface_render_window
 	_window_2,
 	_window_3,
 	_window_4,
+	_last_render_window = _window_4,
+
 	k_number_of_render_windows,
 	k_no_window = NONE,
 	k_any_window = 255
@@ -177,7 +179,19 @@ public:
 		s_screen_state* screen_state,
 		proc_ui_screen_load_cb_t load_cb);
 
-	void* execute_load_function()
+	proc_ui_screen_load_cb_t get_laod_function(void)
+	{
+		return m_load_function;
+	}
+
+	void set_load_function(
+		proc_ui_screen_load_cb_t function)
+	{
+		m_load_function = function;
+		return;
+	}
+
+	void* execute_load_function(void)
 	{
 		return m_load_function(this);
 	}

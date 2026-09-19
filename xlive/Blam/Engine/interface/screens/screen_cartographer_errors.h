@@ -54,7 +54,7 @@ public:
 	virtual ~c_cartographer_error_menu() = default;
 	virtual void pre_destroy() override;
 	virtual bool handle_event(s_event_record* event) override;
-	virtual void initialize(c_screen_parameters* screen_parameters) override;
+	virtual void initialize(c_screen_parameters const* parameters) override;
 	virtual const void* load_proc(void) const override;
 
 private:

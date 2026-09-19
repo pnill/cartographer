@@ -4,6 +4,7 @@
 
 #include "interface/user_interface_errors.h"
 #include "interface/user_interface_memory.h"
+#include "main/game_preferences.h"
 #include "memory/data.h"
 #include "rasterizer/rasterizer_settings.h"
 
