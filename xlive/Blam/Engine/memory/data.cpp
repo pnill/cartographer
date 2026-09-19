@@ -115,31 +115,34 @@ void* datum_get_absolute(const data_array* data, int32 index)
 	return header;
 }
 
-void* datum_try_and_get_absolute(const data_array* data, int32 index)
+void* datum_try_and_get_absolute(const data_array* data, int32 absolute_index)
 {
 	s_datum_header* result = NULL;
 
 	ASSERT(data);
 	ASSERT(data->valid);
-	vassert(index != NONE, "tried to access %s index NONE", data->name);
-	vassert(DATUM_INDEX_TO_IDENTIFIER(index) == 0, "tried to access %s using datum_try_and_get_absolute() with a non absolute index #%d", data->name, index);
-	vassert(VALID_INDEX(index, data->first_free_absolute_index), "%s absolute index #%d is out of range (%d)", data->name, index, data->first_free_absolute_index);
 
-	if (DATUM_INDEX_TO_ABSOLUTE_INDEX(index) < data->first_free_absolute_index)
+	if (absolute_index != NONE)
 	{
-		s_datum_header* header = DATA_HEADER_GET(data, index);
-		if (header->identifier)
+		vassert(
+			DATUM_INDEX_TO_IDENTIFIER(absolute_index) == 0,
+			"tried to access %s using datum_try_and_get_absolute() with a non absolute index #%d (0x%x)",
+			data->name,
+			DATUM_INDEX_TO_ABSOLUTE_INDEX(absolute_index),
+			absolute_index
+		);
+
+		if (VALID_INDEX(absolute_index, data->first_free_absolute_index))
 		{
-			if (header->identifier == DATUM_INDEX_TO_IDENTIFIER(index))
+			s_datum_header* header = DATA_HEADER_GET(data, absolute_index);
+			if (header->identifier)
 			{
 				result = header;
 			}
 		}
 	}
-	else
-	{
-		result = NULL;
-	}
+
+	ASSERT(result == align_pointer(result, data->alignment_bits));
 
 	return result;
 }

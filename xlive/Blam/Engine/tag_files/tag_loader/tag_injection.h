@@ -27,6 +27,7 @@ void tag_injection_clear_active_map(void);
 bool tag_injection_active_map_verified(void);
 
 datum tag_injection_load(tag_group group, char const* tag_name, bool load_dependencies);
+
 datum tag_injection_load(tag_group group, datum cache_datum, bool load_dependencies);
 
 void tag_injection_inject(void);
@@ -40,6 +41,8 @@ void tag_injection_scenario_load_setup(uint32 allocation_size);
 void* tag_injection_extend_block(void* block, uint32 entry_size, uint32 count);
 
 void* tag_injection_reserve_cache_memory(uint32 size, uint32* out_data_offset);
+
+int32 tag_injection_get_injected_tags_count();
 
 void tag_injection_apply_hooks(void);
 

@@ -41,12 +41,15 @@ void c_game_statborg::adjust_team_stat(int32 team_index, e_statborg_entry statis
 
 // Cartographer handler for adjust_player_stat member function
 // TODO Revamp so we don't need to do this
-void __fastcall c_game_statborg__adjust_player_stat(c_game_statborg* thisptr, DWORD _edx, int16 player_datum, e_statborg_entry statistic, short count, int game_result_statistic, bool adjust_team_stat)
+void __fastcall c_game_statborg__adjust_player_stat(c_game_statborg* thisptr, DWORD _edx, datum player_index, e_statborg_entry statistic, int16 adjustment, int32 game_results_statistic, bool propagate_to_teams)
 {
-	bool handled = CustomVariantHandler::c_game_statborg__adjust_player_stat(ExecTime::_preEventExec, thisptr, player_datum, statistic, count, game_result_statistic, adjust_team_stat);
+	// this function can be passed whole or partial datums on the player_index argument, always use the absolute index instead of depending on it to be a whole datum.
+	int16 absolute_player_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index);
+
+	bool handled = CustomVariantHandler::c_game_statborg__adjust_player_stat(ExecTime::_preEventExec, thisptr, absolute_player_index, statistic, adjustment, game_results_statistic, propagate_to_teams);
 	if (!handled)
-		p_c_game_statborg__adjust_player_stat(thisptr, player_datum, statistic, count, game_result_statistic, adjust_team_stat);
-	CustomVariantHandler::c_game_statborg__adjust_player_stat(ExecTime::_postEventExec, thisptr, player_datum, statistic, count, game_result_statistic, adjust_team_stat);
+		p_c_game_statborg__adjust_player_stat(thisptr, player_index, statistic, adjustment, game_results_statistic, propagate_to_teams);
+	CustomVariantHandler::c_game_statborg__adjust_player_stat(ExecTime::_postEventExec, thisptr, absolute_player_index, statistic, adjustment, game_results_statistic, propagate_to_teams);
 	return;
 }
 

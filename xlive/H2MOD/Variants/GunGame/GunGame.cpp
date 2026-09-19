@@ -254,7 +254,7 @@ bool GunGame::c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_stat
 					simulation_action_object_update(player->unit_index, FLAG(_simulation_action_update_grenade_count_bit));
 
 					unit_delete_all_weapons(player->unit_index);
-					call_give_player_weapon(player_index, (datum)k_level_weapons[level], 1);
+					call_give_player_weapon(DATUM_INDEX_NEW(player_index, player->identifier), (datum)k_level_weapons[level], 1);
 				}
 			}
 		}

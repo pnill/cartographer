@@ -696,6 +696,8 @@ void c_tag_injecting_manager::inject_tags(void)
 	// do the loading of the strings before writing the loaded tags into runtime tag cache so the remapped string reference indices match
 	this->load_unicode_strings();
 
+	s_cache_file_memory_globals* g_cache_file_memory_globals = cache_file_memory_globals_get();
+
 	for(uint16 i = 0; i < m_table.get_entry_count(); i++)
 	{
 		s_tag_injecting_table_entry* entry = m_table.get_entry(i);
@@ -765,6 +767,8 @@ void c_tag_injecting_manager::inject_tags(void)
 		tag_add_name(entry->injected_index, tag_name);
 
 		m_injectable_used_size += entry->loaded_data->get_total_size();
+		
+		++g_cache_file_memory_globals->tags_header->tag_count;
 	}
 #if TAG_INJECTION_DEBUG
 	event(_event_verbose, "tags:injection: [%s] Injection Complete", __FUNCTION__);

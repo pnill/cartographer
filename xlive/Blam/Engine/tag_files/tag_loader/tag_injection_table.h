@@ -4,7 +4,7 @@
 
 enum
 {
-	k_first_injected_datum = 15268,
+	k_first_injected_datum = 15066,
 	k_max_tag_instance_count = k_unsigned_short_max,
 };
 

@@ -86,7 +86,7 @@ s_tag_injecting_table_entry* c_tag_injection_table::init_entry(
 
 	s_tag_injecting_table_entry* result = &m_table[m_entry_count];
 	result->cache_index = cache_index;
-	result->injected_index = k_first_injected_datum + m_entry_count;
+	result->injected_index = DATUM_INDEX_NEW(k_first_injected_datum + m_entry_count, k_first_injected_datum + m_entry_count);
 	result->type = type;
 	result->is_initialized = true;
 	result->is_injected = false;

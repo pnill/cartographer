@@ -148,6 +148,11 @@ void* tag_injection_reserve_cache_memory(uint32 size, uint32* out_data_offset)
 	return g_tag_injection_manager->reserve_space_in_cache_memory(size, out_data_offset);
 }
 
+int32 tag_injection_get_injected_tags_count()
+{
+	return g_tag_injection_manager->get_table()->get_entry_count();
+}
+
 void tag_injection_apply_hooks(void)
 {
 	return;
