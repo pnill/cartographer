@@ -27,7 +27,7 @@ public:
 	virtual ~c_screen_press_start_introduction(void) = default;
 	virtual void update(void) override;
 	bool handle_event(struct s_event_record* event) override;
-	virtual void initialize(class c_screen_parameters* parameters) override;
+	virtual void initialize(class c_screen_parameters const* parameters) override;
 	virtual void sub_60EBC2(int32 a1) override;
 	virtual const void* load_proc(void) const override;
 };

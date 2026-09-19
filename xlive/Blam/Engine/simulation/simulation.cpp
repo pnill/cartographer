@@ -194,11 +194,11 @@ void simulation_reset_immediate()
 
 	simulation_globals->simulation_reset_in_progress = true;
 	simulation_globals->world->reset_world();
-	simulation_queue_game_global_event_insert(_simulation_queue_game_global_event_main_reset_map);
+	simulation_queue_game_global_event_insert(_simulation_queue_game_global_event_type_reset_map);
 	// ### TODO figure out these
 	// simulation_gamestate_entities_build_clear_flags();
 	// simulation_queue_gamestates_delete_insert();
-	simulation_queue_game_global_event_insert(_simulation_queue_game_global_event_notify_reset_complete);
+	simulation_queue_game_global_event_insert(_simulation_queue_game_global_event_type_simulation_reset_complete);
 	return;
 }
 
@@ -297,7 +297,7 @@ void __cdecl simulation_apply_before_game(const struct simulation_update* update
 		players_set_machines(update->machine_update.machine_valid_mask, update->machine_update.identifiers);
 	}
 
-	sim_world->apply_simulation_queue(&simulation_bookkeeping_queue, update);
+	sim_world->apply_simulation_queue(&simulation_bookkeeping_queue);
 
 	// Player activation code
 	/* Moved so we can activate in the queue
@@ -334,7 +334,7 @@ void __cdecl simulation_apply_before_game(const struct simulation_update* update
 	{
 		ASSERT(game_simulation_queue.allocated_size_in_bytes() > 0);
 
-		sim_world->apply_simulation_queue(&game_simulation_queue, update);
+		sim_world->apply_simulation_queue(&game_simulation_queue);
 
 		// purge any deletion pending object during this update
 		// if simulation is not in progress
