@@ -9,7 +9,10 @@ enum
 
 /* prototypes */
 
+void network_session_interface_patches(void);
+
 bool __cdecl network_session_interface_initialize(class c_network_session_manager* session_manager);
+bool __cdecl network_squad_session_set_game_variant(struct s_game_variant* variant);
 const wchar_t* network_session_interface_get_session_name(void);
 bool network_group_session_get_membership(
 	int32* update_number,
@@ -46,3 +49,8 @@ bool network_session_get_membership(
 	struct s_network_session_player const **players);
 enum e_network_session_class network_squad_session_get_session_class(void);
 bool network_session_is_online(e_network_session_class session_class);
+
+/* globals */
+
+extern bool debug_net_distributed_always;
+extern bool debug_net_distributed_never;

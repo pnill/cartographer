@@ -125,6 +125,10 @@ void game_apply_pre_winmain_patches(void)
 	{
 		PatchCall(Memory::GetAddress(0x0, 0xC6F7), game_dispose);	// main_loop
 	}
+
+	PatchCall(Memory::GetAddress(0xA57AB, 0x9790F), random_math_get_globals);
+	PatchCall(Memory::GetAddress(0xA5892, 0x979828), random_math_get_globals);
+
 	return;
 }
 
@@ -464,6 +468,22 @@ void __cdecl game_initialize_for_new_map(
 	}
 	game_globals->initializing = false;
 	game_globals->map_active = true;
+
+	// The permutation - history bit vector lives in a system_heap_alloc'd buffer (HeapAlloc, NOT
+	// zeroed - the pointer at IDA 0x8CE86C, 0x1880 bytes) and is allocated once per process by
+	// game_sound_deterministic_initialize. With the picks now drawn from the shared deterministic
+	// seed, the remaining machine-local input is this buffer's INITIAL contents: heap garbage,
+	// plus whatever history a machine accumulated in menus or earlier sessions. Zeroing it at map
+	// init - the same point that seeds the deterministic rng (game_info_initialize_for_new_map) -
+	// gives both machines an identical starting state, so the history evolves identically from
+	// tick 0. Retail's own intent was clearly this: it allocates a game-state-heap twin of this
+	// buffer ("deterministic game sound globals") and then never uses it.
+	uint8 *sound_permutation_state = *Memory::GetAddress<uint8**>(0x4CE86C, 0x4F5058);
+	if (sound_permutation_state)
+	{
+		csmemset(sound_permutation_state, 0, 0x1880);
+	}
+
 	return;
 }
 
