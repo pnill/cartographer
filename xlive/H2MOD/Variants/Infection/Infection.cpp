@@ -260,8 +260,7 @@ void Infection::setPlayerAsHuman(int32 player_index)
 	player_datum* player = player_get(player_index);
 
 	player->configuration.appearance.player_character_type = infection_human_get_player_type();
-	player->unit_speed = k_human_unit_speed;
-	g_game_engine_override_player_speed_changed.set(DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index), true);
+	game_engine_cartographer_override_player_speed(player_index, k_human_unit_speed);
 }
 
 void Infection::setPlayerAsZombie(int32 player_index)
@@ -269,8 +268,7 @@ void Infection::setPlayerAsZombie(int32 player_index)
 	player_datum* player = player_get(player_index);
 
 	player->configuration.appearance.player_character_type = infection_zombie_get_character_type();
-	player->unit_speed = k_zombie_unit_speed;
-	g_game_engine_override_player_speed_changed.set(DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index), true);
+	game_engine_cartographer_override_player_speed(player_index, k_zombie_unit_speed);
 	call_give_player_weapon(player_index, e_weapons_datum_index::energy_blade, 1);
 	
 	return;
@@ -501,7 +499,6 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum player_index)
 
 void Infection::OnPlayerSpawn(ExecTime execTime, datum player_index)
 {
-	const uint16 player_abs_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index);
 	player_datum* player = player_get(player_index);
 
 	switch (execTime)
@@ -512,7 +509,7 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum player_index)
 
 		if (!shell_is_dedicated_server())
 		{
-			event(_event_verbose, "h2mod:infection: Client pre spawn, playerIndex=%d, playerIdentifier=%llu", player_abs_index, player->player_identifier);
+			event(_event_verbose, "h2mod:infection: Client pre spawn, playerIndex=%d, playerIdentifier=%llu", DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index), player->player_identifier);
 
 			if(player->user_index != NONE)
 			{
@@ -522,7 +519,7 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum player_index)
 
 				if(team == k_zombie_team)
 				{
-					event(_event_verbose, "h2mod:infection: Client is infected! switching bipeds: %d", player_abs_index);
+					event(_event_verbose, "h2mod:infection: Client is infected! switching bipeds: %d", DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index));
 					player->configuration.appearance.player_character_type = infection_zombie_get_character_type();
 				}
 			}
@@ -570,12 +567,12 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum player_index)
 		// host only (both client/dedicated server)
 		if (!game_is_predicted())
 		{
-			event(_event_verbose, "h2mod:infection: Spawn player server index=%d", player_abs_index);
+			event(_event_verbose, "h2mod:infection: Spawn player server index=%d", DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index));
 			if (biped_try_and_get(player->unit_index))
 			{
 				//if the unit_object data pointer is not nullptr, the spawned object is "alive"
 				e_game_team team = unit_get_team_index(player->unit_index);
-				event(_event_verbose, "h2mod:infection: Spawn player server index=%d, unit team index=%d", player_abs_index, (int16)team);
+				event(_event_verbose, "h2mod:infection: Spawn player server index=%d, unit team index=%d", DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index), (int16)team);
 				if (team == k_humans_team)
 				{
 					Infection::setPlayerAsHuman(player_index);

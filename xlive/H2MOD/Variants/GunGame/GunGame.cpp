@@ -121,7 +121,6 @@ void GunGame::OnPlayerDeath(ExecTime execTime, datum player_index)
 
 void GunGame::OnPlayerSpawn(ExecTime execTime, datum player_index)
 {
-	const uint16 player_abs_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index);
 	player_datum* player = player_get(player_index);
 
 	switch (execTime)
@@ -136,7 +135,7 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum player_index)
 		// host only (dedicated server and client)
 		if (!game_is_predicted())
 		{
-			event(_event_verbose, "h2mod:gungame: %s player index: %d, player name: %ws", __FUNCTION__, player_abs_index, player->configuration.name);
+			event(_event_verbose, "h2mod:gungame: %s player index: %d, player name: %ws", __FUNCTION__, DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index), player->configuration.name);
 
 			if (biped_try_and_get(player->unit_index))
 			{
@@ -155,8 +154,12 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum player_index)
 					gungamePlayers.insert(std::make_pair(id, level));
 				}
 
-				event(_event_verbose, "h2mod:gungame: %s - player index: %d, player name: %ws - Level: %d", __FUNCTIONW__, player_abs_index, player->configuration.name, level);
-
+				event(_event_verbose, "h2mod:gungame: %s - player index: %d, player name: %ws - Level: %d", 
+					__FUNCTIONW__, 
+					DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index), 
+					player->configuration.name, 
+					level
+				);
 
 				if (level == 15)
 				{
@@ -209,8 +212,7 @@ bool GunGame::c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_stat
 		if (game_results_statistic == 7
 			&& !game_is_predicted())
 		{
-			const uint16 player_abs_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index);
-			event(_event_verbose, "h2mod:gungame: %s - player index: %d, player name: %ws", __FUNCTION__, player_abs_index, player->configuration.name);
+			event(_event_verbose, "h2mod:gungame: %s - player index: %d, player name: %ws", __FUNCTION__, DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index), player->configuration.name);
 
 			int32 level = gungamePlayers[id];
 			++level;
@@ -222,7 +224,7 @@ bool GunGame::c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_stat
 
 			gungamePlayers[id] = level;
 
-			event(_event_verbose, "h2mod:gungame: %s - player index: %d - new level: %d ", __FUNCTION__, player_abs_index, level);
+			event(_event_verbose, "h2mod:gungame: %s - player index: %d - new level: %d ", __FUNCTION__, DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index), level);
 
 			if (player->unit_index != NONE)
 			{

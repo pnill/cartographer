@@ -172,13 +172,9 @@ void simulation_queue_player_event_insert(e_simulation_queue_player_event_type e
 		uint8 encoded_data[128];
 		c_bitstream stream(encoded_data, sizeof(encoded_data));
 
-		uint16 abs_player_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index);
-
 		stream.begin_writing(1);
-		stream.write_integer("player-index", abs_player_index, k_player_index_bits);
+		stream.write_integer("player-index", DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index), k_player_index_bits);
 		stream.write_bool("active", event_data->active);
-
-
 
 		const int32 size = stream.get_space_used_in_bytes();
 		if (stream.error_occurred())

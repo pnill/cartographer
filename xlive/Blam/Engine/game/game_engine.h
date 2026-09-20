@@ -427,4 +427,5 @@ void __cdecl game_engine_update_player_movement_traits();
 // in the future when c_game_engine is rewritten and we can 
 // replace player_speed_modifier these can be removed.
 extern bool g_game_engine_override_player_speed_update;
-extern c_static_flags_no_init<k_maximum_players> g_game_engine_override_player_speed_changed;
+void game_engine_cartographer_override_player_speed(datum player_index, real32 player_speed);
+

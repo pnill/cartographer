@@ -9,10 +9,10 @@ c_game_statborg* __cdecl game_engine_get_statborg(void)
 }
 
 int16 c_game_statborg::get_player_stat(
-	int32 player_index,
+	datum player_index,
 	e_statborg_entry statborg_entry) const
 {
-	return m_player_data[player_index].statistic[statborg_entry];
+	return m_player_data[DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index)].statistic[statborg_entry];
 }
 
 int16 c_game_statborg::get_team_stat(

@@ -51,7 +51,7 @@ class c_game_statborg
 public:
 	void adjust_player_stat(datum player_datum, e_statborg_entry statistic, int16 count, int32 game_result_statistic, bool adjust_team_stat);
 	void adjust_team_stat(int32 team_index, e_statborg_entry statistic, int16 count, int32 game_result_statistic);
-	int16 get_player_stat(int32 player_index, e_statborg_entry statborg_entry) const;
+	int16 get_player_stat(datum player_index, e_statborg_entry statborg_entry) const;
 	int16 get_team_stat(int32 team_index, e_statborg_entry statistic) const;
 
 };

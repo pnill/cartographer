@@ -93,9 +93,7 @@ void GraveRobber::PickupSkull(datum player_index, datum skull_datum)
 		}
 		else
 		{
-			const uint16 player_abs_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index);
-
-			if (game_statborg->get_player_stat(player_abs_index, _statborg_entry_round_score) == current_game_variant()->score_to_win_round)
+			if (game_statborg->get_player_stat(player_index, _statborg_entry_round_score) == current_game_variant()->score_to_win_round)
 			{
 				game_engine_end_round_with_winner(player_index, false);
 			}

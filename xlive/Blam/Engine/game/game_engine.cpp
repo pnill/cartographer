@@ -91,6 +91,13 @@ void __cdecl game_engine_render(void)
 	return;
 }
 
+void game_engine_cartographer_override_player_speed(datum player_index, real32 player_speed)
+{
+	player_datum* player = player_get(player_index);
+	player->unit_speed = player_speed;
+	g_game_engine_override_player_speed_changed.set(DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index), true);
+}
+
 void __cdecl game_engine_update_player_movement_traits()
 {
 	if (g_game_engine_override_player_speed_update)
