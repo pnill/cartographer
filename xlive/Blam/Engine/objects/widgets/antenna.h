@@ -14,6 +14,7 @@
 
 enum
 {
+	k_maximum_antennas_per_map = 12,
 	k_antenna_maximum_vertex_datum_count = MAXIMUM_NUMBER_OF_ANTENNA_VERTICES + 1,
 };
 
@@ -50,5 +51,7 @@ void antenna_apply_patches(void);
 data_array* antenna_data_get(void);
 
 void __cdecl antenna_update(antenna_datum* antenna, const antenna_definition* definition, real32 dt);
+
+void __cdecl antennas_update(real32 dt);
 
 void __cdecl antenna_render_proper(datum object_index, datum antenna_index);
