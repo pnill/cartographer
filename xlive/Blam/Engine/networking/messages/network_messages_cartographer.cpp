@@ -24,10 +24,6 @@ static void encode_rank_change_message(c_bitstream* stream, int a2, const s_netw
 
 static bool decode_rank_change_message(c_bitstream* stream, int a2, s_network_message_rank_change* data);
 
-static void encode_anti_cheat_message(c_bitstream* stream, int a2, const s_network_message_anti_cheat* data);
-
-static bool decode_anti_cheat_message(c_bitstream* stream, int a2, s_network_message_anti_cheat* data);
-
 /* public code */
 
 void network_message_types_register_cartographer_types(c_network_message_type_collection* message_collection)
