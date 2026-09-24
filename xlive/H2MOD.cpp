@@ -793,13 +793,13 @@ static void __cdecl user_interface_controller_set_desired_team_index_hook(e_cont
 	if (network_life_cycle_in_squad_session(&session))
 	{
 		// prevent team switch in the pregame lobby, when the game already started
-		if (session->session_mode() != _network_session_mode_in_game
-			|| network_life_cycle_get_state() != _life_cycle_state_pre_game)
+		if (session->session_mode() == _network_session_mode_in_game
+			&& network_life_cycle_get_state() == _life_cycle_state_pre_game)
 		{
-			p_user_interface_controller_set_desired_team_index(controller_index, team);
+			return;
 		}
 	}
-
+	p_user_interface_controller_set_desired_team_index(controller_index, team);
 	return;
 }
 
