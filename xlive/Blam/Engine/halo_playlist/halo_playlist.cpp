@@ -1097,7 +1097,7 @@ void c_halo_playlist_reader::finalize()
 
         if (!map_found)
         {
-            this->log_error(_halo_playlist_error_match_map_not_found, match->map_line_in_file);
+            this->log_error(_halo_playlist_error_match_map_not_found, match->map_line_in_file, match->map);
             continue;
         }
 
