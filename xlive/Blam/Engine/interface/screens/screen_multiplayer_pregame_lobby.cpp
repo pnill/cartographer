@@ -5,6 +5,7 @@
 #include "interface/user_interface_networking.h"
 #include "interface/user_interface_shared_globals.h"
 #include "interface/user_interface_screen_widget_definition.h"
+#include "interface/user_interface_widget_text.h"
 #include "interface/user_interface_widget_window.h"
 #include "tag_files/tag_loader/tag_injection.h"
 
@@ -442,25 +443,53 @@ const e_pregame_lobby_text_blocks c_screen_pregame_lobby_text_pane_1_mapping(con
 	return k_pregame_lobby_pane_1_text_count;
 }
 
-void fix_server_party_leader_texts(e_pregame_pane_type pane_type)
+void c_screen_multiplayer_pregame_lobby::update_server_party_leader_texts()
 {
 	e_pregame_lobby_text_blocks party_leader_text_id = _pregame_lobby_pane_0_text_party_leader;
 	e_pregame_lobby_text_blocks server_party_leader_text_id = _pregame_lobby_pane_0_text_server_party_leader;
 
-	if (pane_type == _pregame_pane_custom_game)
+	if (m_pregame_pane_type == _pregame_pane_custom_game)
 	{
 		party_leader_text_id = _pregame_lobby_pane_0_text_party_leader;
 		server_party_leader_text_id = _pregame_lobby_pane_0_text_server_party_leader;
 	}
-	else if (pane_type == _pregame_pane_cooperative)
+	else if (m_pregame_pane_type == _pregame_pane_cooperative)
 	{
 		party_leader_text_id = _pregame_lobby_pane_1_text_party_leader;
 		server_party_leader_text_id = _pregame_lobby_pane_1_text_server_party_leader;
 	}
-	// fixes code breaking _pregame_lobby_pane_1_text_party_leader
-	// fixes code breaking _pregame_lobby_pane_1_text_server_party_leader
-	WriteValue<uint8>(Memory::GetAddress(0x2452DD) + 1, (uint8)TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(party_leader_text_id));
-	WriteValue<uint8>(Memory::GetAddress(0x245275) + 1, (uint8)TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(server_party_leader_text_id));
+
+
+	if (user_interface_squad_is_dedicated_server())
+	{
+		c_text_widget* server_text_widget = try_find_screen_text(server_party_leader_text_id);
+		if (server_text_widget)
+		{
+			server_text_widget->set_text_from_string_id(_string_id_server_party_leader);
+		}
+
+		//this might not be correct name as it is present in c_screen_widget
+		this->set_favourites_bitmap_visible(true);
+
+		if (user_interface_globals_has_xbox_live())
+		{
+			//readjusts position of server text because 2 extra buttons "Find Games" and "Players" in LIVE
+			rectangle2d new_bounds;
+			server_text_widget->get_bounds(&new_bounds);
+			new_bounds.top = 400;
+			new_bounds.bottom = 320;
+			server_text_widget->set_bounds(&new_bounds);
+		}
+	}
+	else
+	{
+		c_text_widget* leader_text_widget = try_find_screen_text(party_leader_text_id);
+		if (leader_text_widget)
+		{
+			leader_text_widget->set_text_from_string_id(_string_id_party_leader);
+		}
+	}
+
 }
 
 void c_screen_multiplayer_pregame_lobby::initialize_long_text_chat()
@@ -539,10 +568,10 @@ void c_screen_multiplayer_pregame_lobby::update_protocol()
 
 		// add lobby_switch_codes_here
 		initialize_long_text_chat();
-		fix_server_party_leader_texts(pane_type);
 		update_chat_icons();
 	}
 	update_favourites_icons();
+	update_server_party_leader_texts();	//#Todo : move this code to orignal location when : 0x244E0F is rewritten
 
 }
 
@@ -624,6 +653,7 @@ void c_screen_multiplayer_pregame_lobby::apply_instance_patches()
 	NopFill(Memory::GetAddress(0x244F0A), 4); //	vote_status_text_block->m_visible = 0; 
 	NopFill(Memory::GetAddress(0x244F0E), 4); //	vote_tally_text_block->m_visible = 0;
 	NopFill(Memory::GetAddress(0x244F15), 4); //	vote_countdown_text_block->m_visible = 0;
+	NopFill(Memory::GetAddress(0x24526A), 0x86); // nop orignal server/leader text update block
 
 	// fix chatbox for cooperative_pane
 	WriteValue<uint8>(Memory::GetAddress(0x2435AE) + 1, TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(_pregame_lobby_pane_1_text_chat_body));

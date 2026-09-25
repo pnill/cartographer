@@ -77,6 +77,7 @@ protected:
 	void initialize_long_text_chat();
 	void update_chat_icons();
 	void update_favourites_icons();
+	void update_server_party_leader_texts();
 
 public:
 	void update_protocol();

@@ -779,6 +779,11 @@ bool __cdecl user_interface_globals_is_beta_build(void)
 	return INVOKE(0x209ED8, 0x0, user_interface_globals_is_beta_build);
 }
 
+bool __cdecl user_interface_globals_has_xbox_live(void)
+{
+	return user_interface_globals_get()->xbox_live_active;
+}
+
 int32 __cdecl user_interface_globals_get_game_difficulty(void)
 {
 	return INVOKE(0x209E98, 0x0, user_interface_globals_get_game_difficulty);

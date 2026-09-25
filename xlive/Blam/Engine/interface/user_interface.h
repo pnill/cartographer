@@ -284,6 +284,7 @@ void user_interface_test_confirmation(int16 id);
 #endif
 
 bool __cdecl user_interface_globals_is_beta_build(void);
+bool __cdecl user_interface_globals_has_xbox_live(void);
 int32 __cdecl user_interface_globals_get_game_difficulty(void);
 int32 __cdecl user_interface_globals_get_edit_player_profile_index(void);
 struct s_saved_game_player_profile* user_interface_globals_get_edit_player_profile(void);
