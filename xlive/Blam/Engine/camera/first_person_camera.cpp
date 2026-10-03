@@ -17,7 +17,14 @@
 #include "units/vehicle_definitions.h"
 
 /* typedefs */
+
 typedef void(__cdecl* t_first_person_camera_update)(int8* camera, s_director_update* director_update, s_observer_command* observer_command);
+
+/* prototypes */
+
+static void __cdecl first_person_camera_build_observer_command(datum player_unit_index, real_vector3d* unit_facing, s_observer_command* observer_command);
+
+static void __cdecl first_person_camera_update(int8* camera, s_director_update* director_update, s_observer_command* result);
 
 /* globals */
 
@@ -25,12 +32,6 @@ real32 g_camera_scale = 1.f;
 real32 g_observer_suggested_field_of_view = DEGREES_TO_RADIANS(70.f);
 
 t_first_person_camera_update p_first_person_camera_update;
-
-/* prototypes */
-
-static void __cdecl first_person_camera_build_observer_command(datum player_unit_index, real_vector3d* unit_facing, s_observer_command* observer_command);
-
-static void __cdecl first_person_camera_update(int8* camera, s_director_update* director_update, s_observer_command* result);
 
 /* public code */
 

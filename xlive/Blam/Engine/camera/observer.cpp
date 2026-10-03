@@ -25,13 +25,8 @@ enum
 	OBSERVER_SIGNATURE = 'rad!'
 };
 
-
 constexpr real32 k_observer_default_field_of_view = 78.f;
 constexpr real32 k_observer_default_field_of_view_radians = DEGREES_TO_RADIANS(k_observer_default_field_of_view);
-
-/* globals */
-
-static real32 g_camera_speed = 1.0f;
 
 /* prototypes */
 
@@ -50,6 +45,10 @@ static void observer_update_command_to_usercall(int32 user_index);
 static void __cdecl observer_postcheck(int32 user_index);
 
 static void observer_apply_camera_effect(int32 user_index);
+
+/* globals */
+
+static real32 g_camera_speed = 1.0f;
 
 /* public code */
 
