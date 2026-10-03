@@ -23,10 +23,10 @@ void network_game_definitions_apply_patches()
 
 void network_game_definitions_encode_game_variant(c_bitstream* packet, s_game_variant* variant)
 {
+	packet->write_integer("variant-game-engine-index", variant->variant_game_engine_index, k_game_engine_type_bits_required);
+	
 	if (!variant->variant_game_engine_index)
 		return;
-
-	packet->write_integer("variant-game-engine-index", variant->variant_game_engine_index, k_game_engine_type_bits_required);
 
 	packet->write_integer("variant-flags", variant->flags, 1);
 
@@ -184,7 +184,7 @@ bool network_game_definitions_decode_game_variant(c_bitstream* packet, s_game_va
 	if (!variant->variant_game_engine_index)
 	{
 		csmemset(variant, 0, sizeof(s_game_variant));
-		return false;
+		return true;
 	}
 
 	variant->flags = (int16)packet->read_integer("variant-flags", 1);
