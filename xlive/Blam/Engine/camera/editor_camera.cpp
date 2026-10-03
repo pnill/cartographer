@@ -12,9 +12,10 @@
 
 /* constants */
 
-constexpr real32 k_editor_camera_maximum_pitch = 1.5676548f;
 
-constexpr real32 k_editor_camera_look_sensitivity = 0.0031415927f;
+constexpr real32 k_editor_camera_maximum_pitch = DEGREES_TO_RADIANS(89.82f);
+
+constexpr real32 k_editor_camera_look_sensitivity = _pi / 1000;
 
 constexpr real32 k_flying_camera_default_speed = 2.f;
 constexpr real32 k_flying_camera_minimum_speed = 0.125f;
@@ -37,11 +38,12 @@ typedef void(__cdecl* t_editor_camera_flying_update)(s_editor_camera* camera, s_
 
 /* globals */
 
-t_editor_camera_orbiting_update p_editor_camera_orbiting_update;
-t_editor_camera_flying_update p_editor_camera_flying_update;
+static t_editor_camera_orbiting_update p_editor_camera_orbiting_update;
+static t_editor_camera_flying_update p_editor_camera_flying_update;
 
-static real_vector3d g_flying_camera_velocity = {};
 static real32 g_flying_camera_speed = k_flying_camera_default_speed;
+
+static real_vector3d g_flying_camera_velocity;
 
 /* prototypes */
 

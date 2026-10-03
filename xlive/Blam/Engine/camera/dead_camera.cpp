@@ -37,23 +37,25 @@ constexpr real32 k_dead_camera_manual_switch_delay = 1.f;
 typedef void(__cdecl* t_dead_camera_new)(s_dead_camera* camera, int32 user_index, datum target_object_index);
 typedef void(__cdecl* t_dead_camera_update)(s_dead_camera* camera, s_director_update* director_update, s_observer_command* observer_command);
 
-/* globals */
-
-static t_dead_camera_new p_dead_camera_new;
-static t_dead_camera_update p_dead_camera_update;
-
 /* prototypes */
 
 static void __cdecl dead_camera_get_next_player_view(s_dead_camera* camera);
 
 static datum __cdecl dead_camera_get_campaign_view(void);
 
+/* globals */
+
+static t_dead_camera_new p_dead_camera_new;
+static t_dead_camera_update p_dead_camera_update;
+
 /* public code */
 
-void dead_camera_apply_patches()
+void dead_camera_apply_patches(void)
 {
 	DETOUR_ATTACH(p_dead_camera_new, Memory::GetAddress<t_dead_camera_new>(0xCDF6D), dead_camera_new);
 	DETOUR_ATTACH(p_dead_camera_update, Memory::GetAddress<t_dead_camera_update>(0xCDB2F), dead_camera_update);
+
+	return;
 }
 
 void __cdecl dead_camera_new(s_dead_camera* camera, int32 user_index, datum target_object_index)

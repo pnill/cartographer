@@ -1,5 +1,4 @@
 #pragma once
-#include "observer.h"
 
 /* structures */
 
@@ -22,8 +21,8 @@ ASSERT_STRUCT_SIZE(s_dead_camera, 0x40);
 
 /* prototypes */
 
-void dead_camera_apply_patches();
+void dead_camera_apply_patches(void);
 
 void __cdecl dead_camera_new(s_dead_camera* camera, int32 user_index, datum target_object_index);
 
-void __cdecl dead_camera_update(s_dead_camera* camera, struct s_director_update* director_update, s_observer_command* observer_command);
+void __cdecl dead_camera_update(s_dead_camera* camera, struct s_director_update* director_update, struct s_observer_command* observer_command);
