@@ -69,6 +69,11 @@ bool __cdecl user_interface_squad_session_is_xbox_live()
 	return INVOKE(0x2156B9, 0x0, user_interface_squad_local_peer_is_leader);
 }
 
+bool __cdecl user_interface_squad_is_dedicated_server()
+{
+	return INVOKE(0x2168FC, 0x0, user_interface_squad_is_dedicated_server);
+}
+
 int16 __cdecl user_interface_session_get_campaign_difficulty(void)
 {
 	return INVOKE(0x215697, 0x0, user_interface_session_get_campaign_difficulty);
