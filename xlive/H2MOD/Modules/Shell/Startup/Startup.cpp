@@ -21,11 +21,15 @@ static const wchar_t k_server_process_name[] = L"H2Server";
 static const wchar_t k_microsoft_folder[] = L"\\Microsoft";
 static const wchar_t k_appdata_default_path[] = L"\\Halo 2\\";
 static const wchar_t k_appdata_dev_preview_path[] = L"DevPreview\\";
+static const wchar_t k_mf_dll_original_name[] = L"mf.dll";
+static const wchar_t k_mf_dll_new_name[] = L"mf.dll.old";
 
 wchar_t g_h2_process_file_path[MAX_PATH];
 wchar_t g_h2_appdata_local_path[MAX_PATH];
 
 static void startup_force_working_directory_to_process_directory(void);
+
+static void startup_temporary_remove_outdated_dll(void);
 
 static void startup_init_h2_game(void);
 
@@ -174,6 +178,37 @@ static void startup_force_working_directory_to_process_directory(void)
 
 	// Force the current working directory to the one where halo2.exe is located
 	SetCurrentDirectoryW(g_h2_process_file_path);
+	return;
+}
+
+static void startup_temporary_remove_outdated_dll(void)
+{
+	c_static_wchar_string<MAX_PATH> dll_path(g_h2_process_file_path);
+	dll_path.append(k_mf_dll_original_name);
+
+	c_static_wchar_string<MAX_PATH> renamed_path(g_h2_process_file_path);
+	renamed_path.append(k_mf_dll_new_name);
+
+	// first launch check if the file is not present
+	if (GetFileAttributesW(dll_path.get_string()) == INVALID_FILE_ATTRIBUTES)
+	{
+		// second launch, the renamed copy is no longer loaded by the process so it can be deleted for good
+		if (GetFileAttributesW(renamed_path.get_string()) != INVALID_FILE_ATTRIBUTES)
+		{
+			DeleteFileW(renamed_path.get_string());
+		}
+		return;
+	}
+
+	// if the file is present rename it so it can be removed on second launch.
+	_Shell::OpenMessageBox(NULL, MB_ICONINFORMATION, "Update Required", "Halo 2 needs to be restarted to update files.\nThe game will now close, please launch it again.");
+
+	if (!MoveFileExW(dll_path.get_string(), renamed_path.get_string(), MOVEFILE_REPLACE_EXISTING))
+	{
+		const DWORD error = GetLastError();
+		_Shell::FileErrorDialog(error == ERROR_ACCESS_DENIED ? EACCES : (int)error);
+	}
+	exit(0);
 	return;
 }
 
