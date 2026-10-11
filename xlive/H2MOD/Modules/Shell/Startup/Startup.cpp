@@ -224,6 +224,8 @@ static void startup_init_h2_game(void)
 
 	InitLocalAppData();
 
+	startup_temporary_remove_outdated_dll();
+
 	// initialize curl
 	curl_global_init(CURL_GLOBAL_ALL);
 	atexit([] { curl_global_cleanup(); });
