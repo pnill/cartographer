@@ -15,6 +15,12 @@ void network_loading_apply_patches()
 	PatchCall(Memory::GetAddress(0x1AEABF, 0x1AD666), network_load_update);
 }
 
+void __cdecl network_loading_create_thread(void)
+{
+	INVOKE(0x1AEB5A, 0x0, network_loading_create_thread);
+	return;
+}
+
 /* private code */
 
 static void __cdecl network_load_update()
