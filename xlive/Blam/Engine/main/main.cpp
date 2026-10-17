@@ -522,7 +522,7 @@ void main_crash(const char* str)
 	}
 	else if (!csstricmp(str, "assert"))
 	{
-		DISPLAY_ASSERT("asserting on command");
+		vassert(false, "asserting on command", NULL);
 	}
 	else if (!csstricmp(str, "now"))
 	{

@@ -13,6 +13,22 @@
       <Configuration>debug_msvc</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="play_msvc|Win32">
+      <Configuration>play_msvc</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="play_msvc|x64">
+      <Configuration>play_msvc</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="profile_msvc|Win32">
+      <Configuration>profile_msvc</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="profile_msvc|x64">
+      <Configuration>profile_msvc</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="release_llvm|Win32">
       <Configuration>release_llvm</Configuration>
       <Platform>Win32</Platform>
@@ -49,6 +65,14 @@
       <Configuration>release_msvc</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="symbols_msvc|Win32">
+      <Configuration>symbols_msvc</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="symbols_msvc|x64">
+      <Configuration>symbols_msvc</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>
@@ -64,6 +88,12 @@
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_llvm|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
@@ -71,6 +101,20 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='play_msvc|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='profile_msvc|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
@@ -104,6 +148,12 @@
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_llvm|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
@@ -111,6 +161,20 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_msvc|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='play_msvc|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='profile_msvc|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
@@ -146,10 +210,19 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_llvm|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='play_msvc|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='profile_msvc|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_llvm|Win32'" Label="PropertySheets">
@@ -164,10 +237,19 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='debug_msvc|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_llvm|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='release_msvc|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='play_msvc|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='profile_msvc|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_llvm|x64'" Label="PropertySheets">
@@ -181,6 +263,14 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">
+    <OutDir>$(SolutionDir)bin\</OutDir>
+    <IntDir>$(SolutionDir)\objects\$(ProjectName)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='play_msvc|Win32'">
+    <OutDir>$(SolutionDir)bin\</OutDir>
+    <IntDir>$(SolutionDir)\objects\$(ProjectName)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='profile_msvc|Win32'">
     <OutDir>$(SolutionDir)bin\</OutDir>
     <IntDir>$(SolutionDir)\objects\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -200,6 +290,14 @@
     <OutDir>$(SolutionDir)bin\</OutDir>
     <IntDir>$(SolutionDir)\objects\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='play_msvc|x64'">
+    <OutDir>$(SolutionDir)bin\</OutDir>
+    <IntDir>$(SolutionDir)\objects\$(ProjectName)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='profile_msvc|x64'">
+    <OutDir>$(SolutionDir)bin\</OutDir>
+    <IntDir>$(SolutionDir)\objects\$(ProjectName)\$(Configuration)\</IntDir>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_llvm|x64'">
     <OutDir>$(SolutionDir)bin\</OutDir>
     <IntDir>$(SolutionDir)\objects\$(ProjectName)\$(Configuration)\</IntDir>
@@ -216,11 +314,19 @@
     <OutDir>$(SolutionDir)bin\</OutDir>
     <IntDir>$(SolutionDir)\objects\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|Win32'">
+    <OutDir>$(SolutionDir)bin\</OutDir>
+    <IntDir>$(SolutionDir)\objects\$(ProjectName)\$(Configuration)\</IntDir>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_llvm|Win32'">
     <OutDir>$(SolutionDir)bin\</OutDir>
     <IntDir>$(SolutionDir)\objects\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_msvc|x64'">
+    <OutDir>$(SolutionDir)bin\</OutDir>
+    <IntDir>$(SolutionDir)\objects\$(ProjectName)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|x64'">
     <OutDir>$(SolutionDir)bin\</OutDir>
     <IntDir>$(SolutionDir)\objects\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -244,6 +350,30 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
       <DisableSpecificWarnings>4201;4471</DisableSpecificWarnings>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>.\;..\cseries\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DisableSpecificWarnings>4201;4471</DisableSpecificWarnings>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -273,6 +403,67 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>.\;..\cseries\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <StringPooling>true</StringPooling>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DisableSpecificWarnings>4201;4471</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='play_msvc|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>.\;..\cseries\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <StringPooling>true</StringPooling>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DisableSpecificWarnings>4201;4471</DisableSpecificWarnings>
+      <Optimization>Full</Optimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='profile_msvc|Win32'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -410,6 +601,31 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
       <DisableSpecificWarnings>4201;4471</DisableSpecificWarnings>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>.\;..\cseries\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DisableSpecificWarnings>4201;4471</DisableSpecificWarnings>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <OmitFramePointers>false</OmitFramePointers>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -439,6 +655,67 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_msvc|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>.\;..\cseries\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <StringPooling>true</StringPooling>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DisableSpecificWarnings>4201;4471</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='play_msvc|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>.\;..\cseries\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <StringPooling>true</StringPooling>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DisableSpecificWarnings>4201;4471</DisableSpecificWarnings>
+      <Optimization>Full</Optimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='profile_msvc|x64'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -582,26 +859,38 @@
     <ClCompile Include="kablam_command\kablam_command_vip.cpp" />
     <ClCompile Include="kablam_rpc\kablam_commands_c.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_llvm|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='play_msvc|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='profile_msvc|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_llvm|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_min_llvm|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_msvc|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_llvm|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_msvc|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='play_msvc|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='profile_msvc|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_llvm|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_min_llvm|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|x64'">NotUsing</PrecompiledHeader>
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">false</TreatWarningAsError>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|Win32'">false</TreatWarningAsError>
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='debug_llvm|Win32'">false</TreatWarningAsError>
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">false</TreatWarningAsError>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='play_msvc|Win32'">false</TreatWarningAsError>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='profile_msvc|Win32'">false</TreatWarningAsError>
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='release_llvm|Win32'">false</TreatWarningAsError>
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='release_min_llvm|Win32'">false</TreatWarningAsError>
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">false</TreatWarningAsError>
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='debug_msvc|x64'">false</TreatWarningAsError>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|x64'">false</TreatWarningAsError>
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='debug_llvm|x64'">false</TreatWarningAsError>
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='release_msvc|x64'">false</TreatWarningAsError>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='play_msvc|x64'">false</TreatWarningAsError>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='profile_msvc|x64'">false</TreatWarningAsError>
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='release_llvm|x64'">false</TreatWarningAsError>
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='release_min_llvm|x64'">false</TreatWarningAsError>
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|x64'">false</TreatWarningAsError>
@@ -611,14 +900,20 @@
     <ClCompile Include="kablam_strings.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_llvm|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='play_msvc|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='profile_msvc|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_llvm|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_min_llvm|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_msvc|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_llvm|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_msvc|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='play_msvc|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='profile_msvc|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_llvm|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_min_llvm|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|x64'">Create</PrecompiledHeader>
@@ -627,68 +922,101 @@
   <ItemGroup>
     <Midl Include="kablam_rpc\kablam_commands.idl">
       <ApplicationConfigurationMode Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">true</ApplicationConfigurationMode>
+      <ApplicationConfigurationMode Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|Win32'">true</ApplicationConfigurationMode>
       <ApplicationConfigurationMode Condition="'$(Configuration)|$(Platform)'=='debug_llvm|Win32'">true</ApplicationConfigurationMode>
       <ApplicationConfigurationMode Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">true</ApplicationConfigurationMode>
+      <ApplicationConfigurationMode Condition="'$(Configuration)|$(Platform)'=='play_msvc|Win32'">true</ApplicationConfigurationMode>
+      <ApplicationConfigurationMode Condition="'$(Configuration)|$(Platform)'=='profile_msvc|Win32'">true</ApplicationConfigurationMode>
       <ApplicationConfigurationMode Condition="'$(Configuration)|$(Platform)'=='release_llvm|Win32'">true</ApplicationConfigurationMode>
       <ApplicationConfigurationMode Condition="'$(Configuration)|$(Platform)'=='release_min_llvm|Win32'">true</ApplicationConfigurationMode>
       <ApplicationConfigurationMode Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">true</ApplicationConfigurationMode>
       <ApplicationConfigurationMode Condition="'$(Configuration)|$(Platform)'=='debug_msvc|x64'">true</ApplicationConfigurationMode>
+      <ApplicationConfigurationMode Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|x64'">true</ApplicationConfigurationMode>
       <ApplicationConfigurationMode Condition="'$(Configuration)|$(Platform)'=='debug_llvm|x64'">true</ApplicationConfigurationMode>
       <ApplicationConfigurationMode Condition="'$(Configuration)|$(Platform)'=='release_msvc|x64'">true</ApplicationConfigurationMode>
+      <ApplicationConfigurationMode Condition="'$(Configuration)|$(Platform)'=='play_msvc|x64'">true</ApplicationConfigurationMode>
+      <ApplicationConfigurationMode Condition="'$(Configuration)|$(Platform)'=='profile_msvc|x64'">true</ApplicationConfigurationMode>
       <ApplicationConfigurationMode Condition="'$(Configuration)|$(Platform)'=='release_llvm|x64'">true</ApplicationConfigurationMode>
       <ApplicationConfigurationMode Condition="'$(Configuration)|$(Platform)'=='release_min_llvm|x64'">true</ApplicationConfigurationMode>
       <ApplicationConfigurationMode Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|x64'">true</ApplicationConfigurationMode>
       <TargetEnvironment Condition="'$(Configuration)|$(Platform)'=='debug_msvc|x64'">X64</TargetEnvironment>
+      <TargetEnvironment Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|x64'">X64</TargetEnvironment>
       <TargetEnvironment Condition="'$(Configuration)|$(Platform)'=='debug_llvm|x64'">X64</TargetEnvironment>
       <TargetEnvironment Condition="'$(Configuration)|$(Platform)'=='release_msvc|x64'">X64</TargetEnvironment>
+      <TargetEnvironment Condition="'$(Configuration)|$(Platform)'=='play_msvc|x64'">X64</TargetEnvironment>
+      <TargetEnvironment Condition="'$(Configuration)|$(Platform)'=='profile_msvc|x64'">X64</TargetEnvironment>
       <TargetEnvironment Condition="'$(Configuration)|$(Platform)'=='release_llvm|x64'">X64</TargetEnvironment>
       <TargetEnvironment Condition="'$(Configuration)|$(Platform)'=='release_min_llvm|x64'">X64</TargetEnvironment>
       <TargetEnvironment Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|x64'">X64</TargetEnvironment>
       <OutputDirectory Condition="'$(Configuration)|$(Platform)'=='debug_msvc|x64'">kablam_rpc</OutputDirectory>
+      <OutputDirectory Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|x64'">kablam_rpc</OutputDirectory>
       <OutputDirectory Condition="'$(Configuration)|$(Platform)'=='debug_llvm|x64'">kablam_rpc</OutputDirectory>
       <OutputDirectory Condition="'$(Configuration)|$(Platform)'=='release_msvc|x64'">kablam_rpc</OutputDirectory>
+      <OutputDirectory Condition="'$(Configuration)|$(Platform)'=='play_msvc|x64'">kablam_rpc</OutputDirectory>
+      <OutputDirectory Condition="'$(Configuration)|$(Platform)'=='profile_msvc|x64'">kablam_rpc</OutputDirectory>
       <OutputDirectory Condition="'$(Configuration)|$(Platform)'=='release_llvm|x64'">kablam_rpc</OutputDirectory>
       <OutputDirectory Condition="'$(Configuration)|$(Platform)'=='release_min_llvm|x64'">kablam_rpc</OutputDirectory>
       <OutputDirectory Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|x64'">kablam_rpc</OutputDirectory>
       <OutputDirectory Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">kablam_rpc</OutputDirectory>
+      <OutputDirectory Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|Win32'">kablam_rpc</OutputDirectory>
       <OutputDirectory Condition="'$(Configuration)|$(Platform)'=='debug_llvm|Win32'">kablam_rpc</OutputDirectory>
       <OutputDirectory Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">kablam_rpc</OutputDirectory>
+      <OutputDirectory Condition="'$(Configuration)|$(Platform)'=='play_msvc|Win32'">kablam_rpc</OutputDirectory>
+      <OutputDirectory Condition="'$(Configuration)|$(Platform)'=='profile_msvc|Win32'">kablam_rpc</OutputDirectory>
       <OutputDirectory Condition="'$(Configuration)|$(Platform)'=='release_llvm|Win32'">kablam_rpc</OutputDirectory>
       <OutputDirectory Condition="'$(Configuration)|$(Platform)'=='release_min_llvm|Win32'">kablam_rpc</OutputDirectory>
       <OutputDirectory Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">kablam_rpc</OutputDirectory>
       <GenerateClientFiles Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">Stub</GenerateClientFiles>
+      <GenerateClientFiles Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|Win32'">Stub</GenerateClientFiles>
       <GenerateClientFiles Condition="'$(Configuration)|$(Platform)'=='debug_llvm|Win32'">Stub</GenerateClientFiles>
       <GenerateServerFiles Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">Stub</GenerateServerFiles>
+      <GenerateServerFiles Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|Win32'">Stub</GenerateServerFiles>
       <GenerateServerFiles Condition="'$(Configuration)|$(Platform)'=='debug_llvm|Win32'">Stub</GenerateServerFiles>
       <GenerateClientFiles Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">Stub</GenerateClientFiles>
+      <GenerateClientFiles Condition="'$(Configuration)|$(Platform)'=='play_msvc|Win32'">Stub</GenerateClientFiles>
+      <GenerateClientFiles Condition="'$(Configuration)|$(Platform)'=='profile_msvc|Win32'">Stub</GenerateClientFiles>
       <GenerateClientFiles Condition="'$(Configuration)|$(Platform)'=='release_llvm|Win32'">Stub</GenerateClientFiles>
       <GenerateClientFiles Condition="'$(Configuration)|$(Platform)'=='release_min_llvm|Win32'">Stub</GenerateClientFiles>
       <GenerateClientFiles Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">Stub</GenerateClientFiles>
       <GenerateServerFiles Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">Stub</GenerateServerFiles>
+      <GenerateServerFiles Condition="'$(Configuration)|$(Platform)'=='play_msvc|Win32'">Stub</GenerateServerFiles>
+      <GenerateServerFiles Condition="'$(Configuration)|$(Platform)'=='profile_msvc|Win32'">Stub</GenerateServerFiles>
       <GenerateServerFiles Condition="'$(Configuration)|$(Platform)'=='release_llvm|Win32'">Stub</GenerateServerFiles>
       <GenerateServerFiles Condition="'$(Configuration)|$(Platform)'=='release_min_llvm|Win32'">Stub</GenerateServerFiles>
       <GenerateServerFiles Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">Stub</GenerateServerFiles>
       <GenerateClientFiles Condition="'$(Configuration)|$(Platform)'=='debug_msvc|x64'">Stub</GenerateClientFiles>
+      <GenerateClientFiles Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|x64'">Stub</GenerateClientFiles>
       <GenerateClientFiles Condition="'$(Configuration)|$(Platform)'=='debug_llvm|x64'">Stub</GenerateClientFiles>
       <GenerateServerFiles Condition="'$(Configuration)|$(Platform)'=='debug_msvc|x64'">Stub</GenerateServerFiles>
+      <GenerateServerFiles Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|x64'">Stub</GenerateServerFiles>
       <GenerateServerFiles Condition="'$(Configuration)|$(Platform)'=='debug_llvm|x64'">Stub</GenerateServerFiles>
       <GenerateClientFiles Condition="'$(Configuration)|$(Platform)'=='release_msvc|x64'">Stub</GenerateClientFiles>
+      <GenerateClientFiles Condition="'$(Configuration)|$(Platform)'=='play_msvc|x64'">Stub</GenerateClientFiles>
+      <GenerateClientFiles Condition="'$(Configuration)|$(Platform)'=='profile_msvc|x64'">Stub</GenerateClientFiles>
       <GenerateClientFiles Condition="'$(Configuration)|$(Platform)'=='release_llvm|x64'">Stub</GenerateClientFiles>
       <GenerateClientFiles Condition="'$(Configuration)|$(Platform)'=='release_min_llvm|x64'">Stub</GenerateClientFiles>
       <GenerateClientFiles Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|x64'">Stub</GenerateClientFiles>
       <GenerateServerFiles Condition="'$(Configuration)|$(Platform)'=='release_msvc|x64'">Stub</GenerateServerFiles>
+      <GenerateServerFiles Condition="'$(Configuration)|$(Platform)'=='play_msvc|x64'">Stub</GenerateServerFiles>
+      <GenerateServerFiles Condition="'$(Configuration)|$(Platform)'=='profile_msvc|x64'">Stub</GenerateServerFiles>
       <GenerateServerFiles Condition="'$(Configuration)|$(Platform)'=='release_llvm|x64'">Stub</GenerateServerFiles>
       <GenerateServerFiles Condition="'$(Configuration)|$(Platform)'=='release_min_llvm|x64'">Stub</GenerateServerFiles>
       <GenerateServerFiles Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|x64'">Stub</GenerateServerFiles>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">0</WarningLevel>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|Win32'">0</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='debug_llvm|Win32'">0</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">0</WarningLevel>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='play_msvc|Win32'">0</WarningLevel>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='profile_msvc|Win32'">0</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='release_llvm|Win32'">0</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='release_min_llvm|Win32'">0</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">0</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='debug_msvc|x64'">0</WarningLevel>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|x64'">0</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='debug_llvm|x64'">0</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='release_msvc|x64'">0</WarningLevel>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='play_msvc|x64'">0</WarningLevel>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='profile_msvc|x64'">0</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='release_llvm|x64'">0</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='release_min_llvm|x64'">0</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|x64'">0</WarningLevel>

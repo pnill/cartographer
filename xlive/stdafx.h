@@ -87,26 +87,12 @@
 
 // blam includes
 
-#include "cseries/cseries.h"
-#include "cseries/cseries_errors.h"
-#include "cseries/cseries_system_memory.h"
-#include "cseries/cseries_windows.h"
-
-#include "math/color_math.h"
-#include "math/crypto_windows.h"
-#include "math/integer_math.h"
-#include "math/real_math.h"
-#include "memory/static_arrays.h"
-
-#include "tag_files/files_windows.h"
-#include "tag_files/tag_groups.h"
+#include "cseries/headers.h"
 
 /* hooking */
 
 #include "Util/Hooks/Hook.h"
 #include "Util/Memory.h"
-
-#include "tag_files/tag_group_access.h"
 
 #include "H2MOD/Modules/h2log/h2log.h"
 
