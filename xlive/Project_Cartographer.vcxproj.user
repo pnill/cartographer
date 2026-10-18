@@ -8,6 +8,14 @@
     <LocalDebuggerCommandArguments>-nointro -windowed -novsync</LocalDebuggerCommandArguments>
     <LocalDebuggerCommandArgumentsHistory>-nointro -windowed -novsync|</LocalDebuggerCommandArgumentsHistory>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|Win32'">
+    <LocalDebuggerDebuggerType>NativeOnly</LocalDebuggerDebuggerType>
+    <LocalDebuggerCommand>$(OutDir)halo2.exe</LocalDebuggerCommand>
+    <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>-nointro -windowed -novsync</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArgumentsHistory>-nointro -windowed -novsync|</LocalDebuggerCommandArgumentsHistory>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_llvm|Win32'">
     <LocalDebuggerDebuggerType>NativeOnly</LocalDebuggerDebuggerType>
     <LocalDebuggerCommand>$(OutDir)halo2.exe</LocalDebuggerCommand>
@@ -25,6 +33,22 @@
     <LocalDebuggerAttach>false</LocalDebuggerAttach>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">
+    <LocalDebuggerCommand>$(OutDir)halo2.exe</LocalDebuggerCommand>
+    <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerDebuggerType>NativeOnly</LocalDebuggerDebuggerType>
+    <LocalDebuggerCommandArguments>-nointro -windowed -novsync</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArgumentsHistory>-nointro -windowed -novsync|</LocalDebuggerCommandArgumentsHistory>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='play_msvc|Win32'">
+    <LocalDebuggerCommand>$(OutDir)halo2.exe</LocalDebuggerCommand>
+    <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerDebuggerType>NativeOnly</LocalDebuggerDebuggerType>
+    <LocalDebuggerCommandArguments>-nointro -windowed -novsync</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArgumentsHistory>-nointro -windowed -novsync|</LocalDebuggerCommandArgumentsHistory>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='profile_msvc|Win32'">
     <LocalDebuggerCommand>$(OutDir)halo2.exe</LocalDebuggerCommand>
     <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>

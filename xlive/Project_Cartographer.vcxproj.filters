@@ -2162,6 +2162,7 @@
     <ClInclude Include="Blam\Engine\sound\platform_sound_effect_definitions.h" />
     <ClInclude Include="Blam\Engine\widgets\cloth_definitions.h" />
     <ClInclude Include="Blam\Engine\objects\widgets\antenna.h" />
+    <ClInclude Include="Blam\Engine\cseries\headers.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

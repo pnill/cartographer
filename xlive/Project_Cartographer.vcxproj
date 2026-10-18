@@ -17,6 +17,22 @@
       <Configuration>debug_msvc</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="play_msvc|Win32">
+      <Configuration>play_msvc</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="play_msvc|x64">
+      <Configuration>play_msvc</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="profile_msvc|Win32">
+      <Configuration>profile_msvc</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="profile_msvc|x64">
+      <Configuration>profile_msvc</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="release_llvm|Win32">
       <Configuration>release_llvm</Configuration>
       <Platform>Win32</Platform>
@@ -49,6 +65,14 @@
       <Configuration>release_msvc</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="symbols_msvc|Win32">
+      <Configuration>symbols_msvc</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="symbols_msvc|x64">
+      <Configuration>symbols_msvc</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{DC9655D6-D9C0-4837-8A63-B0693EEED4E8}</ProjectGuid>
@@ -65,7 +89,25 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_msvc|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <PlatformToolset>v143</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
@@ -100,7 +142,39 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='play_msvc|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='profile_msvc|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_msvc|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='play_msvc|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='profile_msvc|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <PlatformToolset>v143</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
@@ -163,7 +237,15 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_msvc|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
   </ImportGroup>
@@ -179,7 +261,23 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='play_msvc|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='profile_msvc|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_msvc|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='play_msvc|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='profile_msvc|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
   </ImportGroup>
@@ -219,7 +317,35 @@
     <LibraryPath>$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x86;3rdparty/discord/lib;3rdparty/imgui/lib;3rdparty/spdlog/lib;3rdparty/tinyxml/lib;3rdparty/zlib/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/release;3rdparty/miniupnpc/lib/release;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>$(ExternalIncludePath);$(DXSDK_DIR)Include</ExternalIncludePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='play_msvc|Win32'">
+    <OutDir>$(SolutionDir)Halo2\</OutDir>
+    <IntDir>.\objects\$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x86;3rdparty/discord/lib;3rdparty/imgui/lib;3rdparty/spdlog/lib;3rdparty/tinyxml/lib;3rdparty/zlib/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/release;3rdparty/miniupnpc/lib/release;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
+    <ExternalIncludePath>$(ExternalIncludePath);$(DXSDK_DIR)Include</ExternalIncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='profile_msvc|Win32'">
+    <OutDir>$(SolutionDir)Halo2\</OutDir>
+    <IntDir>.\objects\$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x86;3rdparty/discord/lib;3rdparty/imgui/lib;3rdparty/spdlog/lib;3rdparty/tinyxml/lib;3rdparty/zlib/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/release;3rdparty/miniupnpc/lib/release;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
+    <ExternalIncludePath>$(ExternalIncludePath);$(DXSDK_DIR)Include</ExternalIncludePath>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_msvc|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x86;3rdparty/discord/lib;3rdparty/imgui/lib;3rdparty/spdlog/lib;3rdparty/tinyxml/lib;3rdparty/zlib/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/release;3rdparty/miniupnpc/lib/release;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
+    <ExternalIncludePath>$(ExternalIncludePath);$(DXSDK_DIR)Include</ExternalIncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='play_msvc|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x86;3rdparty/discord/lib;3rdparty/imgui/lib;3rdparty/spdlog/lib;3rdparty/tinyxml/lib;3rdparty/zlib/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/release;3rdparty/miniupnpc/lib/release;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
+    <ExternalIncludePath>$(ExternalIncludePath);$(DXSDK_DIR)Include</ExternalIncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='profile_msvc|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(IncludePath)</IncludePath>
     <LibraryPath>$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x86;3rdparty/discord/lib;3rdparty/imgui/lib;3rdparty/spdlog/lib;3rdparty/tinyxml/lib;3rdparty/zlib/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/release;3rdparty/miniupnpc/lib/release;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
@@ -275,7 +401,21 @@
     <IncludePath>$(IncludePath)</IncludePath>
     <ExternalIncludePath>$(ExternalIncludePath);$(DXSDK_DIR)Include</ExternalIncludePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|Win32'">
+    <OutDir>$(SolutionDir)Halo2\</OutDir>
+    <IntDir>.\objects\$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <LibraryPath>$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x86;3rdparty/discord/lib;3rdparty/imgui/lib;3rdparty/spdlog/lib;3rdparty/tinyxml/lib;3rdparty/zlib/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/debug/;3rdparty/miniupnpc/lib/debug;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <ExternalIncludePath>$(ExternalIncludePath);$(DXSDK_DIR)Include</ExternalIncludePath>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_msvc|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <LibraryPath>$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x86;3rdparty/discord/lib;3rdparty/imgui/lib;3rdparty/spdlog/lib;3rdparty/tinyxml/lib;3rdparty/zlib/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/debug/;3rdparty/miniupnpc/lib/debug;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <ExternalIncludePath>$(ExternalIncludePath);$(DXSDK_DIR)Include</ExternalIncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|x64'">
     <LinkIncremental>true</LinkIncremental>
     <LibraryPath>$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x86;3rdparty/discord/lib;3rdparty/imgui/lib;3rdparty/spdlog/lib;3rdparty/tinyxml/lib;3rdparty/zlib/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/debug/;3rdparty/miniupnpc/lib/debug;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
     <IncludePath>$(IncludePath)</IncludePath>
@@ -308,7 +448,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;NDEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ERRORS_ENABLED;EVENTS_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;HS_COMPILER_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;NDEBUG;_WINDOWS;_USRDLL;RELEASE_CONFIGURATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -349,6 +489,158 @@
       <ProgramDatabaseFile>$(IntDir)xlive.pdb</ProgramDatabaseFile>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
+      <ImportLibrary>$(IntDir)\xlive.lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+      <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <LinkStatus>
+      </LinkStatus>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <FullProgramDatabaseFile>true</FullProgramDatabaseFile>
+      <GenerateMapFile>true</GenerateMapFile>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <PreBuildEvent>
+      <Command>CALL $(SolutionDir)GIT-VS-VERSION-GEN.bat "$(IntDir)" "$(SolutionDir)xlive\version_git.h"</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='play_msvc|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;NDEBUG;_WINDOWS;_USRDLL;PLAY_CONFIGURATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeaderOutputFile>$(IntDir)xlive.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\detours\include;.\3rdparty\discord\include;.\3rdparty\imgui\imgui;.\3rdparty\libcurl;.\3rdparty\miniupnpc\include;.\3rdparty\spdlog\include;.\3rdparty\tinyxml;.\3rdparty\zlib\src;.\Blam\Engine</AdditionalIncludeDirectories>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DisableSpecificWarnings>4505;4100</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <AdditionalOptions>/DPSAPI_VERSION=1 /utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
+      <TreatSpecificWarningsAsErrors>4700</TreatSpecificWarningsAsErrors>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>imguilib$(Platform)$(Configuration).lib;tinyxmllib$(Platform)$(Configuration).lib;zlib$(Platform)$(Configuration).lib;iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <ModuleDefinitionFile>.\xlive_exports.def</ModuleDefinitionFile>
+      <ProgramDatabaseFile>$(IntDir)xlive.pdb</ProgramDatabaseFile>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <ImportLibrary>$(IntDir)\xlive.lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+      <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <LinkStatus>
+      </LinkStatus>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <FullProgramDatabaseFile>true</FullProgramDatabaseFile>
+      <GenerateMapFile>true</GenerateMapFile>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <PreBuildEvent>
+      <Command>CALL $(SolutionDir)GIT-VS-VERSION-GEN.bat "$(IntDir)" "$(SolutionDir)xlive\version_git.h"</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='profile_msvc|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;NDEBUG;_WINDOWS;_USRDLL;PROFILE_CONFIGURATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeaderOutputFile>$(IntDir)xlive.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\detours\include;.\3rdparty\discord\include;.\3rdparty\imgui\imgui;.\3rdparty\libcurl;.\3rdparty\miniupnpc\include;.\3rdparty\spdlog\include;.\3rdparty\tinyxml;.\3rdparty\zlib\src;.\Blam\Engine</AdditionalIncludeDirectories>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DisableSpecificWarnings>4505;4100</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <AdditionalOptions>/DPSAPI_VERSION=1 /utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
+      <TreatSpecificWarningsAsErrors>4700</TreatSpecificWarningsAsErrors>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>imguilib$(Platform)$(Configuration).lib;tinyxmllib$(Platform)$(Configuration).lib;zlib$(Platform)$(Configuration).lib;iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <ModuleDefinitionFile>.\xlive_exports.def</ModuleDefinitionFile>
+      <ProgramDatabaseFile>$(IntDir)xlive.pdb</ProgramDatabaseFile>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
       <ImportLibrary>$(IntDir)\xlive.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
@@ -444,6 +736,154 @@
       <Command>CALL $(SolutionDir)GIT-VS-VERSION-GEN.bat "$(IntDir)" "$(SolutionDir)xlive\version_git.h"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='play_msvc|x64'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;NDEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ERRORS_ENABLED;EVENTS_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;HS_COMPILER_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeaderOutputFile>$(IntDir)xlive.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\detours\include;.\3rdparty\discord\include;.\3rdparty\imgui\imgui;.\3rdparty\libcurl;.\3rdparty\miniupnpc\include;.\3rdparty\spdlog\include;.\3rdparty\tinyxml;.\3rdparty\zlib\src;.\Blam\Engine</AdditionalIncludeDirectories>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DisableSpecificWarnings>4505;4100</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <AdditionalOptions>/DPSAPI_VERSION=1 /utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
+      <TreatSpecificWarningsAsErrors>4700</TreatSpecificWarningsAsErrors>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>imguilib$(Platform)$(Configuration).lib;tinyxmllib$(Platform)$(Configuration).lib;zlib$(Platform)$(Configuration).lib;iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <ModuleDefinitionFile>.\xlive_exports.def</ModuleDefinitionFile>
+      <ProgramDatabaseFile>$(IntDir)xlive.pdb</ProgramDatabaseFile>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <ImportLibrary>$(IntDir)\xlive.lib</ImportLibrary>
+      <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <LinkStatus>
+      </LinkStatus>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <FullProgramDatabaseFile>true</FullProgramDatabaseFile>
+      <GenerateMapFile>true</GenerateMapFile>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <PreBuildEvent>
+      <Command>CALL $(SolutionDir)GIT-VS-VERSION-GEN.bat "$(IntDir)" "$(SolutionDir)xlive\version_git.h"</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='profile_msvc|x64'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;NDEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ERRORS_ENABLED;EVENTS_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;HS_COMPILER_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeaderOutputFile>$(IntDir)xlive.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\detours\include;.\3rdparty\discord\include;.\3rdparty\imgui\imgui;.\3rdparty\libcurl;.\3rdparty\miniupnpc\include;.\3rdparty\spdlog\include;.\3rdparty\tinyxml;.\3rdparty\zlib\src;.\Blam\Engine</AdditionalIncludeDirectories>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DisableSpecificWarnings>4505;4100</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <AdditionalOptions>/DPSAPI_VERSION=1 /utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
+      <TreatSpecificWarningsAsErrors>4700</TreatSpecificWarningsAsErrors>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>imguilib$(Platform)$(Configuration).lib;tinyxmllib$(Platform)$(Configuration).lib;zlib$(Platform)$(Configuration).lib;iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <ModuleDefinitionFile>.\xlive_exports.def</ModuleDefinitionFile>
+      <ProgramDatabaseFile>$(IntDir)xlive.pdb</ProgramDatabaseFile>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <ImportLibrary>$(IntDir)\xlive.lib</ImportLibrary>
+      <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <LinkStatus>
+      </LinkStatus>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <FullProgramDatabaseFile>true</FullProgramDatabaseFile>
+      <GenerateMapFile>true</GenerateMapFile>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <PreBuildEvent>
+      <Command>CALL $(SolutionDir)GIT-VS-VERSION-GEN.bat "$(IntDir)" "$(SolutionDir)xlive\version_git.h"</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">
     <Midl>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -457,7 +897,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;NDEBUG;_WINDOWS;_USRDLL;SPDLOG_DISABLED;IMGUI_DISABLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;NDEBUG;_WINDOWS;_USRDLL;RELEASE_MIN_CONFIGURATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -607,7 +1047,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <PreprocessorDefinitions>WIN32;LLVM;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;NDEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ERRORS_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;HS_COMPILER_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;LLVM;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;NDEBUG;_WINDOWS;_USRDLL;RELEASE_CONFIGURATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -753,7 +1193,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <PreprocessorDefinitions>WIN32;LLVM;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;NDEBUG;_WINDOWS;_USRDLL;IMGUI_DISABLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;LLVM;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;NDEBUG;_WINDOWS;_USRDLL;RELEASE_MIN_CONFIGURATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -895,7 +1335,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;_DEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ASSERTS_ENABLED;EVENTS_ENABLED;ERRORS_ENABLED;DEBUG_MEMORY_ENABLED;RASTERIZER_PROFILE_ENABLED;VALIDATE_REAL_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;DEBUG_MENU_ENABLED;HS_COMPILER_ENABLED;PROFILE_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;_DEBUG;_WINDOWS;_USRDLL;DEBUG_CONFIGURATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -923,6 +1363,7 @@
       <SupportJustMyCode>false</SupportJustMyCode>
       <TreatSpecificWarningsAsErrors>4700</TreatSpecificWarningsAsErrors>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -936,6 +1377,70 @@
       <ProgramDatabaseFile>$(IntDir)xlive.pdb</ProgramDatabaseFile>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
+      <ImportLibrary>$(IntDir)\xlive.lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <GenerateMapFile>true</GenerateMapFile>
+    </Link>
+    <PreBuildEvent>
+      <Command>CALL $(SolutionDir)GIT-VS-VERSION-GEN.bat "$(IntDir)" "$(SolutionDir)xlive\version_git.h"</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;_DEBUG;_WINDOWS;_USRDLL;SYMBOLS_CONFIGURATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeaderOutputFile>$(IntDir)xlive.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\detours\include;.\3rdparty\discord\include;.\3rdparty\imgui\imgui;.\3rdparty\libcurl;.\3rdparty\miniupnpc\include;.\3rdparty\spdlog\include;.\3rdparty\tinyxml;.\3rdparty\zlib\src;.\Blam\Engine</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <DisableSpecificWarnings>4505;4100</DisableSpecificWarnings>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <AdditionalOptions>/DPSAPI_VERSION=1 /utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
+      <SupportJustMyCode>false</SupportJustMyCode>
+      <TreatSpecificWarningsAsErrors>4700</TreatSpecificWarningsAsErrors>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>imguilib$(Platform)$(Configuration).lib;tinyxmllib$(Platform)$(Configuration).lib;zlib$(Platform)$(Configuration).lib;iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;dxguid.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ModuleDefinitionFile>.\xlive_exports_debug.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(IntDir)xlive.pdb</ProgramDatabaseFile>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
       <ImportLibrary>$(IntDir)\xlive.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
@@ -1009,6 +1514,67 @@
       <Command>CALL $(SolutionDir)GIT-VS-VERSION-GEN.bat "$(IntDir)" "$(SolutionDir)xlive\version_git.h"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|x64'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;_DEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ASSERTS_ENABLED;EVENTS_ENABLED;ERRORS_ENABLED;DEBUG_MEMORY_ENABLED;RASTERIZER_PROFILE_ENABLED;VALIDATE_REAL_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;DEBUG_MENU_ENABLED;HS_COMPILER_ENABLED;_ALLOW_RTCc_IN_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeaderOutputFile>$(IntDir)xlive.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\detours\include;.\3rdparty\discord\include;.\3rdparty\imgui\imgui;.\3rdparty\libcurl;.\3rdparty\miniupnpc\include;.\3rdparty\spdlog\include;.\3rdparty\tinyxml;.\3rdparty\zlib\src;.\Blam\Engine</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <DisableSpecificWarnings>4505;4100</DisableSpecificWarnings>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <AdditionalOptions>/DPSAPI_VERSION=1 /utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
+      <SupportJustMyCode>false</SupportJustMyCode>
+      <TreatSpecificWarningsAsErrors>4700</TreatSpecificWarningsAsErrors>
+      <FloatingPointModel>Fast</FloatingPointModel>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>imguilib$(Platform)$(Configuration).lib;tinyxmllib$(Platform)$(Configuration).lib;zlib$(Platform)$(Configuration).lib;iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;dxguid.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ModuleDefinitionFile>.\xlive_exports_debug.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(IntDir)xlive.pdb</ProgramDatabaseFile>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <ImportLibrary>$(IntDir)\xlive.lib</ImportLibrary>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <GenerateMapFile>true</GenerateMapFile>
+    </Link>
+    <PreBuildEvent>
+      <Command>CALL $(SolutionDir)GIT-VS-VERSION-GEN.bat "$(IntDir)" "$(SolutionDir)xlive\version_git.h"</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_llvm|Win32'">
     <Midl>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -1018,7 +1584,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;LLVM;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;_DEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ASSERTS_ENABLED;EVENTS_ENABLED;ERRORS_ENABLED;DEBUG_MEMORY_ENABLED;RASTERIZER_PROFILE_ENABLED;VALIDATE_REAL_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;DEBUG_MENU_ENABLED;HS_COMPILER_ENABLED;PROFILE_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;LLVM;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;_DEBUG;_WINDOWS;_USRDLL;DEBUG_CONFIGURATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -1586,6 +2152,7 @@
     <ClInclude Include="Blam\Engine\cseries\cseries_windows_modules.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries.h" />
     <ClInclude Include="Blam\Engine\cseries\debug_memory.h" />
+    <ClInclude Include="Blam\Engine\cseries\headers.h" />
     <ClInclude Include="Blam\Engine\cseries\language.h" />
     <ClInclude Include="Blam\Engine\cseries\profile.h" />
     <ClInclude Include="Blam\Engine\cseries\runtime_state.h" />
@@ -2048,11 +2615,17 @@
     <ClCompile Include="H2MOD\Variants\GraveRobber\GraveRobber.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_msvc|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='symbols_msvc|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_llvm|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_llvm|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='play_msvc|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='profile_msvc|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_msvc|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='play_msvc|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='profile_msvc|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_llvm|Win32'">Create</PrecompiledHeader>
