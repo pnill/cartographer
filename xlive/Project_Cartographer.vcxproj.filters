@@ -383,6 +383,7 @@
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_debug.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_vertex_buffers.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_bitmaps.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_bytecode_fixes.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_vertex_shaders.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_stipple.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_text.cpp" />
@@ -1154,6 +1155,7 @@
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_debug.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_vertex_buffers.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_bitmaps.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_bytecode_fixes.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_vertex_shaders.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_stipple.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_text.h" />

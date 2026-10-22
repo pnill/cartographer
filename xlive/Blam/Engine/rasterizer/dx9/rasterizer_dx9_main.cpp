@@ -5,6 +5,7 @@
 
 #include "rasterizer_dx9.h"
 #include "rasterizer_dx9_bitmaps.h"
+#include "rasterizer_dx9_bytecode_fixes.h"
 #include "rasterizer_dx9_debug.h"
 #include "rasterizer_dx9_dof.h"
 #include "rasterizer_dx9_dynavobgeom.h"
@@ -677,6 +678,9 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
 	if (succeeded)
 	{
 		IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
+
+		// Repair stock pixel shaders before any shader is created (see rasterizer_dx9_bytecode_fixes.cpp)
+		rasterizer_dx9_bytecode_fixes_initialize(global_d3d_device);
 
 		HRESULT hr;
 		rasterizer_dx9_log_hr(
