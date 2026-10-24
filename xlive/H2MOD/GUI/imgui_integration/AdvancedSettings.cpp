@@ -593,13 +593,13 @@ namespace ImGuiHandler {
 					}
 					ImGui::NewLine();
 
-					ImGui::Text("Custom Controller Layout");
+					ImGui::Text(advanced_settings_get_string(_advanced_string_custom_controller_layout));
 					ImGui::Checkbox("##Custom Controller Layout", &g_advanced_settings_current_cartographer_profile->controller_custom_layout_enabled);
 					ImGui::NewLine();
 
 					if (g_advanced_settings_current_cartographer_profile->controller_custom_layout_enabled)
 					{
-						ImGui::TextWrapped("To use this you must have your games controller layout SET TO DEFAULT. Changing the drop down for the specific action will remap the button to the new one");
+						ImGui::TextWrapped(advanced_settings_get_string(_advanced_string_custom_controller_layout_note));
 						ImGui::NewLine();
 						ImGui::Columns(3, NULL, false);
 						for (auto i = 0; i < 14; i++)
