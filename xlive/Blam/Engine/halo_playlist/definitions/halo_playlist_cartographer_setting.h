@@ -5,11 +5,12 @@
 
 enum 
 {
-	k_halo_playlist_cartographer_setting_property_count = 12,
+	k_halo_playlist_cartographer_setting_property_count = 13,
 	k_halo_playlist_cartographer_engine_mode_count = 6,
 	k_halo_playlist_cartographer_game_speed_count = 5,
 	k_halo_playlist_cartographer_gravity_count = 8,
-	k_halo_playlist_cartographer_spawn_protection_count = 9
+	k_halo_playlist_cartographer_spawn_protection_count = 9,
+	k_halo_playlist_cartographer_player_speed_count = 12
 };
 
 /* enum */
@@ -28,6 +29,7 @@ enum e_halo_playlist_cartographer_setting_property_type
 	_halo_playlist_cartographer_setting_spawn_protection,
 	_halo_playlist_cartographer_setting_disable_dub_shot,
 	_halo_playlist_cartographer_setting_invincible_players,
+	_halo_playlist_cartographer_setting_player_speed,
 
 	k_halo_playlist_cartographer_setting_count,
 	k_halo_playlist_cartographer_setting_invalid = NONE
@@ -56,6 +58,8 @@ e_game_gravity_modifier halo_playlist_item_collection_cartographer_gravity_get_v
 
 e_player_spawn_protection_timer halo_playlist_item_collection_cartographer_spawn_protection_get_value(wchar_t const* value);
 
+e_player_speed_modifier halo_playlist_item_collection_cartographer_player_speed_modifier_get_value(wchar_t const* value);
+
 bool halo_playlist_item_collection_cartographer_engine_mode_write_to_variant(wchar_t const* value, s_game_variant* variant);
 
 bool halo_playlist_item_collection_cartographer_infinite_ammo_write_to_variant(wchar_t const* value, s_game_variant* variant);
@@ -79,3 +83,5 @@ bool halo_playlist_item_collection_cartographer_game_speed_write_to_variant(wcha
 bool halo_playlist_item_collection_cartographer_gravity_write_to_variant(wchar_t const* value, s_game_variant* variant);
 
 bool halo_playlist_item_collection_cartographer_spawn_protection_write_to_variant(wchar_t const* value, s_game_variant* variant);
+
+bool halo_playlist_item_collection_cartographer_player_speed_write_to_variant(wchar_t const* value, s_game_variant* variant);

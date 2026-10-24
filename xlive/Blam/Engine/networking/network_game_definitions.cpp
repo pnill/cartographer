@@ -175,6 +175,7 @@ void network_game_definitions_encode_game_variant(c_bitstream* packet, s_game_va
 	packet->write_integer("cart-game-speed", variant->cartographer_settings.game_speed, k_game_speed_modifier_bits_required);
 	packet->write_integer("cart-gravity", variant->cartographer_settings.gravity, k_game_gravity_modifier_bits_required);
 	packet->write_integer("cart-spawn-protection", variant->cartographer_settings.spawn_protection, k_player_spawn_protection_timer_bits_required);
+	packet->write_integer("cart-player-speed", variant->cartographer_settings.player_speed, k_player_speed_modifier_bits_required);
 }
 
 bool network_game_definitions_decode_game_variant(c_bitstream* packet, s_game_variant* variant)
@@ -330,6 +331,7 @@ bool network_game_definitions_decode_game_variant(c_bitstream* packet, s_game_va
 	variant->cartographer_settings.game_speed = (e_game_speed_modifier)packet->read_integer("cart-game-speed", k_game_speed_modifier_bits_required);
 	variant->cartographer_settings.gravity = (e_game_gravity_modifier)packet->read_integer("cart-gravity", k_game_gravity_modifier_bits_required);
 	variant->cartographer_settings.spawn_protection = (e_player_spawn_protection_timer)packet->read_integer("cart-spawn-protection", k_player_spawn_protection_timer_bits_required);
+	variant->cartographer_settings.player_speed = (e_player_speed_modifier)packet->read_integer("cart-player-speed", k_player_speed_modifier_bits_required);
 
 	bool result = game_variant_is_valid(variant);
 	return result;

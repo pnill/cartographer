@@ -902,6 +902,10 @@ bool c_halo_playlist_reader::process_variant_cartographer_setting(s_halo_playlis
 			break;
 		case _halo_playlist_cartographer_setting_invincible_players:
 			property_result = halo_playlist_item_collection_cartographer_invincible_players_write_to_variant(section_item->value_buffer, variant);
+			break;
+		case _halo_playlist_cartographer_setting_player_speed:
+			property_result = halo_playlist_item_collection_cartographer_player_speed_write_to_variant(section_item->value_buffer, variant);
+			break;
 	}
 
 	if (!property_result)
