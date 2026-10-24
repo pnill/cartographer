@@ -21,6 +21,8 @@ static void __cdecl close_cache_header(HANDLE* map_handle);
 
 static bool __cdecl validate_and_read_custom_map_data(s_custom_map_entry* custom_map_entry);
 
+static void map_repository_allow_custom_globals(void);
+
 
 void map_repository_apply_sapien_patches(void)
 {
@@ -894,9 +896,44 @@ void c_map_manager::ApplyCustomMapExtensionLimitPatches()
 	PatchCall(Memory::GetAddress(0x4D3BA, 0x417FE), validate_and_read_custom_map_data);
 	PatchCall(Memory::GetAddress(0x4CF26, 0x41D4E), validate_and_read_custom_map_data);
 	PatchCall(Memory::GetAddress(0x8928, 0x1B6482), validate_and_read_custom_map_data);
+
+	map_repository_allow_custom_globals();
 }
 
 /* private code */
+
+// The game's custom map validator (validate_and_add_custom_map_internal) only fills the list entry (map name,
+// descriptions, preview bitmap and the per game type maximum team counts) after every check passed.
+// The very first tag check is on the globals tag: its datum index must be >= 10000, which is only the case when the
+// map uses the shared.map globals ("cmp eax, 2710h / jl fail"). A custom map that carries its own globals (custom HUD
+// text, vehicles, damage groups...) fails here, ends up with only a name in the list, no description,
+// no preview and maximum teams of 0, which makes the team selection in the lobby unusable.
+// Nothing after the check uses the globals index, so the jump is removed.
+static void map_repository_allow_custom_globals(void)
+{
+	// cmp eax, 2710h
+	static const BYTE expected_prefix[] = { 0x3D, 0x10, 0x27, 0x00, 0x00 };
+	// jl <fail> (6 bytes)
+	static const BYTE expected_jl[] = { 0x0F, 0x8C };
+	const unsigned int jl_size = 6;
+	// offset of the jl from the start of the validator function
+	const uintptr_t jl_offset_in_function = 0x2B7;
+
+	// 0x4F690 is validate_and_add_custom_map_internal (see validate_and_read_custom_map_data)
+	const uintptr_t jl_address = Memory::GetAddress(0x4F690, 0x56890) + jl_offset_in_function;
+
+	// only patch the exact build we know, otherwise leave the validator alone
+	const BYTE* prefix = reinterpret_cast<const BYTE*>(jl_address - sizeof(expected_prefix));
+	const BYTE* jl = reinterpret_cast<const BYTE*>(jl_address);
+	if (memcmp(prefix, expected_prefix, sizeof(expected_prefix)) != 0 || memcmp(jl, expected_jl, sizeof(expected_jl)) != 0)
+	{
+		LOG_TRACE_FUNC("custom map globals check not found at the expected address, skipping patch");
+		return;
+	}
+
+	NopFill(jl_address, jl_size);
+	return;
+}
 
 static int32 get_directory_path_from_id(e_directory_id id, LPCWSTR pMore, LPWSTR pszPath, bool is_folder)
 {
