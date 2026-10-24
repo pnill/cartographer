@@ -3,6 +3,8 @@
 // Build with minimum required components
 #ifdef RELEASE_MIN_CONFIGURATION
 
+#define EXECUTABLE_TYPE 4
+
 #define SPDLOG_DISABLED 1
 #define IMGUI_DISABLE 1
 
@@ -10,6 +12,8 @@
 
 // Default build:
 #ifdef RELEASE_CONFIGURATION
+
+#define EXECUTABLE_TYPE 4
 
 #define TERMINAL_ENABLED 1				// Not originally enabled (We want this in cartographer's default build)
 #define ERRORS_ENABLED 1				// Not originally enabled (We want this in cartographer's default build)
@@ -24,6 +28,8 @@
 // Release with profiling code
 #ifdef PROFILE_CONFIGURATION
 
+#define EXECUTABLE_TYPE 3
+
 #define PROFILE_ENABLED 1
 #define RASTERIZER_PROFILE_ENABLED 1
 
@@ -33,6 +39,8 @@
 
 // Debug features but with optimization
 #ifdef PLAY_CONFIGURATION
+
+#define EXECUTABLE_TYPE 2
 
 #define TERMINAL_ENABLED 1
 #define ERRORS_ENABLED 1
@@ -50,6 +58,8 @@
 
 // Debug but with inlined functions and some missing debug features
 #ifdef DEBUG_CONFIGURATION
+
+#define EXECUTABLE_TYPE 2
 
 #define TERMINAL_ENABLED 1
 #define ASSERTS_ENABLED 1
@@ -70,6 +80,8 @@
 // Full debug build
 #ifdef SYMBOLS_CONFIGURATION
 
+#define EXECUTABLE_TYPE 1
+
 #define TERMINAL_ENABLED 1
 #define ASSERTS_ENABLED 1
 #define EVENTS_ENABLED 1
@@ -83,6 +95,14 @@
 #define HS_COMPILER_ENABLED 1
 #define PROFILE_ENABLED 1
 #define RASTERIZER_PROFILE_ENABLED 1
+
+#endif
+
+#ifdef TAGS_CONFIGURATION
+
+#define EXECUTABLE_TYPE 0
+
+// TODO: set this up in the future?
 
 #endif
 

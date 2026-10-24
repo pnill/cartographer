@@ -9,9 +9,6 @@
 #define COMPATIBLE_VERSION 11122
 #endif
 
-// DO NOT CHANGE, DO NOT USE TYPES ABOVE 7 OR BELOW 0 (3 bits values max)
-#define EXECUTABLE_TYPE 4
-
 // DLL VERSION
 #define DLL_VERSION_MAJOR				0
 #define DLL_VERSION_MINOR				7
