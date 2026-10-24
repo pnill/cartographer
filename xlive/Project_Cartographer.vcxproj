@@ -2426,6 +2426,7 @@
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_9on12.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_bitmaps.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_bytecode_fixes.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_debug.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_decals.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dof.cpp" />
@@ -2775,6 +2776,7 @@
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_9on12.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_bitmaps.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_bytecode_fixes.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_debug.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_decals.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dof.h" />
