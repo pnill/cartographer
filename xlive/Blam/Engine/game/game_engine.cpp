@@ -5,6 +5,26 @@
 #include "saved_games/player_profile.h"
 #include "simulation/game_interface/simulation_game_action.h"
 
+/* constants */
+
+constexpr real32 k_player_speed_default = 1.0f;
+
+static const real32 k_variant_player_speed_modifier[k_player_speed_modifier_count]
+{
+	k_player_speed_default,
+	0.25f,
+	0.5f,
+	0.75f,
+	1.25f,
+	1.50f,
+	1.75f,
+	2.0f,
+	2.25f,
+	2.50f,
+	2.75f,
+	3.0f
+};
+
 /* globals */
 
 bool g_game_engine_override_player_speed_update = false;
@@ -41,7 +61,6 @@ c_game_engine** get_game_mode_engines()
 
 c_game_engine* get_slayer_engine()
 {
-
 	return get_game_mode_engines()[_game_engine_type_slayer];
 }
 
@@ -119,31 +138,44 @@ void __cdecl game_engine_update_player_movement_traits()
 	{
 		datum index = it.get_index();
 		player_datum* player = it.get_datum();
-		c_game_engine* game_engine = current_game_engine();
-
-		real32 current_speed = player->unit_speed;
-		real32 desired_speed = 1.0f;
 		
-		if (game_engine)
+		s_game_variant* variant = get_game_variant();
+		if (game_is_multiplayer() && variant 
+			&& IN_RANGE(variant->cartographer_settings.player_speed, _player_speed_modifier_twenty_five_percent, k_player_speed_modifier_count))
 		{
-			desired_speed = game_engine->player_speed_multiplier(index);
+			real32 player_speed = k_variant_player_speed_modifier[variant->cartographer_settings.player_speed] * 2;
+
+			player->unit_speed = player_speed;
+			simulation_action_game_engine_player_update(index, FLAG(_simulation_action_player_update_bit_2));
 		}
-
-		real32 new_speed = desired_speed;
-
-		if (current_speed != desired_speed)
+		else
 		{
-			if (current_speed <= desired_speed)
+			c_game_engine* game_engine = current_game_engine();
+
+			real32 current_speed = player->unit_speed;
+			real32 desired_speed = k_player_speed_default;
+
+			if (game_engine)
 			{
-				// climb to target speed 0.15f per update.
-				new_speed = (0.15f / (real32)game_tick_rate()) + current_speed;
-				
-				new_speed = PIN(new_speed, 0, desired_speed);
+				desired_speed = game_engine->player_speed_multiplier(index);
 			}
 
-			player->unit_speed = new_speed;
+			real32 new_speed = desired_speed;
 
-			simulation_action_game_engine_player_update(index, 2);
+			if (current_speed != desired_speed)
+			{
+				if (current_speed <= desired_speed)
+				{
+					// climb to target speed 0.15f per update.
+					new_speed = (0.15f / (real32)game_tick_rate()) + current_speed;
+
+					new_speed = PIN(new_speed, 0, desired_speed);
+				}
+
+				player->unit_speed = new_speed;
+
+				simulation_action_game_engine_player_update(index, FLAG(_simulation_action_player_update_bit_2));
+			}
 		}
 	}
 }

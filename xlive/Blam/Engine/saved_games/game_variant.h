@@ -482,6 +482,26 @@ enum e_player_spawn_protection_timer : int8
 	k_player_spawn_protection_timer_invalid = NONE
 };
 
+enum e_player_speed_modifier : int8
+{
+	_player_speed_modifier_none,
+	_player_speed_modifier_twenty_five_percent,
+	_player_speed_modifier_fifty_percent,
+	_player_speed_modifier_seventy_five_percent,
+	_player_speed_modifier_hundred_twenty_five_percent,
+	_player_speed_modifier_hundred_fifty_percent,
+	_player_speed_modifier_hundred_seventy_five_percent,
+	_player_speed_modifier_two_hundred_percent,
+	_player_speed_modifier_two_hundred_twenty_five_percent,
+	_player_speed_modifier_two_hundred_fifty_percent,
+	_player_speed_modifier_two_hundred_seventy_five_percent,
+	_player_speed_modifier_three_hundred_percent,
+
+	k_player_speed_modifier_count,
+	k_player_speed_modifier_bits_required = bits_required_for(FLAG(k_player_speed_modifier_count - 1)),
+	k_player_speed_modifier_invalid = NONE
+};
+
 struct s_variant_description_map
 {
 	const char* name;
@@ -565,8 +585,9 @@ struct s_cart_variant_settings
 	e_game_speed_modifier game_speed;
 	e_game_gravity_modifier gravity;
 	e_player_spawn_protection_timer spawn_protection;
+	e_player_speed_modifier player_speed;
 
-	int8 available_storage[16];
+	int8 available_storage[15];
 };
 #pragma pack(pop)
 ASSERT_STRUCT_SIZE(s_cart_variant_settings, 24);
