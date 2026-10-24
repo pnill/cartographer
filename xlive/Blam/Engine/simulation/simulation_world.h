@@ -193,7 +193,7 @@ public:
 	bool runs_simulation(void) const
 	{
 		ASSERT(exists());
-		return m_world_type != _simulation_world_type_synchronous_client;
+		return m_world_type != _simulation_world_type_synchronous_client && !is_playback();
 	}
 
 	bool is_authority(void) const
