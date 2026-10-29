@@ -10,6 +10,7 @@
 #include "physics/bsp3d.h"
 #include "physics/collision_model_definitions.h"
 #include "physics/physics_model_definitions.h"
+#include "rasterizer/dx9/rasterizer_dx9_pixel_shaders.h"
 #include "rasterizer/dx9/rasterizer_dx9_vertex_shaders.h"
 #include "structures/structure_bsp_definitions.h"
 #include "units/biped_definitions.h"
@@ -171,6 +172,9 @@ static void __cdecl scenario_tags_postprocess(void)
 			break;
 		case _tag_group_vertex_shader:
 			//rasterizer_dx9_vertex_shaders_replace_map_bytecode(i);
+			break;
+		case _tag_group_shader_pass:
+			rasterizer_dx9_pixel_shaders_fix_map_bytecode(i);
 			break;
 		default:
 			break;
