@@ -12,6 +12,7 @@
 #include "main/licensing.h"
 #include "math/real_math.h"
 #include "networking/network_configuration.h"
+#include "networking/network_utilities.h"
 #include "networking/session/network_observer.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
 #include "saved_games/game_state.h"
@@ -113,7 +114,11 @@ void shell_command_line_flag_set(e_shell_command_line_flags flag, int32 state)
 const char* shell_get_version(void)
 {
 	// FORMAT: (target build_type platform build_number.branch)
-	return "halo2_pc_cache_  release pc 11122.07.08.24.1808.main";
+
+	return 
+		"halo2_pc_cache_  "
+		BUILD_TYPE
+		" pc 11122.07.08.24.1808.main";
 }
 
 bool shell_initialize(void)

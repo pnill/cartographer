@@ -9,6 +9,7 @@
 #include "networking/session/network_session.h"
 #include "networking/session/network_observer.h"
 #include "networking/network_event.h"
+#include "networking/network_utilities.h"
 #include "shell/shell.h"
 #include "shell/shell_windows.h"
 

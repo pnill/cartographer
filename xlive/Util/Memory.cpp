@@ -69,6 +69,24 @@ e_h2_type Memory::Initialize(void)
 	return game_info.process_type;
 }
 
+uintptr_t Memory::GetAddress(
+	uintptr_t client)
+{
+	ASSERT(client != 0);
+	return GetBaseAddress() + client;
+}
+
+uintptr_t Memory::GetAddress(
+	uintptr_t client,
+	uintptr_t server)
+{
+	ASSERT(g_memory_is_dedicated_server || client != 0);
+	ASSERT(!g_memory_is_dedicated_server || server != 0);
+
+	const uintptr_t address = g_memory_is_dedicated_server ? server : client;
+	return GetBaseAddress() + address;
+}
+
 static e_h2_type detect_process_type(void)
 {
 	e_h2_type result = _h2_type_none;

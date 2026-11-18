@@ -3,7 +3,9 @@
 // Build with minimum required components
 #ifdef RELEASE_MIN_CONFIGURATION
 
-#define EXECUTABLE_TYPE 4
+#define BUILD_TYPE "release_min"
+
+#define EXECUTABLE_TYPE _network_executable_type_release
 
 #define SPDLOG_DISABLED 1
 #define IMGUI_DISABLE 1
@@ -13,7 +15,9 @@
 // Default build:
 #ifdef RELEASE_CONFIGURATION
 
-#define EXECUTABLE_TYPE 4
+#define BUILD_TYPE "release"
+
+#define EXECUTABLE_TYPE _network_executable_type_release
 
 #define TERMINAL_ENABLED 1				// Not originally enabled (We want this in cartographer's default build)
 #define ERRORS_ENABLED 1				// Not originally enabled (We want this in cartographer's default build)
@@ -28,7 +32,9 @@
 // Release with profiling code
 #ifdef PROFILE_CONFIGURATION
 
-#define EXECUTABLE_TYPE 3
+#define BUILD_TYPE "profile"
+
+#define EXECUTABLE_TYPE _network_executable_type_profile
 
 #define PROFILE_ENABLED 1
 #define RASTERIZER_PROFILE_ENABLED 1
@@ -40,7 +46,9 @@
 // Debug features but with optimization
 #ifdef PLAY_CONFIGURATION
 
-#define EXECUTABLE_TYPE 2
+#define BUILD_TYPE "play"
+
+#define EXECUTABLE_TYPE _network_executable_type_profile
 
 #define TERMINAL_ENABLED 1
 #define ERRORS_ENABLED 1
@@ -59,7 +67,9 @@
 // Debug but with inlined functions and some missing debug features
 #ifdef DEBUG_CONFIGURATION
 
-#define EXECUTABLE_TYPE 2
+#define BUILD_TYPE "debug"
+
+#define EXECUTABLE_TYPE _network_executable_type_debug
 
 #define TERMINAL_ENABLED 1
 #define ASSERTS_ENABLED 1
@@ -80,7 +90,9 @@
 // Full debug build
 #ifdef SYMBOLS_CONFIGURATION
 
-#define EXECUTABLE_TYPE 1
+#define BUILD_TYPE "symbols"
+
+#define EXECUTABLE_TYPE _network_executable_type_symbols
 
 #define TERMINAL_ENABLED 1
 #define ASSERTS_ENABLED 1
@@ -100,7 +112,9 @@
 
 #ifdef TAGS_CONFIGURATION
 
-#define EXECUTABLE_TYPE 0
+#define BUILD_TYPE "tags"
+
+#define EXECUTABLE_TYPE _network_executable_type_tags
 
 // TODO: set this up in the future?
 

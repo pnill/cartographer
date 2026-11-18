@@ -7,18 +7,18 @@
 
 /* public code */
 
-bool online_xuid_is_guest_account(XUID xuid)
+bool online_xuid_is_guest_account(XUID id)
 {
 	// return INVOKE(0x1AC4C0, 0, online_xuid_is_guest_account, xuid);
 
-	const uint16 high = (uint16)(xuid >> 48);
+	const uint16 high = (uint16)(id >> 48);
 	return ((high & 0x0F) == 0x9) && ((high & 0xC0) != 0);
 }
 
-uint8 online_xuid_get_guest_account_number(XUID xuid)
+uint8 online_xuid_get_guest_account_number(XUID id)
 {
 	// return INVOKE(0x1AC4C6, 0, online_xuid_get_guest_account_number, xuid);
-	return uint8(xuid >> 62);
+	return uint8(id >> 62);
 }
 
 bool online_xuid_same_account(XUID xuid1, XUID xuid2)

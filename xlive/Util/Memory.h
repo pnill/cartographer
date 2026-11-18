@@ -1,7 +1,5 @@
 #pragma once
 
-#include "cseries/cseries.h"
-
 /* constants */
 
 enum
@@ -53,7 +51,7 @@ Memory::GetAddress<_type>(_addr_client, _addr_server)(__VA_ARGS__)
 enum e_h2_type
 {
 	_h2_type_none = NONE,
-	_h2_type_unsupported,
+	_h2_type_unsupported = 0,
 	_h2_type_game,
 	_h2_type_server,
 
@@ -72,20 +70,9 @@ public:
 		return GetBaseAddress();
 	}
 
-	static uintptr_t GetAddress(uintptr_t client)
-	{
-		ASSERT(client != 0);
-		return GetBaseAddress() + client;
-	}
+	static uintptr_t GetAddress(uintptr_t client);
 
-	static uintptr_t GetAddress(uintptr_t client, uintptr_t server)
-	{
-		ASSERT(g_memory_is_dedicated_server || client != 0);
-		ASSERT(!g_memory_is_dedicated_server || server != 0);
-		
-		const uintptr_t address = g_memory_is_dedicated_server ? server : client;
-		return GetBaseAddress() + address;
-	}
+	static uintptr_t GetAddress(uintptr_t client, uintptr_t server);
 	
 	template <typename T = void*>
 	static T GetAddress(uintptr_t client)
