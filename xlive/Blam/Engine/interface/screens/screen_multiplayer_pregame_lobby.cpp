@@ -9,6 +9,16 @@
 #include "interface/user_interface_widget_window.h"
 #include "tag_files/tag_loader/tag_injection.h"
 
+/* constants */
+
+enum
+{
+	k_maximum_number_of_coop_players = 4,
+
+};
+
+
+/* enums */
 
 enum e_pregame_lobby_button_blocks
 {
@@ -259,189 +269,13 @@ enum e_pregame_lobby_bitmap_blocks
 	k_pregame_lobby_pane_1_bitmap_count,
 };
 
-const e_pregame_lobby_text_blocks c_screen_pregame_lobby_text_pane_1_mapping(const e_pregame_lobby_text_blocks pane_1)
-{
-	switch (pane_1)
-	{
-	case _pregame_lobby_pane_1_text_game_cant_start_no_session:
-		return _pregame_lobby_pane_0_text_game_cant_start_no_session;
+/* prototypes */
 
+static const e_pregame_lobby_text_blocks c_screen_pregame_lobby_text_pane_1_mapping(const e_pregame_lobby_text_blocks pane_1);
+static void force_online_coop_patches(void);
 
-	case _pregame_lobby_pane_1_text_level_description_label:
-		return _pregame_lobby_pane_0_text_gametype_options_format;
 
-
-	case _pregame_lobby_pane_1_text_level_format:
-		return _pregame_lobby_pane_0_text_gametype_format;
-
-
-	case _pregame_lobby_pane_1_text_difficulty_format:
-		return _pregame_lobby_pane_0_text_mapname_format;
-
-
-	case _pregame_lobby_pane_1_text_level_description_placeholder:
-		return _pregame_lobby_pane_0_text_4;
-
-
-	case _pregame_lobby_pane_1_text_party_privacy:
-		return _pregame_lobby_pane_0_text_party_privacy;
-
-
-	case _pregame_lobby_pane_1_text_6:
-		return _pregame_lobby_pane_0_text_11;
-
-
-	case _pregame_lobby_pane_1_text_7:
-		return _pregame_lobby_pane_0_text_12;
-
-
-	case _pregame_lobby_pane_1_text_8:
-		return _pregame_lobby_pane_0_text_13;
-
-
-	case _pregame_lobby_pane_1_text_9:
-		return _pregame_lobby_pane_0_text_14;
-
-
-	case _pregame_lobby_pane_1_text_10:
-		return _pregame_lobby_pane_0_text_15;
-
-
-	case _pregame_lobby_pane_1_text_11:
-		return _pregame_lobby_pane_0_text_16;
-
-
-	case _pregame_lobby_pane_1_text_12:
-		return _pregame_lobby_pane_0_text_17;
-
-
-	case _pregame_lobby_pane_1_text_13:
-		return _pregame_lobby_pane_0_text_18;
-
-
-	case _pregame_lobby_pane_1_text_14:
-		return _pregame_lobby_pane_0_text_19;
-
-
-	case _pregame_lobby_pane_1_text_15:
-		return _pregame_lobby_pane_0_text_20;
-
-
-	case _pregame_lobby_pane_1_text_16:
-		return _pregame_lobby_pane_0_text_21;
-
-
-	case _pregame_lobby_pane_1_text_17:
-		return _pregame_lobby_pane_0_text_22;
-
-
-	case _pregame_lobby_pane_1_text_18:
-		return _pregame_lobby_pane_0_text_23;
-
-
-	case _pregame_lobby_pane_1_text_19:
-		return _pregame_lobby_pane_0_text_24;
-
-
-	case _pregame_lobby_pane_1_text_20:
-		return _pregame_lobby_pane_0_text_25;
-
-
-	case _pregame_lobby_pane_1_text_21:
-		return _pregame_lobby_pane_0_text_26;
-
-
-	case _pregame_lobby_pane_1_text_22:
-		return _pregame_lobby_pane_0_text_27;
-
-
-	case _pregame_lobby_pane_1_text_23:
-		return _pregame_lobby_pane_0_text_28;
-
-
-	case _pregame_lobby_pane_1_text_24:
-		return _pregame_lobby_pane_0_text_29;
-
-
-	case _pregame_lobby_pane_1_text_25:
-		return _pregame_lobby_pane_0_text_30;
-
-
-	case _pregame_lobby_pane_1_text_26:
-		return _pregame_lobby_pane_0_text_31;
-
-
-	case _pregame_lobby_pane_1_text_27:
-		return _pregame_lobby_pane_0_text_32;
-
-
-	case _pregame_lobby_pane_1_text_28:
-		return _pregame_lobby_pane_0_text_33;
-
-
-	case _pregame_lobby_pane_1_text_29:
-		return _pregame_lobby_pane_0_text_34;
-
-
-	case _pregame_lobby_pane_1_text_30:
-		return _pregame_lobby_pane_0_text_35;
-
-
-	case _pregame_lobby_pane_1_text_31:
-		return _pregame_lobby_pane_0_text_36;
-
-
-	case _pregame_lobby_pane_1_text_32:
-		return _pregame_lobby_pane_0_text_37;
-
-
-	case _pregame_lobby_pane_1_text_33:
-		return _pregame_lobby_pane_0_text_38;
-
-
-	case _pregame_lobby_pane_1_text_34:
-		return _pregame_lobby_pane_0_text_39;
-
-
-	case _pregame_lobby_pane_1_text_35:
-		return _pregame_lobby_pane_0_text_40;
-
-
-	case _pregame_lobby_pane_1_text_36:
-		return _pregame_lobby_pane_0_text_41;
-
-
-	case _pregame_lobby_pane_1_text_37:
-		return _pregame_lobby_pane_0_text_42;
-
-
-	case _pregame_lobby_pane_1_text_party_leader:
-		return _pregame_lobby_pane_0_text_party_leader;
-
-
-	case _pregame_lobby_pane_1_text_player_count:
-		return _pregame_lobby_pane_0_text_player_count;
-
-
-	case _pregame_lobby_pane_1_text_view_postgame:
-		return _pregame_lobby_pane_0_text_view_postgame;
-
-
-	case _pregame_lobby_pane_1_text_online_single_xbox_pregame_lobby_help:
-		return _pregame_lobby_pane_0_text_online_single_xbox_pregame_lobby_help;
-
-
-	case _pregame_lobby_pane_1_text_active_protocol:
-		return _pregame_lobby_pane_0_text_active_protocol;
-
-
-	case _pregame_lobby_pane_1_text_server_party_leader:
-		return _pregame_lobby_pane_0_text_server_party_leader;
-
-
-	}
-	return k_pregame_lobby_pane_1_text_count;
-}
+/* public code */
 
 void c_screen_multiplayer_pregame_lobby::update_server_party_leader_texts()
 {
@@ -658,6 +492,7 @@ void c_screen_multiplayer_pregame_lobby::apply_instance_patches()
 	// fix chatbox for cooperative_pane
 	WriteValue<uint8>(Memory::GetAddress(0x2435AE) + 1, TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(_pregame_lobby_pane_1_text_chat_body));
 	PatchCall(Memory::GetAddress(0x24589A), jmp_update_protocol); //inside c_screen_multiplayer_pregame_lobby::update
+	force_online_coop_patches();
 
 }
 
@@ -749,4 +584,213 @@ void c_screen_multiplayer_pregame_lobby::apply_patches_on_map_load()
 	*user_interface_widget_pane_get_text(&coop_pane->text_blocks, _pregame_lobby_pane_1_text_chat_body) = *user_interface_widget_pane_get_text(&custom_games_pane->text_blocks, _pregame_lobby_pane_0_text_chat_body);
 	
 	return;
+}
+
+
+/* private code */
+
+const e_pregame_lobby_text_blocks c_screen_pregame_lobby_text_pane_1_mapping(const e_pregame_lobby_text_blocks pane_1)
+{
+	switch (pane_1)
+	{
+	case _pregame_lobby_pane_1_text_game_cant_start_no_session:
+		return _pregame_lobby_pane_0_text_game_cant_start_no_session;
+
+
+	case _pregame_lobby_pane_1_text_level_description_label:
+		return _pregame_lobby_pane_0_text_gametype_options_format;
+
+
+	case _pregame_lobby_pane_1_text_level_format:
+		return _pregame_lobby_pane_0_text_gametype_format;
+
+
+	case _pregame_lobby_pane_1_text_difficulty_format:
+		return _pregame_lobby_pane_0_text_mapname_format;
+
+
+	case _pregame_lobby_pane_1_text_level_description_placeholder:
+		return _pregame_lobby_pane_0_text_4;
+
+
+	case _pregame_lobby_pane_1_text_party_privacy:
+		return _pregame_lobby_pane_0_text_party_privacy;
+
+
+	case _pregame_lobby_pane_1_text_6:
+		return _pregame_lobby_pane_0_text_11;
+
+
+	case _pregame_lobby_pane_1_text_7:
+		return _pregame_lobby_pane_0_text_12;
+
+
+	case _pregame_lobby_pane_1_text_8:
+		return _pregame_lobby_pane_0_text_13;
+
+
+	case _pregame_lobby_pane_1_text_9:
+		return _pregame_lobby_pane_0_text_14;
+
+
+	case _pregame_lobby_pane_1_text_10:
+		return _pregame_lobby_pane_0_text_15;
+
+
+	case _pregame_lobby_pane_1_text_11:
+		return _pregame_lobby_pane_0_text_16;
+
+
+	case _pregame_lobby_pane_1_text_12:
+		return _pregame_lobby_pane_0_text_17;
+
+
+	case _pregame_lobby_pane_1_text_13:
+		return _pregame_lobby_pane_0_text_18;
+
+
+	case _pregame_lobby_pane_1_text_14:
+		return _pregame_lobby_pane_0_text_19;
+
+
+	case _pregame_lobby_pane_1_text_15:
+		return _pregame_lobby_pane_0_text_20;
+
+
+	case _pregame_lobby_pane_1_text_16:
+		return _pregame_lobby_pane_0_text_21;
+
+
+	case _pregame_lobby_pane_1_text_17:
+		return _pregame_lobby_pane_0_text_22;
+
+
+	case _pregame_lobby_pane_1_text_18:
+		return _pregame_lobby_pane_0_text_23;
+
+
+	case _pregame_lobby_pane_1_text_19:
+		return _pregame_lobby_pane_0_text_24;
+
+
+	case _pregame_lobby_pane_1_text_20:
+		return _pregame_lobby_pane_0_text_25;
+
+
+	case _pregame_lobby_pane_1_text_21:
+		return _pregame_lobby_pane_0_text_26;
+
+
+	case _pregame_lobby_pane_1_text_22:
+		return _pregame_lobby_pane_0_text_27;
+
+
+	case _pregame_lobby_pane_1_text_23:
+		return _pregame_lobby_pane_0_text_28;
+
+
+	case _pregame_lobby_pane_1_text_24:
+		return _pregame_lobby_pane_0_text_29;
+
+
+	case _pregame_lobby_pane_1_text_25:
+		return _pregame_lobby_pane_0_text_30;
+
+
+	case _pregame_lobby_pane_1_text_26:
+		return _pregame_lobby_pane_0_text_31;
+
+
+	case _pregame_lobby_pane_1_text_27:
+		return _pregame_lobby_pane_0_text_32;
+
+
+	case _pregame_lobby_pane_1_text_28:
+		return _pregame_lobby_pane_0_text_33;
+
+
+	case _pregame_lobby_pane_1_text_29:
+		return _pregame_lobby_pane_0_text_34;
+
+
+	case _pregame_lobby_pane_1_text_30:
+		return _pregame_lobby_pane_0_text_35;
+
+
+	case _pregame_lobby_pane_1_text_31:
+		return _pregame_lobby_pane_0_text_36;
+
+
+	case _pregame_lobby_pane_1_text_32:
+		return _pregame_lobby_pane_0_text_37;
+
+
+	case _pregame_lobby_pane_1_text_33:
+		return _pregame_lobby_pane_0_text_38;
+
+
+	case _pregame_lobby_pane_1_text_34:
+		return _pregame_lobby_pane_0_text_39;
+
+
+	case _pregame_lobby_pane_1_text_35:
+		return _pregame_lobby_pane_0_text_40;
+
+
+	case _pregame_lobby_pane_1_text_36:
+		return _pregame_lobby_pane_0_text_41;
+
+
+	case _pregame_lobby_pane_1_text_37:
+		return _pregame_lobby_pane_0_text_42;
+
+
+	case _pregame_lobby_pane_1_text_party_leader:
+		return _pregame_lobby_pane_0_text_party_leader;
+
+
+	case _pregame_lobby_pane_1_text_player_count:
+		return _pregame_lobby_pane_0_text_player_count;
+
+
+	case _pregame_lobby_pane_1_text_view_postgame:
+		return _pregame_lobby_pane_0_text_view_postgame;
+
+
+	case _pregame_lobby_pane_1_text_online_single_xbox_pregame_lobby_help:
+		return _pregame_lobby_pane_0_text_online_single_xbox_pregame_lobby_help;
+
+
+	case _pregame_lobby_pane_1_text_active_protocol:
+		return _pregame_lobby_pane_0_text_active_protocol;
+
+
+	case _pregame_lobby_pane_1_text_server_party_leader:
+		return _pregame_lobby_pane_0_text_server_party_leader;
+
+
+	}
+	return k_pregame_lobby_pane_1_text_count;
+}
+
+static void force_online_coop_patches(void)
+{
+	//#todo: move these out to respective files
+
+	//ui-game-patches
+	WriteValue<BYTE>(Memory::GetAddress(0x23EC55 + 1), 0);	// Prevent from pausing during the game
+	NopFill(Memory::GetAddress(0x7AE4), 0x5); // prevent pause menu from showing up when not in focus
+
+	//lifecycle-game-patches
+	WriteValue<BYTE>(Memory::GetAddress(0x1D9A74 + 1), k_maximum_number_of_coop_players);	// increase max players to 4
+	WriteValue<BYTE>(Memory::GetAddress(0x1D9A7D + 1), k_maximum_number_of_coop_players);	// increase max peer-count to 4
+	WriteValue<BYTE>(Memory::GetAddress(0x4930C), 0xEB);	// remove game_options check
+
+	WriteValue<BYTE>(Memory::GetAddress(0x1D9280 + 2), k_maximum_number_of_coop_players);	// increase membership_player_count to 4
+	WriteValue<BYTE>(Memory::GetAddress(0x1D928A + 2), k_maximum_number_of_coop_players);	// increase membership_peer_count to 4
+
+	// remove pregame lobby player check
+	NopFill(Memory::GetAddress(0x2165E9), 0x7);
+	uint8 pregame_lobby_patch_asm[] = { 0xE9 ,0x16 ,0x01 ,00 ,00 ,0x90 };
+	WriteBytes(Memory::GetAddress(0x2165F0), pregame_lobby_patch_asm, NUMBEROF(pregame_lobby_patch_asm));
 }

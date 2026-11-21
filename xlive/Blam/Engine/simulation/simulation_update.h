@@ -9,7 +9,8 @@
 
 enum
 {
-	k_maximum_simulation_player_updates = 64
+	k_maximum_simulation_player_updates = 64,
+	k_bits_required_for_simulation_player_updates_count = 5
 };
 
 /* structures */

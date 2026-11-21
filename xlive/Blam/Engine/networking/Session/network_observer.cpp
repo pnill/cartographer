@@ -348,6 +348,8 @@ void c_network_observer::apply_patches()
 
 	// increase the network heap size
 	WriteValue<int32>(Memory::GetAddress(0x1ACCC8, 0x1ACE96) + 6, k_network_heap_size);
+	WriteValue<int32>(Memory::GetAddress(0x1ACCE0) + 6, k_network_heap_size); //increase network heap for campaign
+	WriteValue<uint32>(Memory::GetAddress(0x1ACCDB + 1), k_network_channel_count_for_campaign);	// increase network_shared_memory_globals.maximum_channel_count for campaign
 
 	PatchCall(Memory::GetAddress(0x1E0FEE, 0x1B5EDE), jmp_get_bandwidth_results);
 	// replace vtable pointer of network_observer::channel_should_send_packet
