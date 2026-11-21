@@ -22,7 +22,7 @@ enum e_game_engine_type : int32
 	_game_engine_type_juggernaut,
 	_game_engine_type_territories,
 	_game_engine_type_assault,
-	_game_engine_type_stub = 10,
+	_game_engine_type_stub,
 
 	k_game_engine_type_count,
 	k_game_engine_playable_types = 10,
@@ -32,21 +32,21 @@ enum e_game_engine_type : int32
 enum e_game_variant_description_index : int8
 {
 	_game_variant_description_slayer = 0,
-	_game_variant_description_oddball = 1,
-	_game_variant_description_juggernaut = 2,
-	_game_variant_description_king = 3,
-	_game_variant_description_ctf = 4,
-	_game_variant_description_invasion = 5,
-	_game_variant_description_territories = 6,
+	_game_variant_description_oddball,
+	_game_variant_description_juggernaut,
+	_game_variant_description_king,
+	_game_variant_description_ctf,
+	_game_variant_description_invasion,
+	_game_variant_description_territories,
 
-	k_base_game_variant_description_count = 7,
+	k_base_game_variant_description_count,
 
 	// cartographer added variant descriptions
-	_game_variant_description_zombies = 7,
-	_game_variant_description_headhunter = 8,
+	_game_variant_description_zombies = k_base_game_variant_description_count,
+	_game_variant_description_headhunter,
 
 	k_game_variant_description_count,
-	k_game_variant_description_invalid = -1,
+	k_game_variant_description_invalid = NONE,
 
 	// todo: list all the mission game variant description indexes (over 100ish missing)
 	k_game_variant_description_bits_required = 7
@@ -56,20 +56,20 @@ enum e_game_variant_description_index : int8
 enum e_game_engine_flags : int32
 {
 	_game_engine_teams_bit = 0,
-	_game_engine_motion_sensor_bit = 1,
-	_game_engine_always_invisible_bit = 2,
-	_game_engine_round_switch_resets_map_bit = 3,
-	_game_engine_tie_resolution_bit = 4,
-	_game_engine_observers_bit = 5,
-	_game_engine_changing_teams_bit = 6,
-	_game_engine_friendly_fire_bit = 7,
-	_game_engine_overshields_on_map_bit = 8,
-	_game_engine_invisibility_on_map_bit = 9,
-	_game_engine_grenades_on_map_bit = 10,
-	_game_engine_starting_grenades_bit = 11,
-	_game_engine_extra_damage_bit = 12,
-	_game_engine_damage_resistant_bit = 13,
-	_game_engine_force_even_teams_bit = 14,
+	_game_engine_motion_sensor_bit,
+	_game_engine_always_invisible_bit,
+	_game_engine_round_switch_resets_map_bit,
+	_game_engine_tie_resolution_bit,
+	_game_engine_observers_bit,
+	_game_engine_changing_teams_bit,
+	_game_engine_friendly_fire_bit,
+	_game_engine_overshields_on_map_bit,
+	_game_engine_invisibility_on_map_bit,
+	_game_engine_grenades_on_map_bit,
+	_game_engine_starting_grenades_bit,
+	_game_engine_extra_damage_bit,
+	_game_engine_damage_resistant_bit,
+	_game_engine_force_even_teams_bit,
 
 	k_game_engine_flags_count,
 	k_game_engine_flags_clear_unused_bits = FLAG(_game_engine_force_even_teams_bit | _game_engine_damage_resistant_bit | _game_engine_extra_damage_bit | _game_engine_starting_grenades_bit | _game_engine_grenades_on_map_bit | _game_engine_invisibility_on_map_bit | _game_engine_overshields_on_map_bit | _game_engine_friendly_fire_bit | _game_engine_changing_teams_bit | _game_engine_observers_bit | _game_engine_tie_resolution_bit | _game_engine_round_switch_resets_map_bit | _game_engine_always_invisible_bit | _game_engine_motion_sensor_bit | _game_engine_teams_bit),
@@ -79,12 +79,12 @@ enum e_game_engine_flags : int32
 enum e_game_engine_round_setting
 {
 	_game_engine_round_setting_1_round = 0,
-	_game_engine_round_setting_2_rounds = 1,
-	_game_engine_round_setting_4_rounds = 2,
-	_game_engine_round_setting_6_rounds = 3,
-	_game_engine_round_setting_first_to_2_rounds = 4,
-	_game_engine_round_setting_first_to_3_rounds = 5,
-	_game_engine_round_setting_first_to_4_rounds = 6,
+	_game_engine_round_setting_2_rounds,
+	_game_engine_round_setting_4_rounds,
+	_game_engine_round_setting_6_rounds,
+	_game_engine_round_setting_first_to_2_rounds,
+	_game_engine_round_setting_first_to_3_rounds,
+	_game_engine_round_setting_first_to_4_rounds,
 
 	k_game_engine_round_setting_count,
 	k_game_engine_round_setting_bits_required = bits_required_for(k_game_engine_round_setting_count - 1)
@@ -93,8 +93,8 @@ enum e_game_engine_round_setting
 enum e_game_engine_join_in_progress
 {
 	_game_engine_join_in_progress_on = 0,
-	_game_engine_join_in_progress_uneven = 1,
-	_game_engine_join_in_progress_off = 2,
+	_game_engine_join_in_progress_uneven,
+	_game_engine_join_in_progress_off,
 
 	k_game_engine_join_in_progress_count,
 	k_game_engine_join_in_progress_bits_required = bits_required_for(k_game_engine_join_in_progress_count - 1)
@@ -103,8 +103,8 @@ enum e_game_engine_join_in_progress
 enum e_game_engine_shield_setting
 {
 	_game_engine_shield_normal = 0,
-	_game_engine_shield_off = 1,
-	_game_engine_shield_supershield = 2,
+	_game_engine_shield_off,
+	_game_engine_shield_supershield,
 
 	k_game_engine_shield_setting_count,
 	k_game_engine_shield_setting_bits_required = bits_required_for(k_game_engine_shield_setting_count - 1)
@@ -113,8 +113,8 @@ enum e_game_engine_shield_setting
 enum e_game_engine_team_score
 {
 	_game_engine_team_score_sum = 0,
-	_game_engine_team_score_min = 1,
-	_game_engine_team_score_max = 2,
+	_game_engine_team_score_min,
+	_game_engine_team_score_max,
 
 	k_game_engine_team_score_count,
 	k_game_engine_team_score_bits_required = bits_required_for(k_game_engine_team_score_count - 1),
@@ -124,8 +124,8 @@ enum e_game_engine_team_score
 enum e_game_engine_team_respawn
 {
 	_game_engine_team_respawn_inheritance = 0,
-	_game_engine_team_respawn_cycling = 1,
-	_game_engine_team_respawn_standard = 2,
+	_game_engine_team_respawn_cycling,
+	_game_engine_team_respawn_standard,
 
 	k_game_engine_team_respawn_count,
 	k_game_engine_team_respawn_bits_required = bits_required_for(k_game_engine_team_respawn_count - 1)
@@ -134,9 +134,9 @@ enum e_game_engine_team_respawn
 enum e_game_engine_respawn_setting : int8
 {
 	_game_engine_respawn_setting_on = 0,
-	_game_engine_respawn_setting_off = 1,
-	_game_engine_respawn_setting_half = 2,
-	_game_engine_respawn_setting_double = 3,
+	_game_engine_respawn_setting_off,
+	_game_engine_respawn_setting_half,
+	_game_engine_respawn_setting_double,
 
 	k_game_engine_respawn_setting_count,
 	k_game_engine_respawn_setting_bits_required = bits_required_for(k_game_engine_respawn_setting_count - 1)
@@ -145,13 +145,13 @@ enum e_game_engine_respawn_setting : int8
 enum e_game_engine_light_land_vehicle : int8
 {
 	_game_engine_light_land_vehicle_default = 0,
-	_game_engine_light_land_vehicle_warthog = 1,
-	_game_engine_light_land_vehicle_gauss_warthog = 2,
-	_game_engine_light_land_vehicle_ghost = 3,
-	_game_engine_light_land_vehicle_mongoose = 4,
-	_game_engine_light_land_vehicle_shadow = 5,
-	_game_engine_light_land_vehicle_random = 6,
-	_game_engine_light_land_vehicle_none = 7,
+	_game_engine_light_land_vehicle_warthog,
+	_game_engine_light_land_vehicle_gauss_warthog,
+	_game_engine_light_land_vehicle_ghost,
+	_game_engine_light_land_vehicle_mongoose,
+	_game_engine_light_land_vehicle_shadow,
+	_game_engine_light_land_vehicle_random,
+	_game_engine_light_land_vehicle_none,
 
 	k_game_engine_light_land_vehicle_count,
 	k_game_engine_light_land_vehicle_bits_required = bits_required_for(k_game_engine_light_land_vehicle_count - 1)
@@ -160,10 +160,10 @@ enum e_game_engine_light_land_vehicle : int8
 enum e_game_engine_heavy_land_vehicle : int8
 {
 	_game_engine_heavy_land_vehicle_default = 0,
-	_game_engine_heavy_land_vehicle_scorpion = 1,
-	_game_engine_heavy_land_vehicle_wraith = 2,
-	_game_engine_heavy_land_vehicle_random = 3,
-	_game_engine_heavy_land_vehicle_none = 4,
+	_game_engine_heavy_land_vehicle_scorpion,
+	_game_engine_heavy_land_vehicle_wraith,
+	_game_engine_heavy_land_vehicle_random,
+	_game_engine_heavy_land_vehicle_none,
 
 	k_game_engine_heavy_land_vehicle_count,
 	k_game_engine_heavy_land_vehicle_bits_required = bits_required_for(k_game_engine_heavy_land_vehicle_count - 1)
@@ -172,10 +172,10 @@ enum e_game_engine_heavy_land_vehicle : int8
 enum e_game_engine_flying_vehicle : int8
 {
 	_game_engine_flying_vehicle_default = 0,
-	_game_engine_flying_vehicle_banshee = 1,
-	_game_engine_flying_vehicle_falcon = 2,
-	_game_engine_flying_vehicle_random = 3,
-	_game_engine_flying_vehicle_none = 4,
+	_game_engine_flying_vehicle_banshee,
+	_game_engine_flying_vehicle_falcon,
+	_game_engine_flying_vehicle_random,
+	_game_engine_flying_vehicle_none,
 
 	k_game_engine_flying_vehicle_count,
 	k_game_engine_flying_vehicle_bits_required = bits_required_for(k_game_engine_flying_vehicle_count - 1)
@@ -184,12 +184,12 @@ enum e_game_engine_flying_vehicle : int8
 enum e_game_engine_turret_vehicle : int8
 {
 	_game_engine_turret_vehicle_default = 0,
-	_game_engine_turret_vehicle_human_ap = 1,
-	_game_engine_turret_vehicle_human_av = 2,
-	_game_engine_turret_vehicle_covenant_ap = 3,
-	_game_engine_turret_vehicle_covenant_av = 4,
-	_game_engine_turret_vehicle_random = 5,
-	_game_engine_turret_vehicle_none = 6,
+	_game_engine_turret_vehicle_human_ap,
+	_game_engine_turret_vehicle_human_av,
+	_game_engine_turret_vehicle_covenant_ap,
+	_game_engine_turret_vehicle_covenant_av,
+	_game_engine_turret_vehicle_random,
+	_game_engine_turret_vehicle_none,
 
 	k_game_engine_turret_vehicle_count,
 	k_game_engine_turret_vehicle_bits_required = bits_required_for(k_game_engine_turret_vehicle_count - 1)
@@ -198,25 +198,25 @@ enum e_game_engine_turret_vehicle : int8
 enum e_game_engine_weapon_set : int8
 {
 	_game_engine_weapon_set_default = 0,
-	_game_engine_weapon_set_none = 1,
-	_game_engine_weapon_set_rockets = 2,
-	_game_engine_weapon_set_shotguns = 3,
-	_game_engine_weapon_set_swords = 4,
-	_game_engine_weapon_set_brute_shots = 5,
-	_game_engine_weapon_set_halo_classic = 6,
-	_game_engine_weapon_set_new_classic = 7,
-	_game_engine_weapon_set_heavy_weapons = 8,
-	_game_engine_weapon_set_all_duals = 9,
-	_game_engine_weapon_set_no_duals = 10,
-	_game_engine_weapon_set_rifles = 11,
-	_game_engine_weapon_set_sniping = 12,
-	_game_engine_weapon_set_no_sniping = 13,
-	_game_engine_weapon_set_pistols = 14,
-	_game_engine_weapon_set_plasma = 15,
-	_game_engine_weapon_set_human = 16,
-	_game_engine_weapon_set_covenant = 17,
-	_game_engine_weapon_set_sentinel = 18,
-	_game_engine_weapon_set_random = 19,
+	_game_engine_weapon_set_none,
+	_game_engine_weapon_set_rockets,
+	_game_engine_weapon_set_shotguns,
+	_game_engine_weapon_set_swords,
+	_game_engine_weapon_set_brute_shots,
+	_game_engine_weapon_set_halo_classic,
+	_game_engine_weapon_set_new_classic,
+	_game_engine_weapon_set_heavy_weapons,
+	_game_engine_weapon_set_all_duals,
+	_game_engine_weapon_set_no_duals,
+	_game_engine_weapon_set_rifles,
+	_game_engine_weapon_set_sniping,
+	_game_engine_weapon_set_no_sniping,
+	_game_engine_weapon_set_pistols,
+	_game_engine_weapon_set_plasma,
+	_game_engine_weapon_set_human,
+	_game_engine_weapon_set_covenant,
+	_game_engine_weapon_set_sentinel,
+	_game_engine_weapon_set_random,
 
 	k_game_engine_weapon_set_count,
 	k_game_engine_weapon_set_bits_required = bits_required_for(k_game_engine_weapon_set_count - 1)
@@ -225,24 +225,24 @@ enum e_game_engine_weapon_set : int8
 enum e_game_engine_starting_weapon : int8
 {
 	_game_engine_starting_weapon_default = 0,
-	_game_engine_starting_weapon_none = 1,
-	_game_engine_starting_weapon_random = 2,
-	_game_engine_starting_weapon_battle_rifle = 3,
-	_game_engine_starting_weapon_magnum = 4,
-	_game_engine_starting_weapon_smg = 5,
-	_game_engine_starting_weapon_plasma_pistol = 6,
-	_game_engine_starting_weapon_plasma_rifle = 7,
-	_game_engine_starting_weapon_rocket_launcher = 8,
-	_game_engine_starting_weapon_shotgun = 9,
-	_game_engine_starting_weapon_sniper_rifle = 10,
-	_game_engine_starting_weapon_brute_shot = 11,
-	_game_engine_starting_weapon_needler = 12,
-	_game_engine_starting_weapon_carbine = 13,
-	_game_engine_starting_weapon_beam_rifle = 14,
-	_game_engine_starting_weapon_disintegrator = 15,
-	_game_engine_starting_weapon_fuel_rod_gun = 16,
-	_game_engine_starting_weapon_plasma_sword = 17,
-	_game_engine_starting_weapon_brute_plasma = 18,
+	_game_engine_starting_weapon_none,
+	_game_engine_starting_weapon_random,
+	_game_engine_starting_weapon_battle_rifle,
+	_game_engine_starting_weapon_magnum,
+	_game_engine_starting_weapon_smg,
+	_game_engine_starting_weapon_plasma_pistol,
+	_game_engine_starting_weapon_plasma_rifle,
+	_game_engine_starting_weapon_rocket_launcher,
+	_game_engine_starting_weapon_shotgun,
+	_game_engine_starting_weapon_sniper_rifle,
+	_game_engine_starting_weapon_brute_shot,
+	_game_engine_starting_weapon_needler,
+	_game_engine_starting_weapon_carbine,
+	_game_engine_starting_weapon_beam_rifle,
+	_game_engine_starting_weapon_disintegrator,
+	_game_engine_starting_weapon_fuel_rod_gun,
+	_game_engine_starting_weapon_plasma_sword,
+	_game_engine_starting_weapon_brute_plasma,
 
 	k_game_engine_starting_weapon_count,
 	k_game_engine_starting_weapon_bits_required = bits_required_for(k_game_engine_starting_weapon_count - 1)
@@ -251,8 +251,8 @@ enum e_game_engine_starting_weapon : int8
 enum e_ctf_engine_player_speed
 {
 	_ctf_engine_player_speed_slow = 0,
-	_ctf_engine_player_speed_normal = 1,
-	_ctf_engine_player_speed_fast = 2,
+	_ctf_engine_player_speed_normal,
+	_ctf_engine_player_speed_fast,
 
 	k_ctf_engine_player_speed_count,
 	k_ctf_engine_player_speed_bits_required = bits_required_for(k_ctf_engine_player_speed_count - 1),
@@ -262,8 +262,8 @@ enum e_ctf_engine_player_speed
 enum e_oddball_player_speed : uint16
 {
 	_oddball_engine_player_speed_slow = 0,
-	_oddball_engine_player_speed_normal = 1,
-	_oddball_engine_player_speed_fast = 2,
+	_oddball_engine_player_speed_normal,
+	_oddball_engine_player_speed_fast,
 
 	k_oddball_player_speed_count,
 	k_oddball_player_speed_bits_required = bits_required_for(k_oddball_player_speed_count - 1)
@@ -272,7 +272,7 @@ enum e_oddball_player_speed : uint16
 enum e_game_engine_weapon_hit
 {
 	_game_engine_multiplayer_weapon_hit_extra_damage = 0,
-	_game_engine_multiplayer_weapon_hit_normal_damage = 1,
+	_game_engine_multiplayer_weapon_hit_normal_damage,
 
 	k_game_engine_weapon_hit_count,
 	k_game_engine_weapon_hit_bits_required = bits_required_for(k_game_engine_weapon_hit_count - 1)
@@ -282,11 +282,11 @@ enum e_game_engine_weapon_hit
 enum e_slayer_engine_flags : uint32
 {
 	_slayer_engine_bonus_points_bit = 0,
-	_slayer_engine_suicide_point_loss_bit = 1,
-	_slayer_engine_death_point_loss_bit = 2,
+	_slayer_engine_suicide_point_loss_bit,
+	_slayer_engine_death_point_loss_bit,
 
 	k_slayer_engine_flags_count,
-	k_slayer_engine_flags_bits_required = bits_required_for(FLAG(k_slayer_engine_flags_count - 1)),
+	k_slayer_engine_flags_bits_required = bits_required_for(MASK(k_slayer_engine_flags_count)),
 
 	k_slayer_engine_clear_all_bits_mask = FLAG(_slayer_engine_death_point_loss_bit | _slayer_engine_suicide_point_loss_bit | _slayer_engine_bonus_points_bit)
 };
@@ -294,8 +294,8 @@ enum e_slayer_engine_flags : uint32
 enum e_ctf_game_type
 {
 	_ctf_game_type_multi_flag = 0,
-	_ctf_game_type_single_flag = 1,
-	_ctf_game_type_neutral_flag = 2,
+	_ctf_game_type_single_flag,
+	_ctf_game_type_neutral_flag,
 
 	k_ctf_game_type_count,
 	k_ctf_game_type_bits_required = bits_required_for(k_ctf_game_type_count - 1)
@@ -304,9 +304,9 @@ enum e_ctf_game_type
 enum e_ctf_engine_home_flag_waypoint_type
 {
 	_ctf_engine_home_flag_waypoint_neutral = 0,
-	_ctf_engine_home_flag_waypoint_on = 1,
-	_ctf_engine_home_flag_waypoint_away_from_home = 2,
-	_ctf_engine_home_flag_waypoint_off = 3,
+	_ctf_engine_home_flag_waypoint_on,
+	_ctf_engine_home_flag_waypoint_away_from_home,
+	_ctf_engine_home_flag_waypoint_off,
 
 	k_ctf_engine_home_flag_waypoint_type_count,
 	k_ctf_engine_home_flag_waypoint_type_bits_required = bits_required_for(k_ctf_engine_home_flag_waypoint_type_count - 1)
@@ -315,9 +315,9 @@ enum e_ctf_engine_home_flag_waypoint_type
 enum e_ctf_engine_enemy_bomb_waypoint_type : uint32
 {
 	_ctf_engine_enemy_bomb_waypoint_always_on = 0,
-	_ctf_engine_enemy_bomb_waypoint_uncontrolled = 1,
-	_ctf_engine_enemy_bomb_waypoint_armed = 2,
-	_ctf_engine_enemy_bomb_waypoint_off = 3,
+	_ctf_engine_enemy_bomb_waypoint_uncontrolled,
+	_ctf_engine_enemy_bomb_waypoint_armed,
+	_ctf_engine_enemy_bomb_waypoint_off,
 
 	k_ctf_engine_enemy_bomb_waypoint_type_count,
 	k_ctf_engine_enemy_bomb_waypoint_type_bits_required = bits_required_for(k_ctf_engine_enemy_bomb_waypoint_type_count - 1)
@@ -325,13 +325,13 @@ enum e_ctf_engine_enemy_bomb_waypoint_type : uint32
 
 enum e_ctf_engine_flags : int8
 {
-	_ctf_engine_sudden_death_bit = 1,
-	_ctf_engine_flag_can_be_returned_bit = 2,
-	_ctf_engine_flag_at_home_to_score_bit = 3,
-	_ctf_engine_carriers_can_drive_and_gun_bit = 4,
-	_ctf_engine_sticky_arming_bit = 5,
-	_ctf_engine_carriers_damage_resistant_bit = 6,
-	_ctf_engine_carriers_invisible_bit = 7,
+	_ctf_engine_sudden_death_bit,
+	_ctf_engine_flag_can_be_returned_bit,
+	_ctf_engine_flag_at_home_to_score_bit,
+	_ctf_engine_carriers_can_drive_and_gun_bit,
+	_ctf_engine_sticky_arming_bit,
+	_ctf_engine_carriers_damage_resistant_bit,
+	_ctf_engine_carriers_invisible_bit,
 
 	k_ctf_engine_flags_count,
 	k_ctf_engine_flags_bits_required = CHAR_BITS
@@ -340,21 +340,21 @@ enum e_ctf_engine_flags : int8
 enum e_oddball_engine_waypoint_type
 {
 	_oddball_waypoint_type_always_on = 0,
-	_oddball_waypoint_type_neutral = 1,
-	_oddball_waypoint_type_team_control = 2,
-	_oddball_waypoint_type_off = 3,
+	_oddball_waypoint_type_neutral,
+	_oddball_waypoint_type_team_control,
+	_oddball_waypoint_type_off,
 
 	k_oddball_waypoint_type_count,
-	k_oddball_waypoint_type_bits_required = bits_required_for(FLAG(k_oddball_waypoint_type_count - 1))
+	k_oddball_waypoint_type_bits_required = bits_required_for(k_oddball_waypoint_type_count - 1)
 };
 
 enum e_king_engine_flags : uint32
 {
 	_king_engine_uncontested_hill_to_score_bit = 0,
-	_king_engine_team_multiplier_bit = 1,
-	_king_engine_extra_damage_on_hill_bit = 2,
-	_king_engine_damage_resistance_on_hill_bit = 3,
-	_king_engine_invis_on_hill_bit = 4,
+	_king_engine_team_multiplier_bit,
+	_king_engine_extra_damage_on_hill_bit,
+	_king_engine_damage_resistance_on_hill_bit,
+	_king_engine_invis_on_hill_bit,
 
 	k_king_engine_flags_count,
 	k_king_engine_flags_bits_required = bits_required_for(FLAG(k_king_engine_flags_count - 1)),
@@ -365,8 +365,8 @@ enum e_king_engine_flags : uint32
 enum e_oddball_engine_flags : uint32
 {
 	_oddball_engine_carriers_can_drive_and_gun_bit = 0,
-	_oddball_engine_carriers_always_invis_bit = 1,
-	_oddball_engine_carriers_damage_resistance_bit = 2,
+	_oddball_engine_carriers_always_invis_bit,
+	_oddball_engine_carriers_damage_resistance_bit,
 
 	k_oddball_engine_flags_count,
 	k_oddball_engine_flags_bits_required = bits_required_for(FLAG(k_oddball_engine_flags_count - 1)),
@@ -376,12 +376,12 @@ enum e_oddball_engine_flags : uint32
 enum e_juggernaut_engine_flags
 {
 	_juggernaut_has_motion_sensor_bit = 0,
-	_juggernaut_has_supershield_bit = 1,
-	_juggernaut_has_active_camo_bit = 2,
-	_juggernaut_betrayal_point_loss_bit = 3,
-	_juggernaut_does_extra_damage_bit = 4,
-	_juggernaut_has_infinite_ammo_bit = 5,
-	_juggernaut_is_damage_resistant_bit = 6,
+	_juggernaut_has_supershield_bit,
+	_juggernaut_has_active_camo_bit,
+	_juggernaut_betrayal_point_loss_bit,
+	_juggernaut_does_extra_damage_bit,
+	_juggernaut_has_infinite_ammo_bit,
+	_juggernaut_is_damage_resistant_bit,
 
 	k_juggernaut_engine_flags_count,
 	k_juggernaut_engine_flags_bits_required = bits_required_for(FLAG(k_juggernaut_engine_flags_count - 1)),
@@ -396,7 +396,7 @@ enum e_headhunter_max_heads_carried : int8
 	_headhunter_max_heads_carried_ten,
 
 	k_headhunter_max_heads_carried_count,
-	k_headhunter_max_heads_carried_bits_required = bits_required_for(FLAG(k_headhunter_max_heads_carried_count - 1)),
+	k_headhunter_max_heads_carried_bits_required = bits_required_for(k_headhunter_max_heads_carried_count - 1),
 	k_headhunter_max_heads_carried_invalid = NONE
 };
 
@@ -437,7 +437,7 @@ enum e_cartographer_variant_flags : uint32
 	_cartographer_variant_invincible_players,
 
 	k_cartographer_variant_flags_count,
-	k_cartographer_variant_flags_bits_required = bits_required_for(FLAG(k_cartographer_variant_flags_count - 1)),
+	k_cartographer_variant_flags_bits_required = bits_required_for(k_cartographer_variant_flags_count - 1),
 };
 
 enum e_game_speed_modifier : int8
@@ -449,7 +449,7 @@ enum e_game_speed_modifier : int8
 	_game_speed_modifier_ludicrous,
 
 	k_game_speed_modifier_count,
-	k_game_speed_modifier_bits_required = bits_required_for(FLAG(k_game_speed_modifier_count - 1)),
+	k_game_speed_modifier_bits_required = bits_required_for(k_game_speed_modifier_count - 1),
 	k_game_speed_modifier_invalid = NONE
 };
 
@@ -465,7 +465,7 @@ enum e_game_gravity_modifier : int8
 	_game_gravity_modifier_two_hundred,
 
 	k_game_gravity_modifier_count,
-	k_game_gravity_modifier_bits_required = bits_required_for(FLAG(k_game_gravity_modifier_count - 1)),
+	k_game_gravity_modifier_bits_required = bits_required_for(k_game_gravity_modifier_count - 1),
 	k_game_gravity_modifier_invalid = NONE
 };
 
@@ -478,13 +478,13 @@ enum e_player_spawn_protection_timer : int8
 	_player_spawn_protection_timer_ten_seconds,
 
 	k_player_spawn_protection_timer_count,
-	k_player_spawn_protection_timer_bits_required = bits_required_for(FLAG(k_player_spawn_protection_timer_count - 1)),
+	k_player_spawn_protection_timer_bits_required = bits_required_for(k_player_spawn_protection_timer_count-1),
 	k_player_spawn_protection_timer_invalid = NONE
 };
 
 enum e_player_speed_modifier : int8
 {
-	_player_speed_modifier_none,
+	_player_speed_modifier_none = 0,
 	_player_speed_modifier_twenty_five_percent,
 	_player_speed_modifier_fifty_percent,
 	_player_speed_modifier_seventy_five_percent,
@@ -498,7 +498,7 @@ enum e_player_speed_modifier : int8
 	_player_speed_modifier_three_hundred_percent,
 
 	k_player_speed_modifier_count,
-	k_player_speed_modifier_bits_required = bits_required_for(FLAG(k_player_speed_modifier_count - 1)),
+	k_player_speed_modifier_bits_required = bits_required_for(k_player_speed_modifier_count - 1),
 	k_player_speed_modifier_invalid = NONE
 };
 

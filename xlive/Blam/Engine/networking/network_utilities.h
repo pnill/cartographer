@@ -1,5 +1,21 @@
 #pragma once
 
+/* constants */
+
+enum
+{
+    _network_executable_type_tags = 0,
+    _network_executable_type_symbols,
+    _network_executable_type_debug,
+    _network_executable_type_profile,
+    _network_executable_type_release,
+    k_network_executable_type_count,
+    k_network_executable_type_bits = 3,
+};
+
+/* enums */
+
+
 /* structures */
 
 struct s_network_locator_result

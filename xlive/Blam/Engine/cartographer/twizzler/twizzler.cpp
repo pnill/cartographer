@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "twizzler.h"
 
+/* globals */
+
 #ifdef PC5_DEF
 PC5_DEF
 #else

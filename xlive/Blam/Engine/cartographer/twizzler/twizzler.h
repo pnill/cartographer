@@ -1,10 +1,14 @@
 #pragma once
 
+/* globals */
+
 #ifdef PC5_EX
 PC5_EX
 #else
 extern bool g_twizzler_status;
 #endif
+
+/* public code */
 
 inline void twizzler_set_status(bool status)
 {
