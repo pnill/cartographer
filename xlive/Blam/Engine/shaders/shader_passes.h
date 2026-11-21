@@ -5,10 +5,19 @@
 
 /* constants */
 
+enum
+{
+	SHADER_PASS_DEFINITION_TAG = 'spas',
+};
+
 #define k_maximum_implementations_per_shader_pass 32
 #define k_maximum_textures_per_shader_pass_implementation 8
 #define k_number_of_shader_texture_state_constants 10
 #define k_maximum_vertex_shader_constants_per_shader_pass_implementation 32
+
+/* macros */
+
+#define shader_pass_definition_get(index)	((struct s_shader_pass_definition*)tag_get(SHADER_PASS_DEFINITION_TAG, (index)))
 
 /* enums */
 

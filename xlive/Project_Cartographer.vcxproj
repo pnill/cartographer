@@ -2445,6 +2445,7 @@
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_targets.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_text.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_vertex_buffers.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_pixel_shaders.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_vertex_shaders.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_water.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_weather.cpp" />
@@ -2794,6 +2795,7 @@
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_targets.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_text.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_vertex_buffers.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_pixel_shaders.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_vertex_shaders.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_water.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_weather.h" />
