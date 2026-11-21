@@ -13,7 +13,8 @@
 #define k_bitmap_preview_buffer_size 524288u
 
 static const int custom_map_cache_signature = 'mpch';
-#define k_custom_map_data_cache_header_version (1)
+// 2: entries of maps the game validator rejected now carry the descriptions and maximum team counts (re-read old name only entries)
+#define k_custom_map_data_cache_header_version (2)
 
 enum e_directory_id
 {
@@ -29,7 +30,7 @@ struct s_custom_map_entry
 	wchar_t field_60[9][128];
 	// one header might have the compressed thumbnail, and the other the uncompressed one
 	uint8* preview_bitmap_header[2]; 
-	BYTE gap_968[16];
+	uint8 maximum_team_count[16]; // per game type, same order as s_multiplayer_ui_level_definition max_teams_*
 	LONGLONG preview_bitmap_id; // used for bitmap cache file
 	wchar_t file_path[k_map_file_path_size];
 	FILETIME file_time;
@@ -39,6 +40,7 @@ struct s_custom_map_entry
 #pragma pack(pop)
 static_assert(sizeof(s_custom_map_entry) == 0xB90);
 static_assert(offsetof(s_custom_map_entry, preview_bitmap_header) == 0x960);
+static_assert(offsetof(s_custom_map_entry, maximum_team_count) == 0x968);
 
 struct s_custom_map_entry_linked_list
 {

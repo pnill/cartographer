@@ -5,6 +5,7 @@
 #include "filesys/pc_file_system.h"
 #include "game/game_globals.h"
 #include "main/level_definitions.h"
+#include "main/levels.h"
 #include "networking/network_event.h"
 #include "scenario/scenario_definitions.h"
 #include "shell/shell.h"
@@ -217,44 +218,17 @@ static void map_slots_get_multiplayer_level_data(FILE* map_handle, s_multiplayer
 	ASSERT(map_handle);
 	ASSERT(multiplayer_level_data);
 
-	// Read cache header from map file
-	cache_file_header cache_header;
-	file_seek_and_read(map_handle, 0, sizeof(cache_file_header), 1, &cache_header);
-
-	// Read tags header from map file
-	cache_file_tags_header cache_file_tags_header;
-	file_seek_and_read(map_handle, cache_header.tag_offset, sizeof(cache_file_tags_header), 1, &cache_file_tags_header);
-
-	const uint32 active_map_instance_table_offset = cache_header.tag_offset + sizeof(s_tag_group_link) * cache_file_tags_header.tag_group_link_set_count + sizeof(cache_file_tags_header);
-
-	// Read the scenario instance from map file
-	cache_file_tag_instance scenario_instance;
-	file_seek_and_read(map_handle, active_map_instance_table_offset, sizeof(cache_file_tag_instance), 1, &scenario_instance);
-
-	// Scenario is the first tag in the tag data, so we can just go to the starting offset of tag data
-	const uint32 tag_data_offset = cache_header.tag_offset + cache_header.data_offset;
-	
-	// Get the offset of the level data block
-	const uint32 level_data_block_offset = tag_data_offset + offsetof(scenario, level_data);
-
-	// Read tag block of level data
-	s_tag_block tag_block;
-	file_seek_and_read(map_handle, level_data_block_offset, sizeof(tag_block), 1, &tag_block);
-
-	const uint32 level_data_offset = tag_data_offset + (tag_block.data - scenario_instance.data_offset);
-	const uint32 multiplayer_level_data_block_offset = level_data_offset + offsetof(s_scenario_level_data, multiplayer);
-
-	// Read tag block of multiplayer level data
-	file_seek_and_read(map_handle, multiplayer_level_data_block_offset, sizeof(tag_block), 1, &tag_block);
-
-	const uint32 multiplayer_level_data_offset = tag_data_offset + (tag_block.data - scenario_instance.data_offset);
-
-	// Read the multiplayer level data
-	file_seek_and_read(map_handle, multiplayer_level_data_offset, sizeof(s_multiplayer_ui_level_definition), 1, multiplayer_level_data);
+	if (!levels_read_multiplayer_level_data_from_map_file(map_handle, multiplayer_level_data))
+	{
+		event(_event_error, "h2mod:map_slots: Startup - Map file has no multiplayer level data");
+		return;
+	}
 
 	//Fix incase the maps level data is incorrectly setup
 	if (strlen(multiplayer_level_data->path) == 0)
 	{
+		cache_file_header cache_header;
+		file_seek_and_read(map_handle, 0, sizeof(cache_file_header), 1, &cache_header);
 		csstrncpy(multiplayer_level_data->path, cache_header.scenario_path, NUMBEROF(multiplayer_level_data->path));
 	}
 

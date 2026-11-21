@@ -4,6 +4,8 @@
 #include "cache/cache_files.h"
 #include "interface/signal_slot.h"
 #include "interface/user_interface_memory.h"
+#include "main/level_definitions.h"
+#include "main/levels.h"
 #include "memory/data.h"
 #include "multithreading/synchronization.h"
 #include "scenario/scenario_definitions.h"
@@ -20,6 +22,16 @@ static bool open_cache_header(const wchar_t* file_path, void* cache_header_ptr, 
 static void __cdecl close_cache_header(HANDLE* map_handle);
 
 static bool __cdecl validate_and_read_custom_map_data(s_custom_map_entry* custom_map_entry);
+
+static void custom_map_entry_read_level_data(s_custom_map_entry* custom_map_entry);
+
+static void custom_map_entry_set_descriptions(s_custom_map_entry* custom_map_entry, const s_ui_level_descriptions* level_descriptions);
+
+static void custom_map_description_copy_escaped(wchar_t* destination, uint32 destination_count, const wchar_t* source, uint32 source_count);
+
+static bool custom_map_text_is_valid(const wchar_t* text);
+
+static wchar_t custom_map_text_get_character(const wchar_t* text, uint32 index);
 
 
 void map_repository_apply_sapien_patches(void)
@@ -925,6 +937,9 @@ static bool __cdecl validate_and_read_custom_map_data(s_custom_map_entry* custom
 	wchar_t* file_name = custom_map_entry->file_path;
 	if (!open_cache_header(file_name, &header, &map_cache_handle))
 		return false;
+	// the header is a copy, release the file before any check can return
+	close_cache_header(&map_cache_handle);
+
 	if (header.header_signature != 'head' || header.footer_signature != 'foot' || header.file_size <= 0 || header.version != 8)
 	{
 		LOG_TRACE_FUNCW(L"\"{}\" has invalid header", file_name);
@@ -946,7 +961,6 @@ static bool __cdecl validate_and_read_custom_map_data(s_custom_map_entry* custom
 		return false;
 	}
 
-	close_cache_header(&map_cache_handle);
 	// needed because the game loads the human readable map name and description from scenario after checks
 	// without this the map is just called by it's file name
 
@@ -968,9 +982,126 @@ static bool __cdecl validate_and_read_custom_map_data(s_custom_map_entry* custom
 			fallback_name = full_file_name.substr(start != std::wstring::npos ? start : 0, full_file_name.find_last_not_of('.'));
 		}
 		wcsncpy_s(custom_map_entry->map_name, fallback_name.c_str(), fallback_name.length());
+
+		// The game fills the entry only when every check passed, the first being that the map uses the shared.map globals
+		// Maps with their own globals would otherwise be listed without description and with 0 maximum teams (no team changes)
+		// The name stays the fallback name: dedicated servers look up maps by this name (get_custom_map_list_ids_by_map_name)
+		custom_map_entry_read_level_data(custom_map_entry);
 	}
 	// load the map even if some of the checks failed, will still mostly work
 	return true;
+}
+
+static void custom_map_entry_read_level_data(s_custom_map_entry* custom_map_entry)
+{
+	FILE* map_handle = ufopen(custom_map_entry->file_path, L"rb");
+	if (map_handle == NULL)
+	{
+		return;
+	}
+
+	s_multiplayer_ui_level_definition level_data;
+	const bool level_data_read = levels_read_multiplayer_level_data_from_map_file(map_handle, &level_data);
+	ufclose(map_handle);
+
+	if (!level_data_read)
+	{
+		LOG_TRACE_FUNCW(L"\"{}\" has no multiplayer level data", custom_map_entry->file_path);
+		return;
+	}
+
+	// same copy as the game validator: the 16 maximum team counts, from max_teams_none on
+	static_assert(offsetof(s_multiplayer_ui_level_definition, max_teams_stub_15) - offsetof(s_multiplayer_ui_level_definition, max_teams_none) + 1 == sizeof(custom_map_entry->maximum_team_count));
+	csmemcpy(custom_map_entry->maximum_team_count, &level_data.max_teams_none, sizeof(custom_map_entry->maximum_team_count));
+
+	custom_map_entry_set_descriptions(custom_map_entry, &level_data.level_descriptions);
+	return;
+}
+
+// The descriptions are only used when all of them pass the same text checks as the game validator
+static void custom_map_entry_set_descriptions(s_custom_map_entry* custom_map_entry, const s_ui_level_descriptions* level_descriptions)
+{
+	static_assert(NUMBEROF(custom_map_entry->field_60) == NUMBEROF(level_descriptions->description));
+
+	wchar_t descriptions[NUMBEROF(custom_map_entry->field_60)][NUMBEROF(custom_map_entry->field_60[0])];
+	for (uint32 language = 0; language < NUMBEROF(descriptions); ++language)
+	{
+		custom_map_description_copy_escaped(
+			descriptions[language],
+			NUMBEROF(descriptions[language]),
+			level_descriptions->description[language],
+			NUMBEROF(level_descriptions->description[language]));
+
+		if (!custom_map_text_is_valid(descriptions[language]))
+		{
+			LOG_TRACE_FUNCW(L"\"{}\" has an invalid description", custom_map_entry->file_path);
+			return;
+		}
+	}
+
+	csmemcpy(custom_map_entry->field_60, descriptions, sizeof(descriptions));
+	return;
+}
+
+// Copies the text and escapes '|' as "||" the way the game validator does, the destination is always terminated
+static void custom_map_description_copy_escaped(wchar_t* destination, uint32 destination_count, const wchar_t* source, uint32 source_count)
+{
+	ASSERT(destination_count >= 2);
+
+	uint32 written = 0;
+	for (uint32 read = 0; read < source_count && written < destination_count; ++read)
+	{
+		if (source[read] == L'|')
+		{
+			if (written >= destination_count - 2)
+			{
+				break;
+			}
+			destination[written++] = L'|';
+		}
+		destination[written++] = source[read];
+	}
+
+	if (written < destination_count)
+	{
+		destination[written] = L'\0';
+	}
+	destination[destination_count - 1] = L'\0';
+	return;
+}
+
+// Same rules as the game validator: complete UTF-16 surrogate pairs, no control and no private use characters
+static bool custom_map_text_is_valid(const wchar_t* text)
+{
+	const uint32 length = (uint32)wcslen(text);
+	for (uint32 i = 0; i < length; ++i)
+	{
+		const wchar_t character = custom_map_text_get_character(text, i);
+		if (IS_LOW_SURROGATE(character))
+		{
+			return false;
+		}
+		if (IS_HIGH_SURROGATE(character))
+		{
+			if (++i >= length || !IS_LOW_SURROGATE(custom_map_text_get_character(text, i)))
+			{
+				return false;
+			}
+			continue;
+		}
+		if ((character >= 0xE000 && character <= 0xF8FF) || iswcntrl(character))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+// A text starting with a byte swapped byte order mark is read byte swapped, as the game does
+static wchar_t custom_map_text_get_character(const wchar_t* text, uint32 index)
+{
+	const wchar_t character = text[index];
+	return text[0] == 0xFFFE ? (wchar_t)_byteswap_ushort(character) : character;
 }
 
 // '50 map limit removal' region end
