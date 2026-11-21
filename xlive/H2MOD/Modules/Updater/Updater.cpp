@@ -8,7 +8,7 @@
 
 #include "main/main.h"
 
-static const char k_cartographer_update_ini_url[] = k_cartographer_url_http"/update1.ini";
+static const char k_cartographer_update_ini_url[] = k_cartographer_url_https"/update1.ini";
 
 char* g_auto_update_text = NULL;
 
@@ -88,7 +88,7 @@ int DownloadFile(const char* url, wchar_t* local_full_path) {
 	CURL *curl;
 	FILE *fp;
 	CURLcode res;
-	curl = curl_interface_init_no_verify();
+	curl = curl_interface_init_verified();
 	if (curl) {
 		CreateDirTree(local_full_path);
 		fp = ufopen(local_full_path, L"wb");
@@ -121,6 +121,72 @@ typedef struct {
 } UpdateFileEntry;
 
 std::vector<UpdateFileEntry*> UpdateFileEntries;
+
+static bool update_entry_local_name_valid(const char* name)
+{
+	if (name == nullptr || *name == '\0')
+		return false;
+
+	if (name[0] == '/' || name[0] == '\\')
+		return false;
+
+	for (const char* c = name; *c != '\0'; ++c)
+	{
+		const char ch = *c;
+		const bool valid =
+			(ch >= 'a' && ch <= 'z') ||
+			(ch >= 'A' && ch <= 'Z') ||
+			(ch >= '0' && ch <= '9') ||
+			ch == '.' || ch == '_' || ch == '/' || ch == '-';
+
+		if (!valid)
+			return false;
+
+		if (ch == '/')
+		{
+			const char* segment = c + 1;
+			if (segment[0] == '.' && segment[1] == '.' && (segment[2] == '/' || segment[2] == '\0'))
+				return false;
+			if (segment[0] == '.' && (segment[1] == '/' || segment[1] == '\0'))
+				return false;
+		}
+	}
+
+	return true;
+}
+
+static bool update_entry_server_uri_valid(const char* uri)
+{
+	if (uri == nullptr || *uri == '\0')
+		return false;
+
+	if (uri[0] == '/' || uri[0] == '\\')
+		return false;
+
+	for (const char* c = uri; *c != '\0'; ++c)
+	{
+		const char ch = *c;
+		const bool valid =
+			(ch >= 'a' && ch <= 'z') ||
+			(ch >= 'A' && ch <= 'Z') ||
+			(ch >= '0' && ch <= '9') ||
+			ch == '.' || ch == '_' || ch == '/' || ch == '-';
+
+		if (!valid)
+			return false;
+
+		if (ch == '/')
+		{
+			const char* segment = c + 1;
+			if (segment[0] == '.' && segment[1] == '.' && (segment[2] == '/' || segment[2] == '\0'))
+				return false;
+			if (segment[0] == '.' && (segment[1] == '/' || segment[1] == '\0'))
+				return false;
+		}
+	}
+
+	return true;
+}
 
 static void freeUpdateFileEntry(UpdateFileEntry* update_file_entry) {
 	free(update_file_entry->local_name);
@@ -185,7 +251,9 @@ static int interpretUpdateEntry(char* fileLine, char* version, int lineNumber) {
 		else if (strstr(fileLine, H2UpdateLocationsStr[2])) {
 			current_location_id = 2;
 		}
-		else if (sscanf_s(fileLine, "%[^=]=%zx=%s", &tempstr1, 260, &tempDWORD, &tempstr2, 260) == 3) {
+		else if (sscanf_s(fileLine, "%[^=]=%zx=%s", &tempstr1, 260, &tempDWORD, &tempstr2, 260) == 3
+			&& update_entry_local_name_valid(tempstr1)
+			&& update_entry_server_uri_valid(tempstr2)) {
 			
 			UpdateFileEntry* update_file_entry = (UpdateFileEntry*)malloc(sizeof(UpdateFileEntry));
 
@@ -419,7 +487,7 @@ bool DownloadUpdatedFiles() {
 			}
 			uremove(existingfilepath);
 			
-			c_static_string<1024> download_url(k_cartographer_url_http);
+			c_static_string<1024> download_url(k_cartographer_url_https);
 			download_url.append("/");
 			download_url.append(UpdateFileEntries[i]->server_uri);
 			DownloadFile(download_url.get_string(), existingfilepath);

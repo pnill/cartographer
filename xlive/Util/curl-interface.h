@@ -9,3 +9,4 @@
 
 CURL* curl_interface_init();
 CURL* curl_interface_init_no_verify();
+CURL* curl_interface_init_verified();
